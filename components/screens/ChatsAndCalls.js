@@ -40,6 +40,7 @@ const ChatsAndCall = (props) => {
                                     Name
                                     Languages
                                     Experience
+                                    Username
                                     ProfileImage {
                                         data {
                                             attributes {
@@ -610,7 +611,9 @@ const ChatsAndCall = (props) => {
                 <TouchableOpacity
                   activeOpacity={0.9}
                   onPress={() => {
-                    navigation.navigate("ChatUI");
+                    navigation.navigate("ChatUI", {
+                      userName: JSON.parse(selectedAstrologer).Username,
+                    });
                     setShowContactDialog(false);
                   }}
                 >
@@ -639,7 +642,9 @@ const ChatsAndCall = (props) => {
                 <TouchableOpacity
                   activeOpacity={0.9}
                   onPress={() => {
-                    navigation.navigate("ChatUI");
+                    navigation.navigate("ChatUI", {
+                      userName: JSON.parse(selectedAstrologer).Username,
+                    });
                     setShowContactDialog(false);
                   }}
                 >
