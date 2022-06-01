@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, StatusBar, ActivityIndicator } from "react-native";
 import { CometChat } from "@cometchat-pro/react-native-chat";
 import { CometChatMessages } from "../../CometChatWorkspace/src/index";
+import { RFPercentage } from "react-native-responsive-fontsize";
 
-export default function CometChatMessagesView({ navigation }) {
+export default function CometChatMessagesView({ route, navigation }) {
   const [localUser, setLocalUser] = useState(null);
   const [astrologerUser, setAstrologerUser] = useState(null);
 
@@ -39,7 +40,12 @@ export default function CometChatMessagesView({ navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
-      {localUser ? (
+      <StatusBar
+        translucent={true}
+        barStyle="dark-content"
+        backgroundColor={"transparent"}
+      />
+      {localUser && astrologerUser ? (
         <CometChatMessages
           type={"user"}
           item={astrologerUser} //The object will be of user or group depending on type
@@ -48,7 +54,18 @@ export default function CometChatMessagesView({ navigation }) {
             console.log(actionType);
           }}
         />
-      ) : null}
+      ) : (
+        <ActivityIndicator
+          color="#423b88"
+          size={RFPercentage(8)}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: RFPercentage(2),
+          }}
+        />
+      )}
     </View>
   );
 }

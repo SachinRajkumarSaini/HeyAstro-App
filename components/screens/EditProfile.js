@@ -5,34 +5,36 @@ import {
   ScrollView,
   TouchableOpacity,
   ToastAndroid,
-} from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import {Header, Image, Button, Input} from 'react-native-elements';
-import FileBase64 from '../helpers/FileBase64';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import DatePicker from 'react-native-date-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {FetchAPI, Fetch_API} from '../helpers/FetchInstance';
-import moment from 'moment';
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import { Header, Image, Button, Input } from "react-native-elements";
+import FileBase64 from "../helpers/FileBase64";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import DatePicker from "react-native-date-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FetchAPI, Fetch_API } from "../helpers/FetchInstance";
+import moment from "moment";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 
-const EditProfile = ({navigation}) => {
+const EditProfile = ({ navigation }) => {
   const [DOB, setDOB] = useState(new Date());
   const [showDOB, setShowDOB] = useState(false);
   const [TOB, setTOB] = useState(new Date());
   const [showTOB, setShowTOB] = useState(false);
-  const [fullName, setFullName] = useState('');
+  const [fullName, setFullName] = useState("");
   const [birthPlace, setBirthPlace] = useState({
-    Country: '',
-    State: '',
-    City: '',
+    Country: "",
+    State: "",
+    City: "",
   });
-  const [birthPincode, setBirthPincode] = useState('');
+  const [birthPincode, setBirthPincode] = useState("");
   const [location, setLocation] = useState();
 
   const fetchProfile = async () => {
     try {
-      const userId = await AsyncStorage.getItem('userId');
+      const userId = await AsyncStorage.getItem("userId");
       const fetchProfile = await FetchAPI({
         query: `
               query{
@@ -41,7 +43,6 @@ const EditProfile = ({navigation}) => {
                     attributes{
                     FullName,
                     DOB,
-                    TOB,
                     BirthPlacePincode,
                       BirthPlace{
                         City,
@@ -55,18 +56,20 @@ const EditProfile = ({navigation}) => {
         `,
       });
 
-      const birthDate = moment(
-        fetchProfile.data.usersPermissionsUser.data.attributes.DOB,
-      ).format('DD/MM/YYYY');
-      setDOB(new Date(birthDate));
+      setTOB(
+        new Date(fetchProfile.data.usersPermissionsUser.data.attributes.DOB)
+      );
+      setDOB(
+        new Date(fetchProfile.data.usersPermissionsUser.data.attributes.DOB)
+      );
       setFullName(
-        fetchProfile.data.usersPermissionsUser.data.attributes.FullName,
+        fetchProfile.data.usersPermissionsUser.data.attributes.FullName
       );
       setBirthPincode(
         JSON.stringify(
           fetchProfile.data.usersPermissionsUser.data.attributes
-            .BirthPlacePincode,
-        ),
+            .BirthPlacePincode
+        )
       );
       setBirthPlace({
         Country:
@@ -80,10 +83,9 @@ const EditProfile = ({navigation}) => {
       });
     } catch (error) {
       ToastAndroid.show(
-        'Something went wrong, Please try agiain later!',
-        ToastAndroid.SHORT,
+        "Something went wrong, Please try agiain later!",
+        ToastAndroid.SHORT
       );
-      console.log(error);
     }
   };
 
@@ -94,10 +96,10 @@ const EditProfile = ({navigation}) => {
         {
           pincode: parseInt(birthPincode),
         },
-        'POST',
+        "POST",
         {
-          'Content-Type': 'application/json',
-        },
+          "Content-Type": "application/json",
+        }
       );
       setLocation(gettingLocation);
       setBirthPlace({
@@ -106,14 +108,91 @@ const EditProfile = ({navigation}) => {
         City: gettingLocation.City,
       });
     } catch (error) {
-      console.log(error);
-      ToastAndroid.show('Pincode is not valid', ToastAndroid.SHORT);
+      ToastAndroid.show("Pincode is not valid", ToastAndroid.SHORT);
     }
   };
 
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  const updateProfile = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      let DateOfBirth = new Date(DOB);
+      DateOfBirth.setTime(TOB);
+      const updatingProfile = await FetchAPI({
+        query: `
+            mutation {
+              updateUsersPermissionsUser(
+                id: ${userId}
+                data: {
+                  FullName: ${JSON.stringify(fullName)},
+                  BirthPlacePincode: ${JSON.parse(birthPincode)},
+                  DOB: ${JSON.stringify(DateOfBirth.toISOString())}
+                  BirthPlace: { Country: ${JSON.stringify(
+                    birthPlace.Country
+                  )}, State: ${JSON.stringify(
+          birthPlace.State
+        )}, City: ${JSON.stringify(birthPlace.City)} }
+                }
+              ) {
+                data {
+                  attributes {
+                    updatedAt
+                  }
+                }
+              }
+            }
+        `,
+      });
+      if (updatingProfile.data.updateUsersPermissionsUser.data) {
+        ToastAndroid.show("Profile updated successfully!", ToastAndroid.SHORT);
+        navigation.navigate("Profile");
+      }
+    } catch (error) {
+      ToastAndroid.show(
+        "Something went wrong, Please try again later!",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
+  const updateProfileImage = async () => {
+    try {
+      const image = await launchImageLibrary();
+      const fileName = image.assets[0].fileName;
+      const fileType = image.assets[0].type;
+      const fileUri = image.assets[0].uri;
+
+      const formData = new FormData();
+      formData.append("files", {
+        name: JSON.stringify(fileName),
+        type: JSON.stringify(fileType),
+        uri: Platform.OS === "ios" ? fileUri.replace("file://", "") : fileUri,
+      });
+
+      fetch(`https://heyastro.tech/api/upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data;",
+        },
+      })
+        .then((response) => response.json())
+        .then((response) => {
+          console.log("response", response);
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    } catch (error) {
+      ToastAndroid.show(
+        "Something went wrong, Please try again later!",
+        ToastAndroid.SHORT
+      );
+    }
+  };
 
   useEffect(() => {
     if (birthPincode.length === 6) {
@@ -122,32 +201,32 @@ const EditProfile = ({navigation}) => {
   }, [birthPincode]);
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <StatusBar
         translucent={true}
         barStyle="light-content"
-        backgroundColor={'transparent'}
+        backgroundColor={"transparent"}
       />
       {/* Header Section */}
       <Header
-        statusBarProps={{backgroundColor: 'transparent'}}
+        statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: '#423b88',
+          backgroundColor: "#423b88",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
         centerComponent={{
-          text: 'Edit Profile',
+          text: "Edit Profile",
           style: {
-            color: '#fff',
+            color: "#fff",
             fontSize: RFPercentage(3.5),
-            fontFamily: 'Dongle-Regular',
+            fontFamily: "Dongle-Regular",
             marginTop: RFPercentage(0.5),
           },
         }}
         leftComponent={{
-          icon: 'arrow-back',
-          color: '#fff',
+          icon: "arrow-back",
+          color: "#fff",
           iconStyle: {
             marginLeft: RFPercentage(1),
             marginTop: RFPercentage(0.8),
@@ -156,67 +235,70 @@ const EditProfile = ({navigation}) => {
         }}
       />
 
-      <ScrollView style={{flex: 1}}>
-        <View style={{flex: 1}}>
+      <ScrollView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
           {/* Profile Photo */}
           <View
             style={{
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               margin: RFPercentage(2),
-            }}>
+            }}
+          >
             <Image
-              source={{uri: FileBase64.profileLogo}}
+              source={{ uri: FileBase64.profileLogo }}
               style={{
                 height: RFPercentage(12),
                 width: RFPercentage(12),
                 borderRadius: RFPercentage(6),
                 borderWidth: 1,
-                borderColor: 'black',
+                borderColor: "black",
               }}
             />
-            {/* <TouchableOpacity
-              onPress={() => console.log('Pressed')}
+            <TouchableOpacity
+              onPress={updateProfileImage}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 bottom: 0,
                 left: 208,
                 right: 140,
                 top: 69,
-                backgroundColor: 'white',
-                justifyContent: 'center',
-                alignItems: 'center',
+                backgroundColor: "white",
+                justifyContent: "center",
+                alignItems: "center",
                 borderRadius: RFPercentage(5),
                 padding: RFPercentage(1),
-              }}>
-              <AntDesign name="edit" color={'black'} size={15} />
-            </TouchableOpacity> */}
+              }}
+            >
+              <AntDesign name="edit" color={"black"} size={15} />
+            </TouchableOpacity>
           </View>
 
           {/* Profile Form */}
-          <View style={{margin: RFPercentage(0.5)}}>
+          <View style={{ margin: RFPercentage(0.5) }}>
             <View>
               <Text
                 style={{
-                  fontFamily: 'Ubuntu-Bold',
-                  color: '#767676',
+                  fontFamily: "Ubuntu-Bold",
+                  color: "#767676",
                   fontSize: RFPercentage(1.9),
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 12,
-                }}>
+                }}
+              >
                 Full Name
               </Text>
               <Input
                 inputStyle={{
-                  fontFamily: 'Ubuntu-Regular',
+                  fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
-                  color: '#4B4B4B',
+                  color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
                 value={fullName}
-                onChangeText={e => setFullName(e)}
-                inputContainerStyle={{borderBottomColor: '#423b88'}}
+                onChangeText={(e) => setFullName(e)}
+                inputContainerStyle={{ borderBottomColor: "#423b88" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Your Full Name"
               />
@@ -224,13 +306,14 @@ const EditProfile = ({navigation}) => {
             <View>
               <Text
                 style={{
-                  fontFamily: 'Ubuntu-Bold',
-                  color: '#767676',
+                  fontFamily: "Ubuntu-Bold",
+                  color: "#767676",
                   fontSize: RFPercentage(1.9),
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 12,
-                }}>
+                }}
+              >
                 Date of Birth
               </Text>
               <Input
@@ -238,12 +321,12 @@ const EditProfile = ({navigation}) => {
                 onChange={() => setShowDOB(true)}
                 value={DOB.toDateString()}
                 inputStyle={{
-                  fontFamily: 'Ubuntu-Regular',
+                  fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
-                  color: '#4B4B4B',
+                  color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
-                inputContainerStyle={{borderBottomColor: '#423b88'}}
+                inputContainerStyle={{ borderBottomColor: "#423b88" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Date of Birth"
               />
@@ -252,7 +335,7 @@ const EditProfile = ({navigation}) => {
                 mode="date"
                 open={showDOB}
                 date={DOB}
-                onConfirm={date => {
+                onConfirm={(date) => {
                   setShowDOB(false);
                   setDOB(date);
                 }}
@@ -264,38 +347,37 @@ const EditProfile = ({navigation}) => {
             <View>
               <Text
                 style={{
-                  fontFamily: 'Ubuntu-Bold',
-                  color: '#767676',
+                  fontFamily: "Ubuntu-Bold",
+                  color: "#767676",
                   fontSize: RFPercentage(1.9),
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 12,
-                }}>
+                }}
+              >
                 Time of Birth
               </Text>
               <Input
                 onFocus={() => setShowTOB(true)}
                 onChange={() => setShowTOB(true)}
-                value={TOB.toLocaleTimeString()}
+                value={moment(TOB).format("hh:mm a")}
                 inputStyle={{
-                  fontFamily: 'Ubuntu-Regular',
+                  fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
-                  color: '#4B4B4B',
+                  color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
-                inputContainerStyle={{borderBottomColor: '#423b88'}}
+                inputContainerStyle={{ borderBottomColor: "#423b88" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Time of Birth"
               />
-              <DatePicker
-                modal
+              <DateTimePickerModal
+                isVisible={showTOB}
                 mode="time"
-                open={showTOB}
                 date={TOB}
-                is24hourSource={false}
-                onConfirm={time => {
+                onConfirm={(time) => {
+                  setTOB(new Date(time));
                   setShowTOB(false);
-                  setTOB(time);
                 }}
                 onCancel={() => {
                   setShowTOB(false);
@@ -305,27 +387,28 @@ const EditProfile = ({navigation}) => {
             <View>
               <Text
                 style={{
-                  fontFamily: 'Ubuntu-Bold',
-                  color: '#767676',
+                  fontFamily: "Ubuntu-Bold",
+                  color: "#767676",
                   fontSize: RFPercentage(1.9),
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 12,
-                }}>
+                }}
+              >
                 Pin Code
               </Text>
               <Input
                 keyboardType="numeric"
                 maxLength={6}
                 value={birthPincode}
-                onChangeText={e => setBirthPincode(e)}
+                onChangeText={(e) => setBirthPincode(e)}
                 inputStyle={{
-                  fontFamily: 'Ubuntu-Regular',
+                  fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
-                  color: '#4B4B4B',
+                  color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
-                inputContainerStyle={{borderBottomColor: '#423b88'}}
+                inputContainerStyle={{ borderBottomColor: "#423b88" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Birth Place Pincode"
               />
@@ -334,30 +417,31 @@ const EditProfile = ({navigation}) => {
           <View>
             <Text
               style={{
-                fontFamily: 'Ubuntu-Bold',
-                color: '#767676',
+                fontFamily: "Ubuntu-Bold",
+                color: "#767676",
                 fontSize: RFPercentage(1.9),
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
                 left: 12,
-              }}>
+              }}
+            >
               Place of Birth
             </Text>
             <Input
               inputStyle={{
-                fontFamily: 'Ubuntu-Regular',
+                fontFamily: "Ubuntu-Regular",
                 fontSize: RFPercentage(1.8),
-                color: '#4B4B4B',
+                color: "#4B4B4B",
                 marginTop: RFPercentage(1.7),
               }}
               editable={false}
               selectTextOnFocus={false}
-              inputContainerStyle={{borderBottomColor: '#423b88'}}
+              inputContainerStyle={{ borderBottomColor: "#423b88" }}
               value={
                 birthPlace.City +
-                ', ' +
+                ", " +
                 birthPlace.State +
-                ', ' +
+                ", " +
                 birthPlace.Country
               }
               placeholderTextColor="#C8C8C8"
@@ -366,19 +450,20 @@ const EditProfile = ({navigation}) => {
           </View>
         </View>
       </ScrollView>
-      <View style={{backgroundColor: 'white'}}>
+      <View style={{ backgroundColor: "white" }}>
         <Button
-          title={'Submit'}
-          titleStyle={{fontFamily: 'Ubuntu-Regular'}}
+          title={"Submit"}
+          titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: '#423b88',
+            backgroundColor: "#423b88",
           }}
           containerStyle={{
-            width: '100%',
+            width: "100%",
             paddingVertical: RFPercentage(1),
             paddingHorizontal: RFPercentage(2),
           }}
+          onPress={updateProfile}
         />
       </View>
     </View>

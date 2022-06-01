@@ -23,7 +23,7 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
     zIndex: 5,
     alignItems: 'center',
-    marginTop: 35,
+    marginTop: 30,
   },
   backButtonContainer: {
     flexDirection: 'row',

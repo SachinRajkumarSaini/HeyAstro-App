@@ -17,6 +17,7 @@ import FileBase64 from "../helpers/FileBase64";
 import { FetchAPI } from "../helpers/FetchInstance";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ChatsAndCall = (props) => {
   const navigation = useNavigation();
@@ -41,13 +42,7 @@ const ChatsAndCall = (props) => {
                                     Languages
                                     Experience
                                     Username
-                                    ProfileImage {
-                                        data {
-                                            attributes {
-                                                url
-                                            }
-                                        }
-                                    }
+                                    ProfileImage
                                     ChargePerMinute
                                 }
                             }
@@ -62,27 +57,31 @@ const ChatsAndCall = (props) => {
       } else {
         const getAstrologers = await FetchAPI({
           query: `
-              query {
-                astrologers(filters:{ Category: { eq : ${JSON.stringify(
-                  category
-                )} }}) {
-                    data {
-                        attributes {
-                            Name
-                            Languages
-                            Experience
-                            ProfileImage {
-                                data {
-                                    attributes {
-                                        url
-                                    }
-                                }
-                            }
-                            ChargePerMinute
+                query {
+                  astrologers(
+                    filters: {
+                      or: [
+                        {
+                          Category: { eq: ${JSON.stringify(category)} }
+                        },
+                        {
+                          Category: { eq: "All" }
                         }
+                      ]
                     }
-                }
-              }              
+                  ) {
+                    data {
+                      attributes {
+                        Name
+                        Languages
+                        Experience
+                        Username
+                        ProfileImage
+                        ChargePerMinute           
+                      }
+                    }
+                  }
+                }                        
             `,
         });
         setAstrologers(
@@ -359,6 +358,44 @@ const ChatsAndCall = (props) => {
             />
           </Card>
         </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => setCategory("Family")}
+        >
+          <Card
+            containerStyle={{
+              borderRadius: RFPercentage(1),
+              width: RFPercentage(12.5),
+              height: RFPercentage(10.5),
+              borderColor: category === "Family" ? "#423b88" : "#e8e6ff",
+              ...style.shadow,
+            }}
+          >
+            <Text
+              style={{
+                color: "black",
+                textAlign: "center",
+                fontFamily: "Ubuntu-Regular",
+                fontSize: RFPercentage(1),
+                alignItems: "center",
+                position: "absolute",
+                left: -7,
+                top: -7,
+              }}
+            >
+              Family
+            </Text>
+            <Image
+              source={{ uri: FileBase64.categoryFamily }}
+              style={{
+                height: RFPercentage(7),
+                width: RFPercentage(7),
+                marginStart: RFPercentage(1),
+                marginTop: RFPercentage(0.5),
+              }}
+            />
+          </Card>
+        </TouchableOpacity>
       </ScrollView>
 
       <View style={{ flex: 5.3, backgroundColor: "#f3f2fc" }}>
@@ -387,7 +424,7 @@ const ChatsAndCall = (props) => {
                         <View style={{ justifyContent: "center" }}>
                           <Image
                             source={{
-                              uri: astrologer.ProfileImage.data.attributes.url,
+                              uri: astrologer.ProfileImage,
                             }}
                             style={{
                               height: 80,
@@ -544,8 +581,7 @@ const ChatsAndCall = (props) => {
               >
                 <Image
                   source={{
-                    uri: JSON.parse(selectedAstrologer).ProfileImage.data
-                      .attributes.url,
+                    uri: JSON.parse(selectedAstrologer).ProfileImage,
                   }}
                   style={{
                     height: 85,
@@ -641,9 +677,13 @@ const ChatsAndCall = (props) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={0.9}
-                  onPress={() => {
-                    navigation.navigate("ChatUI", {
-                      userName: JSON.parse(selectedAstrologer).Username,
+                  onPress={async () => {
+                    const userName = await AsyncStorage.getItem("userName");
+                    const astrologerId =
+                      JSON.parse(selectedAstrologer).Username;
+                    console.log(userName, astrologerId);
+                    navigation.navigate("VideoCall", {
+                      videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/chatwith/${astrologerId}`,
                     });
                     setShowContactDialog(false);
                   }}

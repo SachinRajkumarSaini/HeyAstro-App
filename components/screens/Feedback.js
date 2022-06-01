@@ -5,27 +5,27 @@ import {
   ScrollView,
   TextInput,
   ToastAndroid,
-} from 'react-native';
-import React, {useState} from 'react';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import {Header, Card, ListItem, Button} from 'react-native-elements';
-import {FetchAPI} from '../helpers/FetchInstance';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+} from "react-native";
+import React, { useState } from "react";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import { Header, Card, ListItem, Button } from "react-native-elements";
+import { FetchAPI } from "../helpers/FetchInstance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Feedback = ({navigation}) => {
+const Feedback = ({ navigation }) => {
   const [showFAQ, setShowFAQ] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [testimonial, setTestimonial] = useState('');
+  const [testimonial, setTestimonial] = useState("");
 
   const sendFeedback = async () => {
     try {
       setIsLoading(true);
-      const getUser = await AsyncStorage.getItem('userName');
+      const getUser = await AsyncStorage.getItem("userName");
       const giveFeedback = await FetchAPI({
         query: `
               mutation{
                 createFeedback(data:{Username:${JSON.stringify(
-                  getUser,
+                  getUser
                 )},Feedback:${JSON.stringify(testimonial)}}){
                   data{
                     attributes{
@@ -39,47 +39,47 @@ const Feedback = ({navigation}) => {
 
       if (giveFeedback.data) {
         if (giveFeedback.data.createFeedback.data.attributes.createdAt) {
-          ToastAndroid.show('Feedback sent successfully!', ToastAndroid.SHORT);
+          ToastAndroid.show("Feedback sent successfully!", ToastAndroid.SHORT);
           setIsLoading(false);
-          navigation.navigate('Settings');
+          navigation.navigate("Settings");
         }
       }
     } catch (error) {
       ToastAndroid.show(
-        'Something went wrong, Please try again later!',
-        ToastAndroid.SHORT,
+        "Something went wrong, Please try again later!",
+        ToastAndroid.SHORT
       );
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <StatusBar
         translucent={true}
         barStyle="light-content"
-        backgroundColor={'transparent'}
+        backgroundColor={"transparent"}
       />
       {/* Header Section */}
       <Header
-        statusBarProps={{backgroundColor: 'transparent'}}
+        statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: '#423b88',
+          backgroundColor: "#423b88",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
         centerComponent={{
-          text: 'Feedback',
+          text: "Feedback",
           style: {
-            color: '#fff',
+            color: "#fff",
             fontSize: RFPercentage(3.5),
-            fontFamily: 'Dongle-Regular',
+            fontFamily: "Dongle-Regular",
             marginTop: RFPercentage(0.5),
           },
         }}
         leftComponent={{
-          icon: 'arrow-back',
-          color: '#fff',
+          icon: "arrow-back",
+          color: "#fff",
           iconStyle: {
             marginLeft: RFPercentage(1),
             marginTop: RFPercentage(0.8),
@@ -88,19 +88,20 @@ const Feedback = ({navigation}) => {
         }}
       />
 
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Card containerStyle={{borderRadius: RFPercentage(1)}}>
-            <View style={{marginTop: RFPercentage(1)}}>
-              <Text style={{fontFamily: 'Ubuntu-Bold', color: 'black'}}>
+          <Card containerStyle={{ borderRadius: RFPercentage(1) }}>
+            <View style={{ marginTop: RFPercentage(1) }}>
+              <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
                 Feedback to the CEO Office!
               </Text>
               <Text
                 style={{
-                  fontFamily: 'Ubuntu-Regular',
-                  color: '#818181',
+                  fontFamily: "Ubuntu-Regular",
+                  color: "#818181",
                   marginTop: RFPercentage(0.8),
-                }}>
+                }}
+              >
                 Please share your honest feedback to help us improve
               </Text>
               <TextInput
@@ -108,11 +109,11 @@ const Feedback = ({navigation}) => {
                 editable
                 numberOfLines={6}
                 value={testimonial}
-                onChangeText={text => setTestimonial(text)}
+                onChangeText={(text) => setTestimonial(text)}
                 textAlignVertical="top"
                 style={{
                   borderWidth: 1,
-                  borderColor: '#818181',
+                  borderColor: "#818181",
                   borderRadius: RFPercentage(1),
                   padding: RFPercentage(1),
                   marginTop: RFPercentage(2),
@@ -121,15 +122,15 @@ const Feedback = ({navigation}) => {
               />
               <Button
                 onPress={sendFeedback}
-                title={'Submit'}
+                title={"Submit"}
                 loading={isLoading}
-                titleStyle={{fontFamily: 'Ubuntu-Regular'}}
+                titleStyle={{ fontFamily: "Ubuntu-Regular" }}
                 buttonStyle={{
                   borderRadius: RFPercentage(1),
-                  backgroundColor: '#423b88',
+                  backgroundColor: "#423b88",
                 }}
                 containerStyle={{
-                  width: '100%',
+                  width: "100%",
                   paddingTop: RFPercentage(2),
                   paddingHorizontal: RFPercentage(10),
                 }}

@@ -6,15 +6,15 @@ import {
   ToastAndroid,
   TouchableOpacity,
   ActivityIndicator,
-} from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import {Header, Card, SearchBar, Image} from 'react-native-elements';
-import FileBase64 from '../helpers/FileBase64';
-import {FetchAPI} from '../helpers/FetchInstance';
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import { Header, Card, SearchBar, Image } from "react-native-elements";
+import FileBase64 from "../helpers/FileBase64";
+import { FetchAPI } from "../helpers/FetchInstance";
 
-const Searching = ({navigation}) => {
-  const [search, setSearch] = useState('');
+const Searching = ({ navigation }) => {
+  const [search, setSearch] = useState("");
   const inputRef = React.useRef();
   setTimeout(() => inputRef.current.focus(), 100);
   const [astrologers, setAstrologers] = useState([]);
@@ -48,13 +48,13 @@ const Searching = ({navigation}) => {
               `,
       });
       setAstrologers(
-        getAstrologers.data.astrologers.data.map(item => item.attributes),
+        getAstrologers.data.astrologers.data.map((item) => item.attributes)
       );
       setIsLoading(false);
     } catch (error) {
       ToastAndroid.show(
-        'Something went wrong, Please try again later!',
-        ToastAndroid.SHORT,
+        "Something went wrong, Please try again later!",
+        ToastAndroid.SHORT
       );
       setIsLoading(false);
     }
@@ -72,7 +72,7 @@ const Searching = ({navigation}) => {
         query: `
                 query{
                     astrologers(filters:{Name:{containsi: ${JSON.stringify(
-                      search,
+                      search
                     )}}}){
                     data{
                         attributes{
@@ -94,45 +94,45 @@ const Searching = ({navigation}) => {
               `,
       });
       setAstrologers(
-        getAstrologer.data.astrologers.data.map(item => item.attributes),
+        getAstrologer.data.astrologers.data.map((item) => item.attributes)
       );
       setIsLoading(false);
     } catch (error) {
       ToastAndroid.show(
-        'Some error occured, Please try again later',
-        ToastAndroid.SHORT,
+        "Some error occured, Please try again later",
+        ToastAndroid.SHORT
       );
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <StatusBar
         translucent={true}
         barStyle="light-content"
-        backgroundColor={'transparent'}
+        backgroundColor={"transparent"}
       />
       {/* Header Section */}
       <Header
-        statusBarProps={{backgroundColor: 'transparent'}}
+        statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: '#423b88',
+          backgroundColor: "#423b88",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
         centerComponent={{
-          text: 'Search',
+          text: "Search",
           style: {
-            color: '#fff',
+            color: "#fff",
             fontSize: RFPercentage(3.5),
-            fontFamily: 'Dongle-Regular',
+            fontFamily: "Dongle-Regular",
             marginTop: RFPercentage(0.5),
           },
         }}
         leftComponent={{
-          icon: 'arrow-back',
-          color: '#fff',
+          icon: "arrow-back",
+          color: "#fff",
           iconStyle: {
             marginLeft: RFPercentage(1),
             marginTop: RFPercentage(0.8),
@@ -141,40 +141,40 @@ const Searching = ({navigation}) => {
         }}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1}}>
-        <View style={{flex: 1}}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
           {/* Search Bar */}
-          <View style={{marginTop: RFPercentage(1)}}>
+          <View style={{ marginTop: RFPercentage(1) }}>
             <SearchBar
               ref={inputRef}
               onEndEditing={searchAstrologer}
-              onChangeText={e => setSearch(e)}
+              onChangeText={(e) => setSearch(e)}
               returnKeyType="search"
               onClear={() => {
-                setSearch('');
+                setSearch("");
                 fetchAstrologers();
               }}
               value={search}
               inputContainerStyle={{
-                backgroundColor: 'white',
+                backgroundColor: "white",
                 height: RFPercentage(4),
               }}
               containerStyle={{
-                backgroundColor: 'white',
+                backgroundColor: "white",
                 borderRadius: RFPercentage(1),
                 margin: RFPercentage(1),
-                shadowColor: '#000',
-                shadowOffset: {width: 0, height: 1},
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.8,
                 shadowRadius: 2,
                 elevation: 5,
-                borderBottomColor: 'transparent',
-                borderTopColor: 'transparent',
+                borderBottomColor: "transparent",
+                borderTopColor: "transparent",
                 marginHorizontal: RFPercentage(2),
               }}
               inputStyle={{
-                color: 'black',
-                fontFamily: 'Ubuntu-Regular',
+                color: "black",
+                fontFamily: "Ubuntu-Regular",
                 fontSize: RFPercentage(1.8),
               }}
               placeholder="Search astrologers..."
@@ -182,24 +182,25 @@ const Searching = ({navigation}) => {
           </View>
           {isLoading && (
             <ActivityIndicator
-              style={{marginVertical: RFPercentage(1)}}
+              style={{ marginVertical: RFPercentage(1) }}
               size={RFPercentage(5)}
-              color={'#423b88'}
+              color={"#423b88"}
             />
           )}
           {/* Search Results */}
-          <View style={{paddingBottom: RFPercentage(3)}}>
+          <View style={{ paddingBottom: RFPercentage(3) }}>
             {astrologers &&
               astrologers.map((astrologer, index) => {
                 return (
                   <TouchableOpacity key={index} activeOpacity={0.9}>
-                    <Card containerStyle={{borderRadius: RFPercentage(1)}}>
+                    <Card containerStyle={{ borderRadius: RFPercentage(1) }}>
                       <View
                         style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                        }}>
-                        <View style={{justifyContent: 'center'}}>
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <View style={{ justifyContent: "center" }}>
                           <Image
                             source={{
                               uri: astrologer.ProfileImage.data.attributes.url,
@@ -209,68 +210,73 @@ const Searching = ({navigation}) => {
                               width: 80,
                               borderRadius: 40,
                               borderWidth: 1,
-                              borderColor: 'black',
+                              borderColor: "black",
                             }}
                           />
                         </View>
-                        <View style={{justifyContent: 'space-around'}}>
+                        <View style={{ justifyContent: "space-around" }}>
                           <Text
                             numberOfLines={1}
                             ellipsizeMode="tail"
                             style={{
-                              fontFamily: 'Ubuntu-Bold',
-                              color: 'black',
+                              fontFamily: "Ubuntu-Bold",
+                              color: "black",
                               fontSize: RFPercentage(1.5),
                               maxWidth: RFPercentage(19),
-                            }}>
+                            }}
+                          >
                             {astrologer.Name}
                           </Text>
                           <Text
                             numberOfLines={1}
                             ellipsizeMode="tail"
                             style={{
-                              fontFamily: 'Ubuntu-Regular',
-                              color: 'black',
+                              fontFamily: "Ubuntu-Regular",
+                              color: "black",
                               fontSize: RFPercentage(1.2),
                               maxWidth: RFPercentage(19),
-                            }}>
+                            }}
+                          >
                             {astrologer.Languages.Languages.map(
                               (language, index) => {
                                 return (
                                   <Text
                                     style={{
-                                      fontFamily: 'Ubuntu-Regular',
-                                      color: 'black',
+                                      fontFamily: "Ubuntu-Regular",
+                                      color: "black",
                                       fontSize: RFPercentage(1.2),
                                       maxWidth: RFPercentage(19),
                                     }}
-                                    key={index}>
+                                    key={index}
+                                  >
                                     {language}&nbsp;&nbsp;
                                   </Text>
                                 );
-                              },
+                              }
                             )}
                           </Text>
                           <Text
                             numberOfLines={1}
                             ellipsizeMode="tail"
                             style={{
-                              fontFamily: 'Ubuntu-Regular',
-                              color: 'black',
+                              fontFamily: "Ubuntu-Regular",
+                              color: "black",
                               fontSize: RFPercentage(1.2),
                               maxWidth: RFPercentage(19),
-                            }}>
+                            }}
+                          >
                             Experience:- {astrologer.Experience}
                           </Text>
                           <Text
                             numberOfLines={1}
                             ellipsizeMode="tail"
                             style={{
-                              fontFamily: 'Ubuntu-Regular',
-                              color: 'black',
+                              fontFamily: "Ubuntu-Regular",
+                              color: "black",
                               fontSize: RFPercentage(1.2),
                               maxWidth: RFPercentage(19),
-                            }}>
+                            }}
+                          >
                             Charges Per Minute:- {astrologer.ChargePerMinute}
                           </Text>
                         </View>
@@ -278,17 +284,19 @@ const Searching = ({navigation}) => {
                           <Card
                             containerStyle={{
                               borderRadius: RFPercentage(1),
-                              borderColor: 'green',
+                              borderColor: "green",
                               borderWidth: 1,
-                            }}>
+                            }}
+                          >
                             <Text
                               style={{
-                                color: 'green',
-                                fontFamily: 'Dongle-Regular',
+                                color: "green",
+                                fontFamily: "Dongle-Regular",
                                 fontSize: RFPercentage(2),
-                                textAlign: 'center',
-                                alignItems: 'center',
-                              }}>
+                                textAlign: "center",
+                                alignItems: "center",
+                              }}
+                            >
                               Chats
                             </Text>
                           </Card>

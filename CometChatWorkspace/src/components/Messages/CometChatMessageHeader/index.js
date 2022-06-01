@@ -2,7 +2,6 @@
 import React from 'react';
 import { MessageHeaderManager } from './controller';
 import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
-
 import { CometChatUserPresence, CometChatAvatar } from '../../Shared';
 import * as enums from '../../../utils/enums';
 import * as actions from '../../../utils/actions';
@@ -14,6 +13,8 @@ import detailPaneIcon from './resources/detailpane.png';
 import { logger } from '../../../utils/common';
 import { CometChat } from '@cometchat-pro/react-native-chat';
 import { CometChatContext } from '../../../utils/CometChatContext';
+import { RFPercentage } from 'react-native-responsive-fontsize';
+
 class CometChatMessageHeader extends React.Component {
   static contextType = CometChatContext;
   constructor(props) {
@@ -362,7 +363,7 @@ class CometChatMessageHeader extends React.Component {
           backgroundColor={'#f2f2f2'}
         />
         <View style={styles.headerContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => this.props.actionGenerated(actions.GO_BACK)}
             style={styles.backButtonContainer}>
             <Icon
@@ -370,7 +371,8 @@ class CometChatMessageHeader extends React.Component {
               size={32}
               color={this.props.theme.color.blue}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <View style={{ margin: RFPercentage(1.5) }} />
           <View style={styles.headerDetailContainer}>
             <View
               style={[

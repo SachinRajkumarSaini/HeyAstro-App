@@ -1,27 +1,33 @@
-import React, {useEffect, useState} from 'react';
-import {View, StatusBar, Text, ScrollView, ToastAndroid} from 'react-native';
-import {Header, Image, Card} from 'react-native-elements';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import FileBase64 from '../helpers/FileBase64';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import {FetchAPI, Fetch_API} from '../helpers/FetchInstance';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from "react";
+import { View, StatusBar, Text, ScrollView, ToastAndroid } from "react-native";
+import { Header, Image, Card } from "react-native-elements";
+import { RFPercentage } from "react-native-responsive-fontsize";
+import FileBase64 from "../helpers/FileBase64";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { FetchAPI, Fetch_API } from "../helpers/FetchInstance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  ProfileHoroscopePlaceholder,
+  ProfileHoroscopePredictionsPlaceholder,
+  ProfilePlaceholder,
+  ProfileImagePlaceholder,
+} from "../helpers/SkeletonPlaceholder";
 
-const Profile = ({navigation}) => {
+const Profile = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState({
-    Name: '',
+    Name: "",
     DOB: new Date(),
   });
   const [astrology, setAstrology] = useState({
-    zodiacSign: '',
+    zodiacSign: "",
     horoscope: new Object(),
-    quote: '',
+    quote: "",
   });
   const fetchProfile = async () => {
     try {
-      const userId = await AsyncStorage.getItem('userId');
+      const userId = await AsyncStorage.getItem("userId");
       const fetchProfile = await FetchAPI({
         query: `
               query{
@@ -39,13 +45,13 @@ const Profile = ({navigation}) => {
       setUserProfile({
         Name: fetchProfile.data.usersPermissionsUser.data.attributes.FullName,
         DOB: new Date(
-          fetchProfile.data.usersPermissionsUser.data.attributes.DOB,
+          fetchProfile.data.usersPermissionsUser.data.attributes.DOB
         ),
       });
     } catch (error) {
       ToastAndroid.show(
-        'Something went wrong, Please try agiain later!',
-        ToastAndroid.SHORT,
+        "Something went wrong, Please try agiain later!",
+        ToastAndroid.SHORT
       );
     }
   };
@@ -60,10 +66,10 @@ const Profile = ({navigation}) => {
           birthDay: day,
           birthMonth: month,
         },
-        'POST',
+        "POST",
         {
-          'Content-Type': 'application/json',
-        },
+          "Content-Type": "application/json",
+        }
       );
       setAstrology(
         {
@@ -73,12 +79,12 @@ const Profile = ({navigation}) => {
         },
         setTimeout(() => {
           setIsLoading(false);
-        }, 2000),
+        }, 2000)
       );
     } catch (error) {
       ToastAndroid.show(
-        'Something went wrong, Please try agiain later!',
-        ToastAndroid.SHORT,
+        "Something went wrong, Please try agiain later!",
+        ToastAndroid.SHORT
       );
       console.log(error);
     }
@@ -88,27 +94,27 @@ const Profile = ({navigation}) => {
     fetchHorocope();
   }, []);
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar
         translucent={true}
         barStyle="light-content"
-        backgroundColor={'transparent'}
+        backgroundColor={"transparent"}
       />
 
       {/* Header Section */}
       <Header
-        statusBarProps={{backgroundColor: 'transparent'}}
+        statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: '#423b88',
+          backgroundColor: "#423b88",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
         centerComponent={{
-          text: 'Profile',
+          text: "Profile",
           style: {
-            color: '#fff',
+            color: "#fff",
             fontSize: RFPercentage(3.5),
-            fontFamily: 'Dongle-Regular',
+            fontFamily: "Dongle-Regular",
             marginTop: RFPercentage(0.5),
           },
         }}
@@ -116,575 +122,692 @@ const Profile = ({navigation}) => {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Body Section */}
-        <View style={{margin: RFPercentage(1.5)}}>
+        <View style={{ margin: RFPercentage(1.5) }}>
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              flexDirection: "row",
+              justifyContent: "space-between",
               margin: RFPercentage(1),
-            }}>
-            <View>
-              <View style={{flexDirection: 'row'}}>
+            }}
+          >
+            {isLoading ? (
+              <ProfilePlaceholder />
+            ) : (
+              <View>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      color: "black",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2),
+                      margin: RFPercentage(0.5),
+                    }}
+                  >
+                    {userProfile.Name}
+                  </Text>
+                  <AntDesign
+                    name="edit"
+                    onPress={() => navigation.navigate("EditProfile")}
+                    style={{
+                      marginStart: RFPercentage(0.5),
+                      marginTop: RFPercentage(0.2),
+                      color: "black",
+                    }}
+                    size={18}
+                  />
+                </View>
                 <Text
                   style={{
-                    color: 'black',
-                    fontFamily: 'Ubuntu-Bold',
-                    fontSize: RFPercentage(2),
+                    color: "#818181",
+                    fontFamily: "Ubuntu-Regular",
+                    fontSize: RFPercentage(1.8),
                     margin: RFPercentage(0.5),
-                  }}>
-                  {userProfile.Name}
-                </Text>
-                <AntDesign
-                  name="edit"
-                  onPress={() => navigation.navigate('EditProfile')}
-                  style={{
-                    marginStart: RFPercentage(0.5),
-                    marginTop: RFPercentage(0.2),
-                    color: 'black',
                   }}
-                  size={18}
-                />
+                >
+                  {userProfile.DOB.toDateString()}
+                </Text>
+                <Text
+                  style={{
+                    color: "#818181",
+                    fontFamily: "Ubuntu-Regular",
+                    fontSize: RFPercentage(1.8),
+                    margin: RFPercentage(0.5),
+                  }}
+                >
+                  {astrology.zodiacSign.name}
+                </Text>
               </View>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.8),
-                  margin: RFPercentage(0.5),
-                }}>
-                {userProfile.DOB.toDateString()}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.8),
-                  margin: RFPercentage(0.5),
-                }}>
-                {astrology.zodiacSign.name}
-              </Text>
-            </View>
+            )}
 
-            <Image
-              source={{uri: FileBase64.profileLogo}}
-              style={{
-                height: RFPercentage(10),
-                width: RFPercentage(10),
-                borderRadius: RFPercentage(5),
-                borderWidth: 1,
-                borderColor: 'black',
-              }}
-            />
+            {isLoading ? (
+              <ProfileImagePlaceholder />
+            ) : (
+              <Image
+                source={{ uri: FileBase64.profileLogo }}
+                style={{
+                  height: RFPercentage(10),
+                  width: RFPercentage(10),
+                  borderRadius: RFPercentage(5),
+                  borderWidth: 1,
+                  borderColor: "black",
+                }}
+              />
+            )}
           </View>
         </View>
 
         <View
           style={{
             marginHorizontal: RFPercentage(2),
-            borderBottomColor: '#e1e1e1',
+            borderBottomColor: "#e1e1e1",
             borderBottomWidth: 1,
           }}
         />
 
-        <View style={{margin: RFPercentage(1.8)}}>
+        <View style={{ margin: RFPercentage(1.8) }}>
           <View>
             <Text
               style={{
-                color: 'black',
-                fontFamily: 'Ubuntu-Bold',
+                color: "black",
+                fontFamily: "Ubuntu-Bold",
                 fontSize: RFPercentage(2),
                 margin: RFPercentage(0.5),
-              }}>
+              }}
+            >
               Today Horoscope
             </Text>
-            <Text
-              style={{
-                color: '#818181',
-                fontFamily: 'Ubuntu-Regular',
-                fontSize: RFPercentage(1.8),
-                margin: RFPercentage(0.5),
-                marginTop: RFPercentage(1),
-              }}>
-              {!isLoading && astrology.horoscope.today.description}
-            </Text>
+            {isLoading ? (
+              <ProfileHoroscopePlaceholder />
+            ) : (
+              <Text
+                style={{
+                  color: "#818181",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.8),
+                  margin: RFPercentage(0.5),
+                  marginTop: RFPercentage(1),
+                }}
+              >
+                {astrology.horoscope.today.description}
+              </Text>
+            )}
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: RFPercentage(2),
-            }}>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
+          {isLoading ? (
+            <ProfileHoroscopePredictionsPlaceholder />
+          ) : (
+            <View>
+              <View
                 style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.today.lucky_number}
-              </Text>
-              <Text
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: RFPercentage(2),
+                }}
+              >
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.today.lucky_number}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.3),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Number
+                  </Text>
+                </Card>
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.today.color}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Color
+                  </Text>
+                </Card>
+              </View>
+              <View
                 style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.3),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Number
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.today.color}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Color
-              </Text>
-            </Card>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.today.lucky_time}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Time
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.today.mood}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Mood
-              </Text>
-            </Card>
-          </View>
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.today.lucky_time}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Time
+                  </Text>
+                </Card>
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.today.mood}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Mood
+                  </Text>
+                </Card>
+              </View>
+            </View>
+          )}
         </View>
 
-        <View style={{margin: RFPercentage(1.8)}}>
+        <View style={{ margin: RFPercentage(1.8) }}>
           <View>
             <Text
               style={{
-                color: 'black',
-                fontFamily: 'Ubuntu-Bold',
+                color: "black",
+                fontFamily: "Ubuntu-Bold",
                 fontSize: RFPercentage(2),
                 margin: RFPercentage(0.5),
-              }}>
+              }}
+            >
               Yesterday Horoscope
             </Text>
-            <Text
-              style={{
-                color: '#818181',
-                fontFamily: 'Ubuntu-Regular',
-                fontSize: RFPercentage(1.8),
-                margin: RFPercentage(0.5),
-                marginTop: RFPercentage(1),
-              }}>
-              {!isLoading && astrology.horoscope.yesterday.description}
-            </Text>
+            {isLoading ? (
+              <ProfileHoroscopePlaceholder />
+            ) : (
+              <Text
+                style={{
+                  color: "#818181",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.8),
+                  margin: RFPercentage(0.5),
+                  marginTop: RFPercentage(1),
+                }}
+              >
+                {astrology.horoscope.yesterday.description}
+              </Text>
+            )}
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: RFPercentage(2),
-            }}>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
+          {isLoading ? (
+            <ProfileHoroscopePredictionsPlaceholder />
+          ) : (
+            <View>
+              <View
                 style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.yesterday.lucky_number}
-              </Text>
-              <Text
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: RFPercentage(2),
+                }}
+              >
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.yesterday.lucky_number}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.3),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Number
+                  </Text>
+                </Card>
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.yesterday.color}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Color
+                  </Text>
+                </Card>
+              </View>
+              <View
                 style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.3),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Number
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.yesterday.color}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Color
-              </Text>
-            </Card>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.yesterday.lucky_time}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Time
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.yesterday.mood}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Mood
-              </Text>
-            </Card>
-          </View>
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.yesterday.lucky_time}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Time
+                  </Text>
+                </Card>
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.yesterday.mood}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Mood
+                  </Text>
+                </Card>
+              </View>
+            </View>
+          )}
         </View>
 
-        <View style={{margin: RFPercentage(1.8)}}>
+        <View style={{ margin: RFPercentage(1.8) }}>
           <View>
             <Text
               style={{
-                color: 'black',
-                fontFamily: 'Ubuntu-Bold',
+                color: "black",
+                fontFamily: "Ubuntu-Bold",
                 fontSize: RFPercentage(2),
                 margin: RFPercentage(0.5),
-              }}>
+              }}
+            >
               Tomorrow Horoscope
             </Text>
-            <Text
-              style={{
-                color: '#818181',
-                fontFamily: 'Ubuntu-Regular',
-                fontSize: RFPercentage(1.8),
-                margin: RFPercentage(0.5),
-                marginTop: RFPercentage(1),
-              }}>
-              {!isLoading && astrology.horoscope.tomorrow.description}
-            </Text>
+            {isLoading ? (
+              <ProfileHoroscopePlaceholder />
+            ) : (
+              <Text
+                style={{
+                  color: "#818181",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.8),
+                  margin: RFPercentage(0.5),
+                  marginTop: RFPercentage(1),
+                }}
+              >
+                {astrology.horoscope.tomorrow.description}
+              </Text>
+            )}
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: RFPercentage(2),
-            }}>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
+
+          {isLoading ? (
+            <ProfileHoroscopePredictionsPlaceholder />
+          ) : (
+            <View>
+              <View
                 style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.tomorrow.lucky_number}
-              </Text>
-              <Text
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: RFPercentage(2),
+                }}
+              >
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.tomorrow.lucky_number}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.3),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Number
+                  </Text>
+                </Card>
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.tomorrow.color}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Color
+                  </Text>
+                </Card>
+              </View>
+              <View
                 style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.3),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Number
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.tomorrow.color}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Color
-              </Text>
-            </Card>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.tomorrow.lucky_time}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Lucky Time
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                borderRadius: RFPercentage(1),
-                width: RFPercentage(15),
-                maxHeight: RFPercentage(15),
-              }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={{
-                  color: 'black',
-                  textAlign: 'center',
-                  fontFamily: 'Ubuntu-Bold',
-                  fontSize: RFPercentage(2.3),
-                  alignItems: 'center',
-                }}>
-                {!isLoading && astrology.horoscope.tomorrow.mood}
-              </Text>
-              <Text
-                style={{
-                  color: '#818181',
-                  fontFamily: 'Ubuntu-Regular',
-                  fontSize: RFPercentage(1.5),
-                  margin: RFPercentage(0.5),
-                  marginTop: RFPercentage(1),
-                  textAlign: 'center',
-                }}>
-                Mood
-              </Text>
-            </Card>
-          </View>
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.tomorrow.lucky_time}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Lucky Time
+                  </Text>
+                </Card>
+                <Card
+                  containerStyle={{
+                    borderRadius: RFPercentage(1),
+                    width: RFPercentage(15),
+                    maxHeight: RFPercentage(15),
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{
+                      color: "black",
+                      textAlign: "center",
+                      fontFamily: "Ubuntu-Bold",
+                      fontSize: RFPercentage(2.3),
+                      alignItems: "center",
+                    }}
+                  >
+                    {astrology.horoscope.tomorrow.mood}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Ubuntu-Regular",
+                      fontSize: RFPercentage(1.5),
+                      margin: RFPercentage(0.5),
+                      marginTop: RFPercentage(1),
+                      textAlign: "center",
+                    }}
+                  >
+                    Mood
+                  </Text>
+                </Card>
+              </View>
+            </View>
+          )}
         </View>
 
-        <View style={{margin: RFPercentage(2), marginBottom: RFPercentage(10)}}>
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              backgroundColor: '#423b88',
-              padding: RFPercentage(4),
-            }}>
-            <Text
+        <View style={{ margin: RFPercentage(1.8) }}>
+          {isLoading ? (
+            <ProfileHoroscopePlaceholder />
+          ) : (
+            <View
               style={{
-                fontFamily: 'Ubuntu-Bold',
-                fontSize: RFPercentage(2.2),
-                textAlign: 'center',
-                color: 'white',
-              }}>
-              Quote of the day
-            </Text>
-            <Text
-              style={{
-                color: 'black',
-                textAlign: 'center',
-                fontFamily: 'Ubuntu-Regular',
-                marginTop: RFPercentage(1.5),
-                fontSize: RFPercentage(2),
-                alignItems: 'center',
-                color: 'white',
-              }}>
-              "{astrology.quote.quote}"
-            </Text>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontFamily: 'Dongle-Regular',
-                marginTop: RFPercentage(1),
-                fontSize: RFPercentage(1.8),
-                color: 'white',
-              }}>
-              ~{astrology.quote.author}
-            </Text>
-          </Card>
+                margin: RFPercentage(2),
+              }}
+            >
+              <Card
+                containerStyle={{
+                  borderRadius: RFPercentage(1),
+                  backgroundColor: "#423b88",
+                  padding: RFPercentage(4),
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Ubuntu-Bold",
+                    fontSize: RFPercentage(2.2),
+                    textAlign: "center",
+                    color: "white",
+                  }}
+                >
+                  Quote of the day
+                </Text>
+                <Text
+                  style={{
+                    color: "black",
+                    textAlign: "center",
+                    fontFamily: "Ubuntu-Regular",
+                    marginTop: RFPercentage(1.5),
+                    fontSize: RFPercentage(2),
+                    alignItems: "center",
+                    color: "white",
+                  }}
+                >
+                  "{astrology.quote.quote}"
+                </Text>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "Dongle-Regular",
+                    marginTop: RFPercentage(1),
+                    fontSize: RFPercentage(1.8),
+                    color: "white",
+                  }}
+                >
+                  ~{astrology.quote.author}
+                </Text>
+              </Card>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>

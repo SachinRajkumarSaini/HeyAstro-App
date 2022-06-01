@@ -18,6 +18,10 @@ import { FlatListSlider } from "react-native-flatlist-slider";
 import { FetchAPI } from "../helpers/FetchInstance";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  HomeLatestPlaceholder,
+  HomeCarouselPlaceholder,
+} from "../helpers/SkeletonPlaceholder";
 
 const Home = ({ navigation }) => {
   const width = Dimensions.get("window").width;
@@ -26,6 +30,8 @@ const Home = ({ navigation }) => {
   const [blogs, setBlogs] = useState([]);
   const [videos, setVideos] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
+  const [userBalance, setUserBalance] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -156,6 +162,26 @@ const Home = ({ navigation }) => {
       setTestimonials(
         getTestimonails.data.testimonials.data.map((item) => item.attributes)
       );
+
+      // getBalance
+      const userId = await AsyncStorage.getItem("userId");
+      const getBalance = await FetchAPI({
+        query: `
+        query{
+          usersPermissionsUser(id: ${userId}){
+            data{
+              attributes{
+                Balance
+              }
+            }
+          }
+        }
+        `,
+      });
+      setUserBalance(
+        getBalance.data.usersPermissionsUser.data.attributes.Balance
+      );
+      setIsLoading(false);
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
@@ -187,10 +213,23 @@ const Home = ({ navigation }) => {
           text: "HeyAstro",
           style: {
             color: "#fff",
-            fontSize: RFPercentage(3.5),
+            fontSize: RFPercentage(4.5),
             fontFamily: "Dongle-Regular",
             marginTop: RFPercentage(0.5),
           },
+        }}
+        rightComponent={{
+          icon: "account-balance-wallet",
+          color: "#fff",
+          size: RFPercentage(3.5),
+          iconStyle: {
+            paddingEnd: RFPercentage(1.5),
+            paddingTop: RFPercentage(1.5),
+          },
+          onPress: () =>
+            navigation.navigate("Wallet", {
+              balance: userBalance,
+            }),
         }}
       />
 
@@ -371,7 +410,9 @@ const Home = ({ navigation }) => {
           <View
             style={{ margin: RFPercentage(2), borderRadius: RFPercentage(2) }}
           >
-            {carousels.length != 0 && (
+            {isLoading ? (
+              <HomeCarouselPlaceholder />
+            ) : carousels.length != 0 ? (
               <FlatListSlider
                 data={carousels}
                 imageKey={"url"}
@@ -383,7 +424,7 @@ const Home = ({ navigation }) => {
                 indicatorActiveWidth={15}
                 animation
               />
-            )}
+            ) : null}
           </View>
 
           {/* Astrologer Talk */}
@@ -414,7 +455,9 @@ const Home = ({ navigation }) => {
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             >
-              {blogs &&
+              {isLoading ? (
+                <HomeLatestPlaceholder />
+              ) : (
                 blogs.map((blog, index) => {
                   const date = new Date(blog.attributes.createdAt);
                   return (
@@ -466,7 +509,8 @@ const Home = ({ navigation }) => {
                       </Card>
                     </TouchableOpacity>
                   );
-                })}
+                })
+              )}
             </ScrollView>
           </View>
 
@@ -486,7 +530,9 @@ const Home = ({ navigation }) => {
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             >
-              {videos &&
+              {isLoading ? (
+                <HomeLatestPlaceholder />
+              ) : (
                 videos.map((video, index) => {
                   const date = new Date(video.createdAt);
                   return (
@@ -538,7 +584,8 @@ const Home = ({ navigation }) => {
                       </Card>
                     </TouchableOpacity>
                   );
-                })}
+                })
+              )}
             </ScrollView>
           </View>
 
@@ -560,7 +607,9 @@ const Home = ({ navigation }) => {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
             >
-              {testimonials &&
+              {isLoading ? (
+                <HomeLatestPlaceholder />
+              ) : (
                 testimonials.map((testimonial, index) => {
                   return (
                     <View
@@ -644,8 +693,133 @@ const Home = ({ navigation }) => {
                       </Card>
                     </View>
                   );
-                })}
+                })
+              )}
             </ScrollView>
+          </View>
+
+          {/* Footer */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              marginBottom: RFPercentage(1),
+            }}
+          >
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Card
+                containerStyle={{
+                  borderRadius: RFPercentage(10),
+                  height: RFPercentage(10),
+                  width: RFPercentage(10),
+                  borderRadius: RFPercentage(5),
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={{
+                    uri: FileBase64.privacyIcon,
+                  }}
+                  style={{
+                    height: RFPercentage(6.5),
+                    width: RFPercentage(6.5),
+                  }}
+                />
+              </Card>
+              <Text
+                style={{
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.5),
+                  marginTop: RFPercentage(1),
+                  marginStart: RFPercentage(1),
+                  textAlign: "center",
+                }}
+              >
+                Privacy & {"\n"}Confidential
+              </Text>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Card
+                containerStyle={{
+                  borderRadius: RFPercentage(10),
+                  height: RFPercentage(10),
+                  width: RFPercentage(10),
+                  borderRadius: RFPercentage(5),
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={{
+                    uri: FileBase64.verifiedAstrologers,
+                  }}
+                  style={{
+                    height: RFPercentage(7),
+                    width: RFPercentage(7),
+                  }}
+                />
+              </Card>
+              <Text
+                style={{
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.5),
+                  marginTop: RFPercentage(1),
+                  marginStart: RFPercentage(1),
+                  textAlign: "center",
+                }}
+              >
+                Verified {"\n"}Astrologers
+              </Text>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Card
+                containerStyle={{
+                  borderRadius: RFPercentage(10),
+                  height: RFPercentage(10),
+                  width: RFPercentage(10),
+                  borderRadius: RFPercentage(5),
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={{
+                    uri: FileBase64.securedPayments,
+                  }}
+                  style={{
+                    height: RFPercentage(6.5),
+                    width: RFPercentage(6.5),
+                  }}
+                />
+              </Card>
+              <Text
+                style={{
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.5),
+                  marginTop: RFPercentage(1),
+                  marginStart: RFPercentage(1),
+                  textAlign: "center",
+                }}
+              >
+                Secure {"\n"}Payments
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>

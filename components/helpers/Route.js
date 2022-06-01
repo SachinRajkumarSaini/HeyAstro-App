@@ -32,6 +32,7 @@ import Login from "../screens/Login";
 import Signup from "../screens/Signup";
 import Blog from "../screens/Blog";
 import EmbbedPlayer from "./EmbbedPlayer";
+import VideoCall from "../screens/VideoCall";
 import CometChatUIView from "../screens/ChatUI";
 import {
   CometChatUI,
@@ -57,6 +58,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Blogs" component={Blogs} />
         <Stack.Screen name="Blog" component={Blog} />
         <Stack.Screen name="EmbbedPlayer" component={EmbbedPlayer} />
+        <Stack.Screen name="VideoCall" component={VideoCall} />
         <Stack.Screen name="MoreSettings" component={MoreSettings} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="ChatUI" component={CometChatUIView} />
@@ -127,7 +129,7 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "black" : "#748c94",
+                  tintColor: focused ? "blue" : "black",
                 }}
               />
             </View>
@@ -148,7 +150,7 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "black" : "#748c94",
+                  tintColor: focused ? "blue" : "black",
                 }}
               />
             </View>
@@ -169,7 +171,7 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "black" : "#748c94",
+                  tintColor: focused ? "blue" : "black",
                 }}
               />
             </View>
@@ -190,7 +192,7 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "black" : "#748c94",
+                  tintColor: focused ? "blue" : "black",
                 }}
               />
             </View>
@@ -211,7 +213,7 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "black" : "#748c94",
+                  tintColor: focused ? "blue" : "black",
                 }}
               />
             </View>
