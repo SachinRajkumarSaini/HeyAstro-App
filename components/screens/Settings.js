@@ -24,9 +24,9 @@ import Foundation from "react-native-vector-icons/Foundation";
 import { FetchAPI } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Settings = ({ navigation }) => {
+const Settings = ({ route, navigation }) => {
   const [settings, setSettings] = useState();
-  const [balance, setBalance] = useState();
+  const [balance, setBalance] = useState(0);
   const customShare = () => {
     try {
       const ShareOptions = {
@@ -339,13 +339,7 @@ const Settings = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Wallet", {
-                    balance: balance,
-                  })
-                }
-              >
+              <TouchableOpacity onPress={() => navigation.navigate("Wallet")}>
                 <View
                   style={{
                     flexDirection: "row",
@@ -384,7 +378,7 @@ const Settings = ({ navigation }) => {
                         color: "#818181",
                       }}
                     >
-                      {balance}
+                      {route.params ? route.params.balance : balance}
                     </Text>
                     <FontAwesome5
                       color={"#818181"}
@@ -664,7 +658,7 @@ const Settings = ({ navigation }) => {
                 color: "green",
               }}
             >
-              Version {settings && settings.Version}
+              Version {settings ? settings.Version : parseFloat(0.0).toFixed(1)}
             </Text>
           </View>
         </View>

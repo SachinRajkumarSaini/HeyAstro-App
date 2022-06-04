@@ -99,6 +99,7 @@ const HelpAndSupport = ({ navigation }) => {
                   fontFamily: "Dongle-Regular",
                   fontSize: RFPercentage(2.5),
                   marginTop: RFPercentage(1),
+                  color: "black",
                 }}
               >
                 Help and Support
@@ -108,6 +109,7 @@ const HelpAndSupport = ({ navigation }) => {
                   fontFamily: "Dongle-Regular",
                   fontSize: RFPercentage(2),
                   marginTop: RFPercentage(1),
+                  color: "black",
                 }}
               >
                 If you have any questions, please contact us at:
@@ -118,6 +120,7 @@ const HelpAndSupport = ({ navigation }) => {
                   fontFamily: "Dongle-Regular",
                   fontSize: RFPercentage(2),
                   marginTop: RFPercentage(1),
+                  color: "black",
                 }}
               >
                 We will be happy to help you.

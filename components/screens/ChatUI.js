@@ -50,6 +50,7 @@ export default function CometChatMessagesView({ route, navigation }) {
           type={"user"}
           item={astrologerUser} //The object will be of user or group depending on type
           loggedInUser={localUser}
+          navigation={navigation}
           actionGenerated={(actionType) => {
             console.log(actionType);
           }}

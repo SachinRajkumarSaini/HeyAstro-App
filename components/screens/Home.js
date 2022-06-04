@@ -30,7 +30,6 @@ const Home = ({ navigation }) => {
   const [blogs, setBlogs] = useState([]);
   const [videos, setVideos] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
-  const [userBalance, setUserBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useFocusEffect(
@@ -162,31 +161,13 @@ const Home = ({ navigation }) => {
       setTestimonials(
         getTestimonails.data.testimonials.data.map((item) => item.attributes)
       );
-
-      // getBalance
-      const userId = await AsyncStorage.getItem("userId");
-      const getBalance = await FetchAPI({
-        query: `
-        query{
-          usersPermissionsUser(id: ${userId}){
-            data{
-              attributes{
-                Balance
-              }
-            }
-          }
-        }
-        `,
-      });
-      setUserBalance(
-        getBalance.data.usersPermissionsUser.data.attributes.Balance
-      );
       setIsLoading(false);
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
         ToastAndroid.SHORT
       );
+      console.log(error);
     }
   };
 
@@ -226,10 +207,7 @@ const Home = ({ navigation }) => {
             paddingEnd: RFPercentage(1.5),
             paddingTop: RFPercentage(1.5),
           },
-          onPress: () =>
-            navigation.navigate("Wallet", {
-              balance: userBalance,
-            }),
+          onPress: () => navigation.navigate("Wallet"),
         }}
       />
 

@@ -15,39 +15,41 @@ import TextInput from "react-native-text-input-interactive";
 import { Button } from "@rneui/themed";
 import { FetchAPI } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { WalletTransactionPlaceholder } from "../helpers/SkeletonPlaceholder";
+import {
+  WalletTransactionPlaceholder,
+  WalletBalancePlaceholder,
+} from "../helpers/SkeletonPlaceholder";
+import moment from "moment";
 
 const Wallet = ({ route, navigation }) => {
   const [showAddBalance, setShowAddBalance] = useState(false);
   const [amount, setAmount] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [balance, setBalance] = useState(0);
 
-  const fetchTransactions = async () => {
+  const fetchWallet = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      const getTransactions = await FetchAPI({
+      const getWallet = await FetchAPI({
         query: `
                 query {
                   usersPermissionsUser(id: ${JSON.stringify(userId)}) {
                     data {
                       attributes {
-                        Transactions {
-                          Razorpay_Order_Id
-                          Amount
-                          Success
-                        }
+                        Transactions
+                        Balance
                       }
                     }
                   }
                 }
         `,
       });
+      setBalance(getWallet.data.usersPermissionsUser.data.attributes.Balance);
       setTransactions(
-        getTransactions.data.usersPermissionsUser.data.attributes.Transactions,
+        getWallet.data.usersPermissionsUser.data.attributes.Transactions,
         setIsLoading(false)
       );
-      console.log(transactions);
     } catch (error) {
       ToastAndroid.show(
         "Some error occured, Please try again later",
@@ -57,7 +59,7 @@ const Wallet = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    fetchTransactions();
+    fetchWallet();
   }, []);
 
   return (
@@ -130,16 +132,20 @@ const Wallet = ({ route, navigation }) => {
                   size={20}
                   style={{ marginTop: RFPercentage(0.5) }}
                 />
-                <Text
-                  style={{
-                    fontFamily: "Ubuntu-Bold",
-                    color: "black",
-                    marginStart: RFPercentage(0.5),
-                    fontSize: RFPercentage(2.5),
-                  }}
-                >
-                  {route.params.balance}
-                </Text>
+                {isLoading ? (
+                  <WalletBalancePlaceholder />
+                ) : (
+                  <Text
+                    style={{
+                      fontFamily: "Ubuntu-Bold",
+                      color: "black",
+                      marginStart: RFPercentage(0.5),
+                      fontSize: RFPercentage(2.5),
+                    }}
+                  >
+                    {balance}
+                  </Text>
+                )}
               </View>
             </View>
             <TouchableOpacity
@@ -201,19 +207,12 @@ const Wallet = ({ route, navigation }) => {
           <View style={{ paddingBottom: RFPercentage(3) }}>
             {isLoading ? (
               <WalletTransactionPlaceholder />
-            ) : transactions.length === 0 ? (
-              <Text
-                style={{
-                  fontFamily: "Dongle-Regular",
-                  fontSize: RFPercentage(3),
-                  textAlign: "center",
-                  marginTop: RFPercentage(5),
-                }}
-              >
-                No Transactions
-              </Text>
-            ) : (
+            ) : transactions ? (
               transactions.map((transaction, index) => {
+                const date = new Date(JSON.parse(transaction.DateAndTime));
+                const formattedDate = moment(date).format(
+                  "DD MMM YYYY hh:mm A"
+                );
                 return (
                   <Card
                     key={index}
@@ -243,7 +242,7 @@ const Wallet = ({ route, navigation }) => {
                             fontSize: RFPercentage(1.3),
                           }}
                         >
-                          Date And Time
+                          {formattedDate}
                         </Text>
                         <Text
                           style={{
@@ -252,7 +251,11 @@ const Wallet = ({ route, navigation }) => {
                             fontSize: RFPercentage(1.3),
                           }}
                         >
-                          {transaction.Razorpay_Order_Id}
+                          {
+                            JSON.parse(transaction.Razorpay_Order_Id).split(
+                              "_"
+                            )[1]
+                          }
                         </Text>
                       </View>
                       <View>
@@ -312,6 +315,18 @@ const Wallet = ({ route, navigation }) => {
                   </Card>
                 );
               })
+            ) : (
+              <Text
+                style={{
+                  fontFamily: "Dongle-Regular",
+                  fontSize: RFPercentage(3),
+                  textAlign: "center",
+                  marginTop: RFPercentage(5),
+                  color: "black",
+                }}
+              >
+                No Transactions
+              </Text>
             )}
           </View>
         </ScrollView>
@@ -363,7 +378,7 @@ const Wallet = ({ route, navigation }) => {
               onPress={() => {
                 navigation.navigate("PaymentInformation", {
                   Amount: amount,
-                  Balance: route.params.balance,
+                  Balance: balance,
                   Transactions: transactions,
                 });
                 setShowAddBalance(false);

@@ -115,6 +115,44 @@ export const ProfileImagePlaceholder = () => {
   );
 };
 
+export const WalletBalancePlaceholder = () => {
+  return (
+    <SkeletonPlaceholder
+      highlightColor={"#b7b7b7"}
+      backgroundColor={"#dbd9d9"}
+      speed={1000}
+    >
+      <View
+        style={{
+          height: RFPercentage(3),
+          width: RFPercentage(7),
+          marginStart: RFPercentage(1),
+          marginTop: RFPercentage(0.5),
+        }}
+      ></View>
+    </SkeletonPlaceholder>
+  );
+};
+
+export const SettingsPlaceholder = () => {
+  return (
+    <SkeletonPlaceholder
+      highlightColor={"#b7b7b7"}
+      backgroundColor={"#dbd9d9"}
+      speed={1000}
+    >
+      <View
+        style={{
+          height: RFPercentage(1.5),
+          width: RFPercentage(2.5),
+          marginStart: RFPercentage(0.5),
+          marginTop: RFPercentage(1.5),
+        }}
+      ></View>
+    </SkeletonPlaceholder>
+  );
+};
+
 export const WalletTransactionPlaceholder = () => {
   return (
     <SkeletonPlaceholder

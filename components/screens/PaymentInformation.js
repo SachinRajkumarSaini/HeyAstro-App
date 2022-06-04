@@ -16,6 +16,7 @@ import uuid from "react-native-uuid";
 import { Fetch_API, FetchAPI } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Animatable from "react-native-animatable";
+import { STRAPI_API_URL } from "@env";
 
 const PaymentInformation = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,38 +42,17 @@ const PaymentInformation = ({ route, navigation }) => {
           "x-razorpay-signature": data.razorpay_signature,
         }
       );
-      console.log(verifyPayment);
 
       const userId = await AsyncStorage.getItem("userId");
 
       if (verifyPayment.success) {
-        console.log(
-          userId,
-          orderId,
-          data.razorpay_payment_id,
-          data.razorpay_signature,
-          amount,
-          amount + balance
-        );
-        setStatus("Success");
-        const date = new Date();
-        console.log("previous ", previousTransactions);
-        previousTransactions.push({
-          Success: true,
-          Razorpay_Order_Id: JSON.stringify(orderId),
-          Razorpay_Payment_Id: JSON.stringify(data.razorpay_payment_id),
-          Razorpay_Signature: JSON.stringify(data.razorpay_signature),
-          Amount: parseFloat(amount).toFixed(2),
-          DateAndTime: JSON.stringify(date.toISOString()),
-        });
-        console.log("transactions ", previousTransactions);
-        const getBalance = await FetchAPI({
+        // Update Balance
+        const updateBalance = await FetchAPI({
           query: `
                 mutation {
                   updateUsersPermissionsUser(
                     id: ${userId}
                     data: {
-                      Transactions: ${previousTransactions},
                       Balance: ${parseFloat(amount + balance).toFixed(2)}
                     }
                   ) {
@@ -83,63 +63,100 @@ const PaymentInformation = ({ route, navigation }) => {
                     }
                   }
                 }
-          `,
+            `,
         });
-        console.log(getBalance);
-        setIsLoading(false);
-        setShowPaymentStatus(true);
-        setTimeout(() => {
-          setShowPaymentStatus(false);
-          navigation.navigate("Settings");
-        }, 2000);
         const { Balance } =
-          getBalance.updateUsersPermissionsUser.data.attributes;
-        ToastAndroid.show("Payment Success", ToastAndroid.SHORT);
+          updateBalance.data.updateUsersPermissionsUser.data.attributes;
+        if (Balance) {
+          // Adding Transactions to the user
+          const date = new Date();
+          const netAmount = parseFloat(
+            route.params.Amount * 0.18 + route.params.Amount
+          );
+          const addTransactions = await Fetch_API(
+            `${STRAPI_API_URL}/api/users/transactions/${userId}`,
+            {
+              Transactions: {
+                Success: true,
+                Razorpay_Order_Id: JSON.stringify(orderId),
+                Razorpay_Payment_Id: JSON.stringify(data.razorpay_payment_id),
+                Razorpay_Signature: JSON.stringify(data.razorpay_signature),
+                Amount: parseFloat(netAmount).toFixed(2),
+                DateAndTime: JSON.stringify(date.toISOString()),
+              },
+            },
+            "PUT",
+            {
+              "Content-Type": "application/json",
+            }
+          );
+          console.log(addTransactions);
+          if (addTransactions.Balance) {
+            setStatus("Success");
+            setIsLoading(false);
+            setShowPaymentStatus(true);
+            setTimeout(() => {
+              setShowPaymentStatus(false);
+              navigation.navigate("Settings", {
+                balance: addTransactions.Balance,
+              });
+            }, 2000);
+            ToastAndroid.show("Payment Success", ToastAndroid.SHORT);
+          }
+        } else {
+          setStatus("Failed");
+          setIsLoading(false);
+          setShowPaymentStatus(true);
+          setTimeout(() => {
+            setShowPaymentStatus(false);
+            navigation.navigate("Settings");
+          }, 2000);
+          ToastAndroid.show("Payment Failed", ToastAndroid.SHORT);
+        }
       }
       if (!verifyPayment.success) {
-        setStatus("Failed");
-        const getBalance = await FetchAPI({
-          query: `
-                mutation {
-                  updateUsersPermissionsUser(
-                    id: ${userId}
-                    data: {
-                      Transactions: {
-                        Status: Failed
-                        Razorpay_Order_Id: ${JSON.stringify(orderId)}
-                        Razorpay_Payment_Id: ${JSON.stringify(
-                          data.razorpay_payment_id
-                        )}
-                        Razorpay_Signature: ${JSON.stringify(
-                          data.razorpay_signature
-                        )}
-                        Amount: ${parseFloat(amount).toFixed(2)}
-                        DateAndTime: ${JSON.stringify(date.toISOString())}
-                      }
-                    }
-                  ) {
-                    data {
-                      attributes {
-                        Balance
-                      }
-                    }
-                  }
-                }
-          `,
-        });
-        setIsLoading(false);
-        setShowPaymentStatus(true);
-        setTimeout(() => {
-          setShowPaymentStatus(false);
-          navigation.navigate("Settings");
-        }, 2000);
-        const { Balance } =
-          getBalance.updateUsersPermissionsUser.data.attributes;
-        ToastAndroid.show("Payment Failed", ToastAndroid.SHORT);
+        // Adding Transactions to the user
+        const date = new Date();
+        const netAmount = parseFloat(
+          route.params.Amount * 0.18 + route.params.Amount
+        );
+        const addTransactions = await Fetch_API(
+          `${STRAPI_API_URL}/api/users/transactions/${userId}`,
+          {
+            Transactions: {
+              Success: false,
+              Razorpay_Order_Id: JSON.stringify(orderId),
+              Razorpay_Payment_Id: JSON.stringify(data.razorpay_payment_id),
+              Razorpay_Signature: JSON.stringify(data.razorpay_signature),
+              Amount: parseFloat(netAmount).toFixed(2),
+              DateAndTime: JSON.stringify(date.toISOString()),
+            },
+          },
+          "PUT",
+          {
+            "Content-Type": "application/json",
+          }
+        );
+        if (addTransactions.Balance) {
+          setStatus("Failed");
+          setIsLoading(false);
+          setShowPaymentStatus(true);
+          setTimeout(() => {
+            setShowPaymentStatus(false);
+            navigation.navigate("Settings");
+          }, 2000);
+          ToastAndroid.show(
+            "Payment Failed, You'll get refund soon",
+            ToastAndroid.SHORT
+          );
+        }
       }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.SHORT);
-      ToastAndroid.show("Payment Failed", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "Payment Failed, You'll get refund soon",
+        ToastAndroid.SHORT
+      );
       console.log("error rrrr", error);
       setIsLoading(false);
     }
@@ -320,7 +337,9 @@ const PaymentInformation = ({ route, navigation }) => {
                   color: "black",
                 }}
               >
-                {parseFloat(route.params.Amount * 0.18 + route.params.Amount)}
+                {parseFloat(
+                  route.params.Amount * 0.18 + route.params.Amount
+                ).toFixed(2)}
               </Text>
             </View>
           </View>

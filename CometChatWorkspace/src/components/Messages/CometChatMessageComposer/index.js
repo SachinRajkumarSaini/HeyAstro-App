@@ -10,25 +10,30 @@ import {
   Text,
   Keyboard,
   Platform,
+  ToastAndroid,
+  BackHandler,
 } from 'react-native';
-
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDIcon from 'react-native-vector-icons/AntDesign';
 import { CometChat } from '@cometchat-pro/react-native-chat';
 import Sound from 'react-native-sound';
-
 import style from './styles';
-
 import { CometChatCreatePoll, CometChatSmartReplyPreview } from '../Extensions';
 import CometChatStickerKeyboard from '../CometChatStickerKeyboard';
 import ComposerActions from './composerActions';
-
 import { outgoingMessageAlert } from '../../../resources/audio';
 import * as enums from '../../../utils/enums';
 import * as actions from '../../../utils/actions';
 import { heightRatio } from '../../../utils/consts';
 import { logger } from '../../../utils/common';
 import { CometChatContext } from '../../../utils/CometChatContext';
+import {
+  FetchAPI,
+  Fetch_API,
+} from '../../../../../components/helpers/FetchInstance';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import { STRAPI_API_URL } from '@env';
 
 export default class CometChatMessageComposer extends React.PureComponent {
   static contextType = CometChatContext;
@@ -58,6 +63,9 @@ export default class CometChatMessageComposer extends React.PureComponent {
       user: null,
       keyboardActivity: false,
       restrictions: null,
+      userUsageTime: 0,
+      userBalance: null,
+      astrologerChargesPerMinute: null,
     };
     Sound.setCategory('Ambient', true);
     this.audio = new Sound(outgoingMessageAlert);
@@ -67,7 +75,121 @@ export default class CometChatMessageComposer extends React.PureComponent {
         const errorCode = error?.message || 'ERROR';
         this.props?.showMessage('error', errorCode);
       });
+    // Back Button Clicked
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
+
+  increaseUsageTime = 0;
+
+  deductBalance = async (Amount) => {
+    try {
+      clearInterval(this.increaseUsageTime);
+      this.setState({ userBalance: this.state.userBalance - Amount });
+      const userId = await AsyncStorage.getItem('userId');
+      const removeBalance = await FetchAPI({
+        query: `
+            mutation {
+              updateUsersPermissionsUser(id: ${userId}, data: { Balance: ${this.state.userBalance} }) {
+                data {
+                  attributes {
+                    Balance
+                  }
+                }
+              }
+            }
+        `,
+      });
+      this.setState({
+        userBalance:
+          removeBalance.data.updateUsersPermissionsUser.data.attributes.Balance,
+      });
+      const date = new Date();
+      const addOrderHistory = await Fetch_API(
+        `${STRAPI_API_URL}/api/users/orderhistory/${userId}`,
+        {
+          OrderHistory: {
+            OrderId: uuid.v4(),
+            AstrologerName: JSON.stringify(this.props.item.name),
+            DateAndTime: JSON.stringify(date.toISOString()),
+            CallRate: JSON.stringify(this.state.astrologerChargesPerMinute),
+            Duration: JSON.stringify(Math.ceil(this.state.userUsageTime / 60)),
+            Deduction: JSON.stringify(
+              Math.ceil(this.state.userUsageTime / 60) *
+                this.state.astrologerChargesPerMinute,
+            ),
+            OrderType: JSON.stringify('Chat'),
+          },
+        },
+        'PUT',
+        {
+          'Content-Type': 'application/json',
+        },
+      );
+      console.log('addOrderHistory', addOrderHistory);
+      console.log(
+        'Final Balance',
+        removeBalance.data.updateUsersPermissionsUser.data.attributes.Balance,
+      );
+      // Exit the Screen
+      console.log('Exit the Screen');
+      this.props.actionGenerated(actions.GO_BACK);
+    } catch (error) {
+      ToastAndroid.show('Something went wrong', ToastAndroid.SHORT);
+    }
+  };
+
+  calculateTime = async () => {
+    // Astrologer Charge Per Minute
+    const getCharges = await FetchAPI({
+      query: `
+        query {
+          astrologers(filters: { Username: { eq: ${JSON.stringify(
+            this.props.item.uid,
+          )} } }) {
+            data {
+              attributes {
+                ChargePerMinute
+              }
+            }
+          }
+        }      
+      `,
+    });
+    const { ChargePerMinute } = getCharges.data.astrologers.data[0].attributes;
+    this.setState({ astrologerChargesPerMinute: ChargePerMinute });
+    // User Balance
+    const userId = await AsyncStorage.getItem('userId');
+    const getBalance = await FetchAPI({
+      query: `
+        query {
+          usersPermissionsUser(id: ${userId}) {
+            data {
+              attributes {
+                Balance
+              }
+            }
+          }
+        }
+      `,
+    });
+    const { Balance } = getBalance.data.usersPermissionsUser.data.attributes;
+    this.setState({ userBalance: Balance });
+
+    // Calculate User Usage Time
+    console.log('balance', Balance);
+    console.log('ChargePerMinute', ChargePerMinute);
+    let maximumTime = Math.floor((Balance / ChargePerMinute) * 60);
+    let usageTime = 0;
+    console.log('maximumTime', maximumTime);
+    this.increaseUsageTime = setInterval(() => {
+      if (usageTime < maximumTime) {
+        this.setState({ userUsageTime: usageTime++ });
+        console.log('userTime', this.state.userUsageTime);
+      } else {
+        this.deductBalance(Balance);
+      }
+    }, 1000);
+  };
 
   componentDidMount() {
     this.keyboardDidShowListener = Keyboard.addListener(
@@ -79,6 +201,11 @@ export default class CometChatMessageComposer extends React.PureComponent {
       this._keyboardDidHide,
     );
     this.checkRestrictions();
+    this.calculateTime();
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
   }
 
   checkRestrictions = async () => {
@@ -100,6 +227,26 @@ export default class CometChatMessageComposer extends React.PureComponent {
   componentWillUnmount() {
     this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+    clearInterval(this.increaseUsageTime);
+  }
+
+  handleBackButtonClick() {
+    if (this.state.userUsageTime > 10) {
+      console.log('usage', this.state.userUsageTime);
+      const { userUsageTime, astrologerChargesPerMinute } = this.state;
+      let amount = Math.ceil(userUsageTime / 60) * astrologerChargesPerMinute;
+      console.log('amount', amount);
+      this.deductBalance(amount);
+    } else {
+      // Exit the Screen
+      this.props.actionGenerated(actions.GO_BACK);
+      clearInterval(this.increaseUsageTime);
+    }
+    return true;
   }
 
   _keyboardDidShow = () => {

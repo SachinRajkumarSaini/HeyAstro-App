@@ -9,6 +9,7 @@ export const FetchAPI = async (body) => {
     },
   });
   const jsonData = await fetchData.json();
+  console.log("FetchAPI", jsonData);
   return jsonData;
 };
 
