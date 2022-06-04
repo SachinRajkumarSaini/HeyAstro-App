@@ -18,6 +18,7 @@ import { FetchAPI } from "../helpers/FetchInstance";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CometChat } from "@cometchat-pro/react-native-chat";
 
 const ChatsAndCall = (props) => {
   const navigation = useNavigation();
@@ -26,6 +27,8 @@ const ChatsAndCall = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedAstrologer, setSelectedAstrologer] = useState();
+  const [userBalance, setUserBalance] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   const fetchAstrologers = async () => {
     try {
@@ -90,17 +93,45 @@ const ChatsAndCall = (props) => {
         );
       }
     } catch (error) {
+      console.log(error);
       ToastAndroid.show(
         "Some error occured, Please try again later",
         ToastAndroid.SHORT
       );
-      console.log(error);
       setIsLoading(false);
+    }
+  };
+
+  const fetchUserBalance = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const getBalance = await FetchAPI({
+        query: `
+            query {
+              usersPermissionsUser(id: ${userId}) {
+                data {
+                  attributes {
+                    Balance
+                  }
+                }
+              }
+            }
+          `,
+      });
+      setUserBalance(
+        getBalance.data.usersPermissionsUser.data.attributes.Balance
+      );
+    } catch (error) {
+      ToastAndroid.show(
+        "Some error occured, Please try again later",
+        ToastAndroid.SHORT
+      );
     }
   };
 
   useEffect(() => {
     fetchAstrologers();
+    fetchUserBalance();
   }, [category]);
 
   return (
@@ -505,9 +536,15 @@ const ChatsAndCall = (props) => {
                         <View>
                           <TouchableOpacity
                             activeOpacity={0.9}
-                            onPress={() => {
-                              setShowContactDialog(true);
+                            onPress={async () => {
+                              setStatusLoading(true);
+                              const astrologerStatus = await CometChat.getUser(
+                                astrologer.Username
+                              );
+                              astrologer.status = astrologerStatus.status;
                               setSelectedAstrologer(JSON.stringify(astrologer));
+                              setShowContactDialog(true);
+                              setStatusLoading(false);
                             }}
                           >
                             <Card
@@ -631,7 +668,12 @@ const ChatsAndCall = (props) => {
                       marginTop: RFPercentage(0.5),
                     }}
                   >
-                    Status:- Online
+                    Status :-{" "}
+                    {JSON.parse(selectedAstrologer).status === "online" ? (
+                      <Text style={{ color: "green" }}>Online</Text>
+                    ) : (
+                      <Text style={{ color: "red" }}> Offline</Text>
+                    )}
                   </Text>
                 </View>
                 <View />
@@ -647,10 +689,27 @@ const ChatsAndCall = (props) => {
                 <TouchableOpacity
                   activeOpacity={0.9}
                   onPress={() => {
-                    navigation.navigate("ChatUI", {
-                      userName: JSON.parse(selectedAstrologer).Username,
-                    });
-                    setShowContactDialog(false);
+                    if (JSON.parse(selectedAstrologer).status === "online") {
+                      if (
+                        JSON.parse(selectedAstrologer).ChargePerMinute <=
+                        userBalance
+                      ) {
+                        navigation.navigate("ChatUI", {
+                          userName: JSON.parse(selectedAstrologer).Username,
+                        });
+                        setShowContactDialog(false);
+                      } else {
+                        ToastAndroid.show(
+                          "Insufficient Balance, Please recharge your wallet",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    } else {
+                      ToastAndroid.show(
+                        "Astrologer is offline, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
+                    }
                   }}
                 >
                   <Card
@@ -678,14 +737,31 @@ const ChatsAndCall = (props) => {
                 <TouchableOpacity
                   activeOpacity={0.9}
                   onPress={async () => {
-                    const userName = await AsyncStorage.getItem("userName");
-                    const astrologerId =
-                      JSON.parse(selectedAstrologer).Username;
-                    console.log(userName, astrologerId);
-                    navigation.navigate("VideoCall", {
-                      videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/chatwith/${astrologerId}`,
-                    });
-                    setShowContactDialog(false);
+                    if (JSON.parse(selectedAstrologer).status === "online") {
+                      if (
+                        JSON.parse(selectedAstrologer).ChargePerMinute <=
+                        userBalance
+                      ) {
+                        const userName = await AsyncStorage.getItem("userName");
+                        const astrologerId =
+                          JSON.parse(selectedAstrologer).Username;
+                        console.log(userName, astrologerId);
+                        navigation.navigate("VideoCall", {
+                          videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/chatwith/${astrologerId}`,
+                        });
+                        setShowContactDialog(false);
+                      } else {
+                        ToastAndroid.show(
+                          "Insufficient Balance, Please recharge your wallet",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    } else {
+                      ToastAndroid.show(
+                        "Astrologer is offline, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
+                    }
                   }}
                 >
                   <Card
@@ -715,6 +791,19 @@ const ChatsAndCall = (props) => {
           </View>
         </Modal>
       )}
+      {/* Loading Model */}
+      <Modal transparent={true} visible={statusLoading}>
+        <View
+          style={{
+            backgroundColor: "#000000aa",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      </Modal>
     </View>
   );
 };

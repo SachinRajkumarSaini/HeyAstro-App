@@ -12,6 +12,9 @@ import {
   Platform,
   ToastAndroid,
   BackHandler,
+  Alert,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDIcon from 'react-native-vector-icons/AntDesign';
@@ -66,6 +69,7 @@ export default class CometChatMessageComposer extends React.PureComponent {
       userUsageTime: 0,
       userBalance: null,
       astrologerChargesPerMinute: null,
+      showLoader: false,
     };
     Sound.setCategory('Ambient', true);
     this.audio = new Sound(outgoingMessageAlert);
@@ -84,7 +88,10 @@ export default class CometChatMessageComposer extends React.PureComponent {
   deductBalance = async (Amount) => {
     try {
       clearInterval(this.increaseUsageTime);
-      this.setState({ userBalance: this.state.userBalance - Amount });
+      this.setState({
+        userBalance: this.state.userBalance - Amount,
+        showLoader: true,
+      });
       const userId = await AsyncStorage.getItem('userId');
       const removeBalance = await FetchAPI({
         query: `
@@ -132,9 +139,11 @@ export default class CometChatMessageComposer extends React.PureComponent {
       );
       // Exit the Screen
       console.log('Exit the Screen');
+      this.setState({ showLoader: false });
       this.props.actionGenerated(actions.GO_BACK);
     } catch (error) {
       ToastAndroid.show('Something went wrong', ToastAndroid.SHORT);
+      this.setState({ showLoader: false });
     }
   };
 
@@ -187,6 +196,12 @@ export default class CometChatMessageComposer extends React.PureComponent {
         console.log('userTime', this.state.userUsageTime);
       } else {
         this.deductBalance(Balance);
+        setTimeout(() => {
+          ToastAndroid.show(
+            'Out of Balance, Please recharge your account',
+            ToastAndroid.LONG,
+          );
+        }, 2000);
       }
     }, 1000);
   };
@@ -235,17 +250,35 @@ export default class CometChatMessageComposer extends React.PureComponent {
   }
 
   handleBackButtonClick() {
-    if (this.state.userUsageTime > 10) {
-      console.log('usage', this.state.userUsageTime);
-      const { userUsageTime, astrologerChargesPerMinute } = this.state;
-      let amount = Math.ceil(userUsageTime / 60) * astrologerChargesPerMinute;
-      console.log('amount', amount);
-      this.deductBalance(amount);
-    } else {
-      // Exit the Screen
-      this.props.actionGenerated(actions.GO_BACK);
-      clearInterval(this.increaseUsageTime);
-    }
+    Alert.alert(
+      'Leave',
+      'Are you sure you want to leave?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {
+          text: 'Leave',
+          onPress: () => {
+            if (this.state.userUsageTime > 10) {
+              console.log('usage', this.state.userUsageTime);
+              const { userUsageTime, astrologerChargesPerMinute } = this.state;
+              let amount =
+                Math.ceil(userUsageTime / 60) * astrologerChargesPerMinute;
+              console.log('amount', amount);
+              this.deductBalance(amount);
+            } else {
+              // Exit the Screen
+              this.props.actionGenerated(actions.GO_BACK);
+              clearInterval(this.increaseUsageTime);
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
     return true;
   }
 
@@ -992,6 +1025,17 @@ export default class CometChatMessageComposer extends React.PureComponent {
           </View>
           {liveReactionBtn}
         </View>
+        <Modal transparent={true} visible={this.state.showLoader}>
+          <View
+            style={{
+              backgroundColor: '#000000aa',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <ActivityIndicator size="large" color="white" />
+          </View>
+        </Modal>
       </View>
     );
   }

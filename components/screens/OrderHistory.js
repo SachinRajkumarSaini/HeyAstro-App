@@ -4,15 +4,64 @@ import {
   StatusBar,
   TouchableOpacity,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Header, Card } from "react-native-elements";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { FetchAPI } from "../helpers/FetchInstance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import moment from "moment";
+import { OrderHistoryPlaceholder } from "../helpers/SkeletonPlaceholder";
 
 const OrderHistory = ({ navigation }) => {
   const [callOrderHistory, setCallOrderHistory] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [chatOrderhistories, setChatOrderHistories] = useState([]);
+  const [callOrderhistories, setCallOrderHistories] = useState([]);
 
+  const fetchOrderHistory = async () => {
+    try {
+      setIsLoading(true);
+      const userId = await AsyncStorage.getItem("userId");
+      const getHistories = await FetchAPI({
+        query: `
+          query {
+            usersPermissionsUser(id: ${JSON.stringify(userId)}) {
+              data {
+                attributes {
+                  OrderHistory
+                }
+              }
+            }
+          }     
+        `,
+      });
+      setChatOrderHistories(
+        getHistories.data.usersPermissionsUser.data.attributes.OrderHistory.filter(
+          (item) => JSON.parse(item.OrderType) === "Chat"
+        )
+      );
+      setCallOrderHistories(
+        getHistories.data.usersPermissionsUser.data.attributes.OrderHistory.filter(
+          (item) => JSON.parse(item.OrderType) === "Call"
+        )
+      );
+      setIsLoading(false);
+    } catch (error) {
+      ToastAndroid.show(
+        "Something went wrong, Please try again later!",
+        ToastAndroid.SHORT
+      );
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrderHistory();
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <StatusBar
@@ -91,906 +140,111 @@ const OrderHistory = ({ navigation }) => {
               paddingBottom: RFPercentage(3),
             }}
           >
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
+            {isLoading ? (
+              <OrderHistoryPlaceholder />
+            ) : callOrderhistories.length > 0 ? (
+              callOrderhistories.map((item, index) => {
+                const date = new Date(JSON.parse(item.DateAndTime));
+                const formattedDate = moment(date).format(
+                  "DD MMM YYYY hh:mm A"
+                );
+                return (
+                  <Card
+                    key={index}
+                    containerStyle={{
+                      margin: RFPercentage(2),
+                      borderRadius: RFPercentage(1),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#818181",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        textAlign: "center",
+                      }}
+                    >
+                      {item.OrderId.split("-")[0]}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(1),
+                      }}
+                    >
+                      Astrologer :- {JSON.parse(item.AstrologerName)}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Date :- {formattedDate}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Call rate :-{" "}
+                      <FontAwesome
+                        name="inr"
+                        color="green"
+                        size={15}
+                        style={{ marginTop: RFPercentage(0.5) }}
+                      />{" "}
+                      {JSON.parse(item.CallRate)}/min{" "}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#818181",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Duration :- {item.Duration} minutes
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#818181",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Deduction :-{" "}
+                      <FontAwesome
+                        name="inr"
+                        color="green"
+                        size={15}
+                        style={{ marginTop: RFPercentage(0.5) }}
+                      />{" "}
+                      {item.Deduction}
+                    </Text>
+                  </Card>
+                );
+              })
+            ) : (
               <Text
                 style={{
-                  color: "#818181",
+                  color: "black",
                   fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
                   textAlign: "center",
+                  marginTop: RFPercentage(30),
                 }}
               >
-                Order Id
+                No Call Order History
               </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
+            )}
           </View>
         ) : (
           <View
@@ -1000,1206 +254,111 @@ const OrderHistory = ({ navigation }) => {
               paddingBottom: RFPercentage(3),
             }}
           >
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
+            {isLoading ? (
+              <OrderHistoryPlaceholder />
+            ) : chatOrderhistories.length > 0 ? (
+              chatOrderhistories.map((item, index) => {
+                const date = new Date(JSON.parse(item.DateAndTime));
+                const formattedDate = moment(date).format(
+                  "DD MMM YYYY hh:mm A"
+                );
+                return (
+                  <Card
+                    key={index}
+                    containerStyle={{
+                      margin: RFPercentage(2),
+                      borderRadius: RFPercentage(1),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#818181",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        textAlign: "center",
+                      }}
+                    >
+                      {item.OrderId.split("-")[0]}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(1),
+                      }}
+                    >
+                      Astrologer :- {JSON.parse(item.AstrologerName)}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Date :- {formattedDate}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Call rate :-{" "}
+                      <FontAwesome
+                        name="inr"
+                        color="green"
+                        size={15}
+                        style={{ marginTop: RFPercentage(0.5) }}
+                      />{" "}
+                      {JSON.parse(item.CallRate)}/min{" "}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#818181",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Duration :- {item.Duration} minutes
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#818181",
+                        fontFamily: "Ubuntu-Regular",
+                        fontSize: RFPercentage(1.8),
+                        marginTop: RFPercentage(0.5),
+                      }}
+                    >
+                      Deduction :-{" "}
+                      <FontAwesome
+                        name="inr"
+                        color="green"
+                        size={15}
+                        style={{ marginTop: RFPercentage(0.5) }}
+                      />{" "}
+                      {item.Deduction}
+                    </Text>
+                  </Card>
+                );
+              })
+            ) : (
               <Text
                 style={{
-                  color: "#818181",
+                  color: "black",
                   fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
                   textAlign: "center",
+                  marginTop: RFPercentage(30),
                 }}
               >
-                Order Id
+                No Chat Order History
               </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
-            <Card
-              containerStyle={{
-                margin: RFPercentage(2),
-                borderRadius: RFPercentage(1),
-              }}
-            >
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  textAlign: "center",
-                }}
-              >
-                Order Id
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                Astrologer Name
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Status :{" "}
-                <Text
-                  style={{
-                    color: "green",
-                    fontFamily: "Ubuntu-Regular",
-                    fontSize: RFPercentage(1.8),
-                  }}
-                >
-                  Completed
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Date : Monday 20 April 2022
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Call rate :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0/min{" "}
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Duration : 0 minutes
-              </Text>
-              <Text
-                style={{
-                  color: "#818181",
-                  fontFamily: "Ubuntu-Regular",
-                  fontSize: RFPercentage(1.8),
-                  marginTop: RFPercentage(0.5),
-                }}
-              >
-                Deduction :{" "}
-                <FontAwesome
-                  name="inr"
-                  color="green"
-                  size={15}
-                  style={{ marginTop: RFPercentage(0.5) }}
-                />{" "}
-                0
-              </Text>
-            </Card>
+            )}
           </View>
         )}
       </ScrollView>
