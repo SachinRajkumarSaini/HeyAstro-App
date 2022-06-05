@@ -489,24 +489,22 @@ const ChatsAndCall = (props) => {
                               maxWidth: RFPercentage(19),
                             }}
                           >
-                            {astrologer.Languages.Languages &&
-                              astrologer.Languages.Languages.map(
-                                (language, index) => {
-                                  return (
-                                    <Text
-                                      style={{
-                                        fontFamily: "Ubuntu-Regular",
-                                        color: "black",
-                                        fontSize: RFPercentage(1.2),
-                                        maxWidth: RFPercentage(19),
-                                      }}
-                                      key={index}
-                                    >
-                                      {language}&nbsp;&nbsp;
-                                    </Text>
-                                  );
-                                }
-                              )}
+                            {astrologer.Languages &&
+                              astrologer.Languages.map((language, index) => {
+                                return (
+                                  <Text
+                                    style={{
+                                      fontFamily: "Ubuntu-Regular",
+                                      color: "black",
+                                      fontSize: RFPercentage(1.2),
+                                      maxWidth: RFPercentage(19),
+                                    }}
+                                    key={index}
+                                  >
+                                    {language}&nbsp;&nbsp;
+                                  </Text>
+                                );
+                              })}
                           </Text>
                           <Text
                             numberOfLines={1}

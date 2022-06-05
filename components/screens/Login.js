@@ -31,7 +31,7 @@ const Login = ({ navigation }) => {
           query: `
             mutation{
               login(input:{identifier: ${JSON.stringify(
-                identifier
+                identifier.toLowerCase()
               )}, password: ${JSON.stringify(password)},provider:"local"}){
                 jwt
                 user{
@@ -137,13 +137,23 @@ const Login = ({ navigation }) => {
             width: RFPercentage(20),
           }}
         />
+        <Text
+          style={{
+            fontFamily: "Dongle-Bold",
+            color: "#4d148c",
+            fontSize: RFPercentage(4),
+            marginTop: RFPercentage(1),
+          }}
+        >
+          Login
+        </Text>
         <TextInput
-          textInputStyle={{ marginTop: RFPercentage(3) }}
+          textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
           placeholder="Email or Username"
           onChangeText={(identifier) => setIdentifier(identifier)}
         />
         <TextInput
-          textInputStyle={{ marginTop: RFPercentage(2) }}
+          textInputStyle={{ marginTop: RFPercentage(2), color: "black" }}
           placeholder="Password"
           secureTextEntry={true}
           onChangeText={(password) => setPassword(password)}
@@ -174,6 +184,7 @@ const Login = ({ navigation }) => {
               fontFamily: "Dongle-Regular",
               fontSize: RFPercentage(3),
               marginTop: RFPercentage(2),
+              color: "black",
             }}
           >
             Don't have an account?

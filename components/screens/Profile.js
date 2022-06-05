@@ -7,6 +7,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { FetchAPI, Fetch_API } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
 import {
   ProfileHoroscopePlaceholder,
   ProfileHoroscopePredictionsPlaceholder,
@@ -15,9 +16,10 @@ import {
 } from "../helpers/SkeletonPlaceholder";
 
 const Profile = ({ navigation }) => {
+  const isFocused = useIsFocused();
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState({
-    Name: "",
+    Name: "Full Name",
     DOB: new Date(),
   });
   const [astrology, setAstrology] = useState({
@@ -25,8 +27,10 @@ const Profile = ({ navigation }) => {
     horoscope: new Object(),
     quote: "",
   });
+
   const fetchProfile = async () => {
     try {
+      console.log("aa");
       const userId = await AsyncStorage.getItem("userId");
       const fetchProfile = await FetchAPI({
         query: `
@@ -89,8 +93,12 @@ const Profile = ({ navigation }) => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     fetchProfile();
+  }, [isFocused]);
+
+  useEffect(() => {
     fetchHorocope();
   }, []);
   return (

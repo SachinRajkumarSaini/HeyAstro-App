@@ -5,6 +5,9 @@ import {
   ScrollView,
   TouchableOpacity,
   ToastAndroid,
+  Modal,
+  ActivityIndicator,
+  Platform,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -17,6 +20,7 @@ import { FetchAPI, Fetch_API } from "../helpers/FetchInstance";
 import moment from "moment";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { STRAPI_API_URL } from "@env";
 
 const EditProfile = ({ navigation }) => {
   const [DOB, setDOB] = useState(new Date());
@@ -31,9 +35,11 @@ const EditProfile = ({ navigation }) => {
   });
   const [birthPincode, setBirthPincode] = useState("");
   const [location, setLocation] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchProfile = async () => {
     try {
+      setIsLoading(true);
       const userId = await AsyncStorage.getItem("userId");
       const fetchProfile = await FetchAPI({
         query: `
@@ -71,16 +77,19 @@ const EditProfile = ({ navigation }) => {
             .BirthPlacePincode
         )
       );
-      setBirthPlace({
-        Country:
-          fetchProfile.data.usersPermissionsUser.data.attributes.BirthPlace
-            .Country,
-        State:
-          fetchProfile.data.usersPermissionsUser.data.attributes.BirthPlace
-            .State,
-        City: fetchProfile.data.usersPermissionsUser.data.attributes.BirthPlace
-          .City,
-      });
+      setBirthPlace(
+        {
+          Country:
+            fetchProfile.data.usersPermissionsUser.data.attributes.BirthPlace
+              .Country,
+          State:
+            fetchProfile.data.usersPermissionsUser.data.attributes.BirthPlace
+              .State,
+          City: fetchProfile.data.usersPermissionsUser.data.attributes
+            .BirthPlace.City,
+        },
+        setIsLoading(true)
+      );
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try agiain later!",
@@ -91,6 +100,7 @@ const EditProfile = ({ navigation }) => {
 
   const getLocation = async () => {
     try {
+      setIsLoading(true);
       const gettingLocation = await Fetch_API(
         `${process.env.HEYASTRO_API_URL}/getLocation`,
         {
@@ -107,8 +117,10 @@ const EditProfile = ({ navigation }) => {
         State: gettingLocation.State,
         City: gettingLocation.City,
       });
+      setIsLoading(false);
     } catch (error) {
       ToastAndroid.show("Pincode is not valid", ToastAndroid.SHORT);
+      setIsLoading(false);
     }
   };
 
@@ -118,6 +130,7 @@ const EditProfile = ({ navigation }) => {
 
   const updateProfile = async () => {
     try {
+      setIsLoading(true);
       const userId = await AsyncStorage.getItem("userId");
       let DateOfBirth = new Date(DOB);
       DateOfBirth.setTime(TOB);
@@ -149,12 +162,14 @@ const EditProfile = ({ navigation }) => {
       if (updatingProfile.data.updateUsersPermissionsUser.data) {
         ToastAndroid.show("Profile updated successfully!", ToastAndroid.SHORT);
         navigation.navigate("Profile");
+        setIsLoading(false);
       }
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
         ToastAndroid.SHORT
       );
+      setIsLoading(false);
     }
   };
 
@@ -169,23 +184,27 @@ const EditProfile = ({ navigation }) => {
       formData.append("files", {
         name: JSON.stringify(fileName),
         type: JSON.stringify(fileType),
+        source: "users-permissions",
         uri: Platform.OS === "ios" ? fileUri.replace("file://", "") : fileUri,
       });
 
-      fetch(`https://heyastro.tech/api/upload`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data;",
-        },
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          console.log("response", response);
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
+      // fetch(`${STRAPI_API_URL}/api/upload`, {
+      //   method: "POST",
+      //   body: formData,
+      // })
+      //   .then((response) => response.json())
+      //   .then((response) => {
+      //     console.log("response", response);
+      //   })
+      //   .catch((error) => {
+      //     console.log("error", error);
+      //   });
+      const uploadImage = await Fetch_API(
+        `${STRAPI_API_URL}/api/upload`,
+        formData,
+        "POST"
+      );
+      console.log(uploadImage);
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
@@ -412,9 +431,20 @@ const EditProfile = ({ navigation }) => {
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Birth Place Pincode"
               />
+              <Text
+                style={{
+                  fontFamily: "Ubuntu-Regular",
+                  color: "#767676",
+                  fontSize: RFPercentage(1.2),
+                  marginStart: RFPercentage(1.2),
+                  marginTop: RFPercentage(-2),
+                }}
+              >
+                Your Place of Birth is automatically fetched from your pincode.
+              </Text>
             </View>
           </View>
-          <View>
+          <View style={{ marginTop: RFPercentage(1) }}>
             <Text
               style={{
                 fontFamily: "Ubuntu-Bold",
@@ -466,6 +496,19 @@ const EditProfile = ({ navigation }) => {
           onPress={updateProfile}
         />
       </View>
+      {/* Loading Model */}
+      <Modal transparent={true} visible={isLoading}>
+        <View
+          style={{
+            backgroundColor: "#000000aa",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      </Modal>
     </View>
   );
 };

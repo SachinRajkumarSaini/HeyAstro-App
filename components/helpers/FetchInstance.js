@@ -20,5 +20,6 @@ export const Fetch_API = async (url, body, method, headers) => {
     headers: headers,
   });
   const jsonData = await fetchData.json();
+  console.log("FetchAPI", jsonData);
   return jsonData;
 };
