@@ -289,65 +289,74 @@ const Home = ({ navigation }) => {
                   </Text>
                 </View>
               </TouchableOpacity>
-              <View>
-                <Card
-                  containerStyle={{
-                    height: RFPercentage(8),
-                    width: RFPercentage(8),
-                    borderRadius: RFPercentage(4),
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Image
-                    style={{ height: RFPercentage(7), width: RFPercentage(7) }}
-                    source={{ uri: FileBase64.freeKundli }}
-                  />
-                </Card>
-                <Text
-                  style={{
-                    color: "#818181",
-                    fontFamily: "Dongle-Bold",
-                    textAlign: "center",
-                    position: "absolute",
-                    top: RFPercentage(10),
-                    left: RFPercentage(2.5),
-                  }}
-                >
-                  Free Kundli
-                </Text>
-              </View>
-              <View>
-                <Card
-                  containerStyle={{
-                    height: RFPercentage(8),
-                    width: RFPercentage(8),
-                    borderRadius: RFPercentage(4),
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Image
-                    style={{
-                      height: RFPercentage(6.8),
-                      width: RFPercentage(6.8),
+              <TouchableOpacity onPress={() => navigation.navigate("Kundli")}>
+                <View>
+                  <Card
+                    containerStyle={{
+                      height: RFPercentage(8),
+                      width: RFPercentage(8),
+                      borderRadius: RFPercentage(4),
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                    source={{ uri: FileBase64.matchMaking }}
-                  />
-                </Card>
-                <Text
-                  style={{
-                    color: "#818181",
-                    fontFamily: "Dongle-Bold",
-                    textAlign: "center",
-                    position: "absolute",
-                    top: RFPercentage(10),
-                    left: RFPercentage(1.2),
-                  }}
-                >
-                  Match Making
-                </Text>
-              </View>
+                  >
+                    <Image
+                      style={{
+                        height: RFPercentage(7),
+                        width: RFPercentage(7),
+                      }}
+                      source={{ uri: FileBase64.freeKundli }}
+                    />
+                  </Card>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Dongle-Bold",
+                      textAlign: "center",
+                      position: "absolute",
+                      top: RFPercentage(10),
+                      left: RFPercentage(2.5),
+                    }}
+                  >
+                    Free Kundli
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("KundliMatching")}
+              >
+                <View>
+                  <Card
+                    containerStyle={{
+                      height: RFPercentage(8),
+                      width: RFPercentage(8),
+                      borderRadius: RFPercentage(4),
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Image
+                      style={{
+                        height: RFPercentage(6.8),
+                        width: RFPercentage(6.8),
+                      }}
+                      source={{ uri: FileBase64.matchMaking }}
+                    />
+                  </Card>
+                  <Text
+                    style={{
+                      color: "#818181",
+                      fontFamily: "Dongle-Bold",
+                      textAlign: "center",
+                      position: "absolute",
+                      top: RFPercentage(10),
+                      left: RFPercentage(1.2),
+                    }}
+                  >
+                    Kundli Matching
+                  </Text>
+                </View>
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate("Blogs")}>
                 <View>
                   <Card

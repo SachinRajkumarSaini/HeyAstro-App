@@ -33,6 +33,10 @@ import Signup from "../screens/Signup";
 import Blog from "../screens/Blog";
 import EmbbedPlayer from "./EmbbedPlayer";
 import VideoCall from "../screens/VideoCall";
+import Kundli from "../screens/Kundli/Kundli";
+import CreateKundli from "../screens/Kundli/CreateKundli";
+import KundliMatching from "../screens/KundliMatching/KundliMatching";
+import DetailMatching from "../screens/KundliMatching/DetailMatching";
 import CometChatUIView from "../screens/ChatUI";
 import {
   CometChatUI,
@@ -67,6 +71,10 @@ const StackNavigator = () => {
         <Stack.Screen name="Notifications" component={Notifications} />
         <Stack.Screen name="OrderHistory" component={OrderHistory} />
         <Stack.Screen name="Wallet" component={Wallet} />
+        <Stack.Screen name="Kundli" component={Kundli} />
+        <Stack.Screen name="CreateKundli" component={CreateKundli} />
+        <Stack.Screen name="KundliMatching" component={KundliMatching} />
+        <Stack.Screen name="DetailMatching" component={DetailMatching} />
         <Stack.Screen
           name="PaymentInformation"
           component={PaymentInformation}
