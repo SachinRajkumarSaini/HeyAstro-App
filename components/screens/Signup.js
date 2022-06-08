@@ -13,7 +13,6 @@ import { Button, Image } from "@rneui/themed";
 import FileBase64 from "../helpers/FileBase64";
 import { FetchAPI, Fetch_API } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import DatePicker from "react-native-date-picker";
 import moment from "moment";
 import { CometChat } from "@cometchat-pro/react-native-chat";
@@ -24,7 +23,6 @@ const Signup = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [DOB, setDOB] = useState(new Date());
-  const [TOB, setTOB] = useState(new Date());
   const [password, setPassword] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [openDate, setOpenDate] = useState(false);
@@ -55,8 +53,6 @@ const Signup = ({ navigation }) => {
   const createUser = async () => {
     try {
       const userName = email.split("@")[0].toLowerCase();
-      let DateOfBirth = new Date(DOB);
-      DateOfBirth.setTime(TOB);
 
       const location = await getLocation();
 
@@ -70,7 +66,7 @@ const Signup = ({ navigation }) => {
                       password: ${JSON.stringify(password)},
                       confirmed: true
                       FullName: ${JSON.stringify(fullName)},
-                      DOB: ${JSON.stringify(DateOfBirth.toISOString())}
+                      DOB: ${JSON.stringify(DOB.toISOString())}
                       BirthPlacePincode: ${pincode},
                       Balance: ${parseFloat(0)},
                       BirthPlace: {
@@ -361,16 +357,16 @@ const Signup = ({ navigation }) => {
               <TextInput
                 textInputStyle={{ color: "black" }}
                 placeholder="Time of Birth"
-                value={moment(TOB).format("hh:mm a")}
+                value={moment(DOB).format("hh:mm a")}
                 onFocus={() => setOpenTime(true)}
                 onPressIn={() => setOpenTime(true)}
               />
               <DateTimePickerModal
                 isVisible={openTime}
                 mode="time"
-                date={TOB}
+                date={DOB}
                 onConfirm={(time) => {
-                  setTOB(new Date(time));
+                  DOB.setTime(time);
                   setOpenTime(false);
                 }}
                 onCancel={() => {
@@ -386,7 +382,7 @@ const Signup = ({ navigation }) => {
                 marginStart: RFPercentage(3),
               }}
             >
-              If you don't know time, then select 12:12 AM
+              If you don't know time, then select 12:00 AM
             </Text>
             <Text
               style={{

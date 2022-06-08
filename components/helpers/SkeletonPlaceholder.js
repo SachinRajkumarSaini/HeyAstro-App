@@ -204,6 +204,57 @@ export const WalletTransactionPlaceholder = () => {
   );
 };
 
+export const KundliPlaceholder = () => {
+  return (
+    <SkeletonPlaceholder
+      highlightColor={"#b7b7b7"}
+      backgroundColor={"#efedef"}
+      speed={1000}
+    >
+      <View
+        style={{
+          borderRadius: RFPercentage(1),
+          height: RFPercentage(10),
+          margin: RFPercentage(2),
+          width: RFPercentage(45),
+        }}
+      />
+      <View
+        style={{
+          borderRadius: RFPercentage(1),
+          height: RFPercentage(10),
+          margin: RFPercentage(2),
+          width: RFPercentage(45),
+        }}
+      />
+      <View
+        style={{
+          borderRadius: RFPercentage(1),
+          height: RFPercentage(10),
+          margin: RFPercentage(2),
+          width: RFPercentage(45),
+        }}
+      />
+      <View
+        style={{
+          borderRadius: RFPercentage(1),
+          height: RFPercentage(10),
+          margin: RFPercentage(2),
+          width: RFPercentage(45),
+        }}
+      />
+      <View
+        style={{
+          borderRadius: RFPercentage(1),
+          height: RFPercentage(10),
+          margin: RFPercentage(2),
+          width: RFPercentage(45),
+        }}
+      />
+    </SkeletonPlaceholder>
+  );
+};
+
 export const OrderHistoryPlaceholder = () => {
   return (
     <SkeletonPlaceholder

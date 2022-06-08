@@ -35,6 +35,7 @@ import EmbbedPlayer from "./EmbbedPlayer";
 import VideoCall from "../screens/VideoCall";
 import Kundli from "../screens/Kundli/Kundli";
 import CreateKundli from "../screens/Kundli/CreateKundli";
+import DetailedKundli from "../screens/Kundli/DetailedKundli";
 import KundliMatching from "../screens/KundliMatching/KundliMatching";
 import DetailMatching from "../screens/KundliMatching/DetailMatching";
 import CometChatUIView from "../screens/ChatUI";
@@ -73,6 +74,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Wallet" component={Wallet} />
         <Stack.Screen name="Kundli" component={Kundli} />
         <Stack.Screen name="CreateKundli" component={CreateKundli} />
+        <Stack.Screen name="DetailedKundli" component={DetailedKundli} />
         <Stack.Screen name="KundliMatching" component={KundliMatching} />
         <Stack.Screen name="DetailMatching" component={DetailMatching} />
         <Stack.Screen

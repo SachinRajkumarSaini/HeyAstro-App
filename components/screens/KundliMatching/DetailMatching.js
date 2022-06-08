@@ -4,15 +4,72 @@ import { RFPercentage } from "react-native-responsive-fontsize";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import React, { useState } from "react";
 
-const DetailMatching = ({ navigation }) => {
-  const [varna, setVarna] = useState(85);
-  const [bhakut, setBhakut] = useState(76);
-  const [maitri, setMaitri] = useState(21);
-  const [nadi, setNadi] = useState(43);
-  const [vashya, setVashya] = useState(65);
-  const [tara, setTara] = useState(32);
-  const [gana, setGana] = useState(56);
-  const [yani, setYani] = useState(12);
+const DetailMatching = ({ route, navigation }) => {
+  const [varna] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[0].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[0].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [vasya] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[1].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[1].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [tara] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[2].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[2].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [yoni] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[3].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[3].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [maitri] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[4].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[4].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [nadi] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[7].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[7].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [gana] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[5].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[5].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+  const [bhakoot] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.guna[6].obtained_points /
+        route.params.KundliMatching.guna_milan.guna[6].maximum_points) *
+      100
+    ).toFixed(2)
+  );
+
+  const [compatibiltyScore] = useState(
+    (
+      (route.params.KundliMatching.guna_milan.total_points /
+        route.params.KundliMatching.guna_milan.maximum_points) *
+      100
+    ).toFixed(2)
+  );
+
   return (
     <View style={{ flex: 1 }}>
       <StatusBar
@@ -71,7 +128,7 @@ const DetailMatching = ({ navigation }) => {
             <AnimatedCircularProgress
               size={250}
               width={25}
-              fill={80}
+              fill={compatibiltyScore}
               rotation={270}
               arcSweepAngle={180}
               style={{ marginTop: RFPercentage(2) }}
@@ -98,7 +155,8 @@ const DetailMatching = ({ navigation }) => {
                   fontSize: RFPercentage(2.5),
                 }}
               >
-                23/36
+                {route.params.KundliMatching.guna_milan.total_points}/
+                {route.params.KundliMatching.guna_milan.maximum_points}
               </Text>
             </Card>
           </Card>
@@ -146,7 +204,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[0].description}
                   </Text>
                 </View>
                 <View
@@ -177,7 +235,7 @@ const DetailMatching = ({ navigation }) => {
               </View>
             </Card>
 
-            {/* Love (Bhakut) */}
+            {/* Love (Bhakoot) */}
             <Card
               containerStyle={{
                 borderRadius: RFPercentage(1.5),
@@ -199,7 +257,7 @@ const DetailMatching = ({ navigation }) => {
                       fontSize: RFPercentage(2.5),
                     }}
                   >
-                    Love (Bhakut)
+                    Love (Bhakoot)
                   </Text>
                   <Text
                     style={{
@@ -208,7 +266,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[6].description}
                   </Text>
                 </View>
                 <View
@@ -222,7 +280,7 @@ const DetailMatching = ({ navigation }) => {
                   <AnimatedCircularProgress
                     size={80}
                     width={10}
-                    fill={bhakut}
+                    fill={bhakoot}
                     arcSweepAngle={360}
                     tintColor="#6FCE96"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
@@ -231,8 +289,8 @@ const DetailMatching = ({ navigation }) => {
                     }
                     backgroundColor="#E0E1E1"
                   >
-                    {(bhakut) => (
-                      <Text style={{ color: "black" }}>{bhakut}%</Text>
+                    {(bhakoot) => (
+                      <Text style={{ color: "black" }}>{bhakoot}%</Text>
                     )}
                   </AnimatedCircularProgress>
                 </View>
@@ -270,7 +328,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[4].description}
                   </Text>
                 </View>
                 <View
@@ -332,7 +390,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[7].description}
                   </Text>
                 </View>
                 <View
@@ -361,7 +419,7 @@ const DetailMatching = ({ navigation }) => {
               </View>
             </Card>
 
-            {/* Dominance (Vashya) */}
+            {/* Dominance (Vasya) */}
             <Card
               containerStyle={{
                 borderRadius: RFPercentage(1.5),
@@ -383,7 +441,7 @@ const DetailMatching = ({ navigation }) => {
                       fontSize: RFPercentage(2.5),
                     }}
                   >
-                    Dominance (Vashya)
+                    Dominance (Vasya)
                   </Text>
                   <Text
                     style={{
@@ -392,7 +450,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[1].description}
                   </Text>
                 </View>
                 <View
@@ -406,7 +464,7 @@ const DetailMatching = ({ navigation }) => {
                   <AnimatedCircularProgress
                     size={80}
                     width={10}
-                    fill={vashya}
+                    fill={vasya}
                     arcSweepAngle={360}
                     tintColor="#FE83BB"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
@@ -415,8 +473,8 @@ const DetailMatching = ({ navigation }) => {
                     }
                     backgroundColor="#E0E1E1"
                   >
-                    {(vashya) => (
-                      <Text style={{ color: "black" }}>{vashya}%</Text>
+                    {(vasya) => (
+                      <Text style={{ color: "black" }}>{vasya}%</Text>
                     )}
                   </AnimatedCircularProgress>
                 </View>
@@ -454,7 +512,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[5].description}
                   </Text>
                 </View>
                 <View
@@ -514,7 +572,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[2].description}
                   </Text>
                 </View>
                 <View
@@ -543,7 +601,7 @@ const DetailMatching = ({ navigation }) => {
               </View>
             </Card>
 
-            {/* Physical Compatibility (Yani) */}
+            {/* Physical Compatibility (Yoni) */}
             <Card
               containerStyle={{
                 borderRadius: RFPercentage(1.5),
@@ -565,7 +623,7 @@ const DetailMatching = ({ navigation }) => {
                       fontSize: RFPercentage(2.5),
                     }}
                   >
-                    Physical Compatibility (Yani)
+                    Physical Compatibility (Yoni)
                   </Text>
                   <Text
                     style={{
@@ -574,7 +632,7 @@ const DetailMatching = ({ navigation }) => {
                       color: "#808080",
                     }}
                   >
-                    Some Desptionsasasasa sasa sa sasa sa sa sasa
+                    {route.params.KundliMatching.guna_milan.guna[3].description}
                   </Text>
                 </View>
                 <View
@@ -588,7 +646,7 @@ const DetailMatching = ({ navigation }) => {
                   <AnimatedCircularProgress
                     size={80}
                     width={10}
-                    fill={yani}
+                    fill={yoni}
                     arcSweepAngle={360}
                     tintColor="#B96AD8"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
@@ -597,7 +655,7 @@ const DetailMatching = ({ navigation }) => {
                     }
                     backgroundColor="#E0E1E1"
                   >
-                    {(yani) => <Text style={{ color: "black" }}>{yani}%</Text>}
+                    {(yoni) => <Text style={{ color: "black" }}>{yoni}%</Text>}
                   </AnimatedCircularProgress>
                 </View>
               </View>

@@ -21,6 +21,8 @@ target 'HeyAstro' do
 
   pod 'RNCMaskedView', :path => '../node_modules/@react-native-masked-view/masked-view'
 
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
   target 'HeyAstroTests' do
     inherit! :complete
     # Pods for testing

@@ -25,7 +25,6 @@ import { STRAPI_API_URL } from "@env";
 const EditProfile = ({ navigation }) => {
   const [DOB, setDOB] = useState(new Date());
   const [showDOB, setShowDOB] = useState(false);
-  const [TOB, setTOB] = useState(new Date());
   const [showTOB, setShowTOB] = useState(false);
   const [fullName, setFullName] = useState("");
   const [birthPlace, setBirthPlace] = useState({
@@ -61,10 +60,6 @@ const EditProfile = ({ navigation }) => {
               }
         `,
       });
-
-      setTOB(
-        new Date(fetchProfile.data.usersPermissionsUser.data.attributes.DOB)
-      );
       setDOB(
         new Date(fetchProfile.data.usersPermissionsUser.data.attributes.DOB)
       );
@@ -132,8 +127,6 @@ const EditProfile = ({ navigation }) => {
     try {
       setIsLoading(true);
       const userId = await AsyncStorage.getItem("userId");
-      let DateOfBirth = new Date(DOB);
-      DateOfBirth.setTime(TOB);
       const updatingProfile = await FetchAPI({
         query: `
             mutation {
@@ -142,7 +135,7 @@ const EditProfile = ({ navigation }) => {
                 data: {
                   FullName: ${JSON.stringify(fullName)},
                   BirthPlacePincode: ${JSON.parse(birthPincode)},
-                  DOB: ${JSON.stringify(DateOfBirth.toISOString())}
+                  DOB: ${JSON.stringify(DOB.toISOString())}
                   BirthPlace: { Country: ${JSON.stringify(
                     birthPlace.Country
                   )}, State: ${JSON.stringify(
@@ -379,7 +372,7 @@ const EditProfile = ({ navigation }) => {
               <Input
                 onFocus={() => setShowTOB(true)}
                 onChange={() => setShowTOB(true)}
-                value={moment(TOB).format("hh:mm a")}
+                value={moment(DOB).format("hh:mm a")}
                 inputStyle={{
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
@@ -393,9 +386,9 @@ const EditProfile = ({ navigation }) => {
               <DateTimePickerModal
                 isVisible={showTOB}
                 mode="time"
-                date={TOB}
+                date={DOB}
                 onConfirm={(time) => {
-                  setTOB(new Date(time));
+                  DOB.setTime(time);
                   setShowTOB(false);
                 }}
                 onCancel={() => {
