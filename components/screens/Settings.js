@@ -23,8 +23,10 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import Foundation from "react-native-vector-icons/Foundation";
 import { FetchAPI } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
 
-const Settings = ({ route, navigation }) => {
+const Settings = ({ navigation }) => {
+  const isFocused = useIsFocused();
   const [settings, setSettings] = useState();
   const [balance, setBalance] = useState(0);
   const customShare = () => {
@@ -103,7 +105,7 @@ const Settings = ({ route, navigation }) => {
   useEffect(() => {
     fetchSettings();
     fetchBalance();
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -117,7 +119,7 @@ const Settings = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -234,7 +236,7 @@ const Settings = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => navigation.navigate("Notifications")}
               >
                 <View
@@ -270,7 +272,7 @@ const Settings = ({ route, navigation }) => {
                     />
                   </View>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
 
@@ -378,7 +380,7 @@ const Settings = ({ route, navigation }) => {
                         color: "#818181",
                       }}
                     >
-                      {route.params ? route.params.balance : balance}
+                      {balance}
                     </Text>
                     <FontAwesome5
                       color={"#818181"}

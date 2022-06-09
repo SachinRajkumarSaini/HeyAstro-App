@@ -135,7 +135,8 @@ export default class CometChatMessageComposer extends React.PureComponent {
       console.log('addOrderHistory', addOrderHistory);
       console.log(
         'Final Balance',
-        removeBalance.data.updateUsersPermissionsUser.data.attributes.Balance,
+        removeBalance.data.updateUsersPermissionsUser.data.attributes
+          .updatedOrderHistory,
       );
       // Exit the Screen
       console.log('Exit the Screen');

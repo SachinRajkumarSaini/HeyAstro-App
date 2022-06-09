@@ -21,12 +21,15 @@ import moment from "moment";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { STRAPI_API_URL } from "@env";
+import { useIsFocused } from "@react-navigation/native";
 
 const EditProfile = ({ navigation }) => {
+  const isFocused = useIsFocused();
   const [DOB, setDOB] = useState(new Date());
   const [showDOB, setShowDOB] = useState(false);
   const [showTOB, setShowTOB] = useState(false);
   const [fullName, setFullName] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [birthPlace, setBirthPlace] = useState({
     Country: "",
     State: "",
@@ -47,6 +50,7 @@ const EditProfile = ({ navigation }) => {
                   data{
                     attributes{
                     FullName,
+                    ProfileImage,
                     DOB,
                     BirthPlacePincode,
                       BirthPlace{
@@ -60,6 +64,9 @@ const EditProfile = ({ navigation }) => {
               }
         `,
       });
+      setProfileImage(
+        fetchProfile.data.usersPermissionsUser.data.attributes.ProfileImage
+      );
       setDOB(
         new Date(fetchProfile.data.usersPermissionsUser.data.attributes.DOB)
       );
@@ -121,7 +128,7 @@ const EditProfile = ({ navigation }) => {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, [isFocused]);
 
   const updateProfile = async () => {
     try {
@@ -166,46 +173,6 @@ const EditProfile = ({ navigation }) => {
     }
   };
 
-  const updateProfileImage = async () => {
-    try {
-      const image = await launchImageLibrary();
-      const fileName = image.assets[0].fileName;
-      const fileType = image.assets[0].type;
-      const fileUri = image.assets[0].uri;
-
-      const formData = new FormData();
-      formData.append("files", {
-        name: JSON.stringify(fileName),
-        type: JSON.stringify(fileType),
-        source: "users-permissions",
-        uri: Platform.OS === "ios" ? fileUri.replace("file://", "") : fileUri,
-      });
-
-      // fetch(`${STRAPI_API_URL}/api/upload`, {
-      //   method: "POST",
-      //   body: formData,
-      // })
-      //   .then((response) => response.json())
-      //   .then((response) => {
-      //     console.log("response", response);
-      //   })
-      //   .catch((error) => {
-      //     console.log("error", error);
-      //   });
-      const uploadImage = await Fetch_API(
-        `${STRAPI_API_URL}/api/upload`,
-        formData,
-        "POST"
-      );
-      console.log(uploadImage);
-    } catch (error) {
-      ToastAndroid.show(
-        "Something went wrong, Please try again later!",
-        ToastAndroid.SHORT
-      );
-    }
-  };
-
   useEffect(() => {
     if (birthPincode.length === 6) {
       getLocation();
@@ -223,7 +190,7 @@ const EditProfile = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -258,7 +225,9 @@ const EditProfile = ({ navigation }) => {
             }}
           >
             <Image
-              source={{ uri: FileBase64.profileLogo }}
+              source={{
+                uri: profileImage ? profileImage : FileBase64.profileLogo,
+              }}
               style={{
                 height: RFPercentage(12),
                 width: RFPercentage(12),
@@ -268,7 +237,13 @@ const EditProfile = ({ navigation }) => {
               }}
             />
             <TouchableOpacity
-              onPress={updateProfileImage}
+              onPress={async () => {
+                const userName = await AsyncStorage.getItem("userName");
+                const userId = await AsyncStorage.getItem("userId");
+                navigation.navigate("UploadImage", {
+                  uploadImageUrl: `https://hey-astro-video-call.vercel.app/user/uploadImage/${userName}/${userId}`,
+                });
+              }}
               style={{
                 position: "absolute",
                 bottom: 0,
@@ -310,7 +285,7 @@ const EditProfile = ({ navigation }) => {
                 }}
                 value={fullName}
                 onChangeText={(e) => setFullName(e)}
-                inputContainerStyle={{ borderBottomColor: "#423b88" }}
+                inputContainerStyle={{ borderBottomColor: "#1F4693" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Your Full Name"
               />
@@ -338,7 +313,7 @@ const EditProfile = ({ navigation }) => {
                   color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
-                inputContainerStyle={{ borderBottomColor: "#423b88" }}
+                inputContainerStyle={{ borderBottomColor: "#1F4693" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Date of Birth"
               />
@@ -379,7 +354,7 @@ const EditProfile = ({ navigation }) => {
                   color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
-                inputContainerStyle={{ borderBottomColor: "#423b88" }}
+                inputContainerStyle={{ borderBottomColor: "#1F4693" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Time of Birth"
               />
@@ -420,7 +395,7 @@ const EditProfile = ({ navigation }) => {
                   color: "#4B4B4B",
                   marginTop: RFPercentage(1.7),
                 }}
-                inputContainerStyle={{ borderBottomColor: "#423b88" }}
+                inputContainerStyle={{ borderBottomColor: "#1F4693" }}
                 placeholderTextColor="#C8C8C8"
                 placeholder="Enter Birth Place Pincode"
               />
@@ -459,7 +434,7 @@ const EditProfile = ({ navigation }) => {
               }}
               editable={false}
               selectTextOnFocus={false}
-              inputContainerStyle={{ borderBottomColor: "#423b88" }}
+              inputContainerStyle={{ borderBottomColor: "#1F4693" }}
               value={
                 birthPlace.City +
                 ", " +
@@ -479,7 +454,7 @@ const EditProfile = ({ navigation }) => {
           titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
           }}
           containerStyle={{
             width: "100%",

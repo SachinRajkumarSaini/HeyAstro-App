@@ -81,7 +81,7 @@ const DetailMatching = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -132,8 +132,7 @@ const DetailMatching = ({ route, navigation }) => {
               rotation={270}
               arcSweepAngle={180}
               style={{ marginTop: RFPercentage(2) }}
-              tintColor="#423b88"
-              onAnimationComplete={() => console.log("onAnimationComplete")}
+              tintColor="#1F4693"
               backgroundColor="#b7b4d9"
             />
             <Card
@@ -222,9 +221,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#FEA379"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(varna) => (
@@ -284,9 +280,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#6FCE96"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(bhakoot) => (
@@ -346,9 +339,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#B96AD9"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(maitri) => (
@@ -408,9 +398,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#5AA3EE"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(nadi) => <Text style={{ color: "black" }}>{nadi}%</Text>}
@@ -468,9 +455,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#FE83BB"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(vasya) => (
@@ -530,9 +514,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#FFA27A"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(gana) => <Text style={{ color: "black" }}>{gana}%</Text>}
@@ -590,9 +571,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#6FCF97"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(tara) => <Text style={{ color: "black" }}>{tara}%</Text>}
@@ -650,9 +628,6 @@ const DetailMatching = ({ route, navigation }) => {
                     arcSweepAngle={360}
                     tintColor="#B96AD8"
                     style={{ marginTop: RFPercentage(3), marginBottom: 0 }}
-                    onAnimationComplete={() =>
-                      console.log("onAnimationComplete")
-                    }
                     backgroundColor="#E0E1E1"
                   >
                     {(yoni) => <Text style={{ color: "black" }}>{yoni}%</Text>}

@@ -50,7 +50,7 @@ const Login = ({ navigation }) => {
                 if (!cometChatUser) {
                   CometChat.login(user.username, COMETCHAT_AUTH_KEY).then(
                     async (cometChatUser) => {
-                      console.log("Login Successful:", { cometChatUser });
+                      // console.log("Login Successful:", { cometChatUser });
                       setIsLoading(false);
                       // Main App Login Logic
                       await AsyncStorage.setItem("jwtToken", jwt);
@@ -59,14 +59,22 @@ const Login = ({ navigation }) => {
                       navigation.navigate("Home");
                     },
                     (error) => {
-                      console.log("Login failed with exception:", { error });
+                      // console.log("Login failed with exception:", { error });
+                      ToastAndroid.show(
+                        "Something went wrong, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
                       setIsLoading(false);
                     }
                   );
                 }
               },
               (error) => {
-                console.log("Something went wrong", error);
+                // console.log("Something went wrong", error);
+                ToastAndroid.show(
+                  "Something went wrong, Please try again later!",
+                  ToastAndroid.SHORT
+                );
                 setIsLoading(false);
               }
             );
@@ -85,7 +93,7 @@ const Login = ({ navigation }) => {
           "Something went wrong, Please try again later!",
           ToastAndroid.SHORT
         );
-        console.log(error);
+        // console.log(error);
       }
     } else {
       ToastAndroid.show("Please fill all the fields", ToastAndroid.SHORT);
@@ -163,7 +171,7 @@ const Login = ({ navigation }) => {
             marginTop: RFPercentage(2),
             width: "90%",
           }}
-          buttonStyle={{ backgroundColor: "#423b88" }}
+          buttonStyle={{ backgroundColor: "#1F4693" }}
           titleStyle={{
             fontFamily: "Dongle-Regular",
             fontSize: RFPercentage(2.5),

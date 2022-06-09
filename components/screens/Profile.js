@@ -21,6 +21,7 @@ const Profile = ({ navigation }) => {
   const [userProfile, setUserProfile] = useState({
     Name: "Full Name",
     DOB: new Date(),
+    Image: null,
   });
   const [astrology, setAstrology] = useState({
     zodiacSign: "",
@@ -30,7 +31,6 @@ const Profile = ({ navigation }) => {
 
   const fetchProfile = async () => {
     try {
-      console.log("aa");
       const userId = await AsyncStorage.getItem("userId");
       const fetchProfile = await FetchAPI({
         query: `
@@ -38,8 +38,9 @@ const Profile = ({ navigation }) => {
                 usersPermissionsUser(id:${userId}){
                   data{
                     attributes{
-                    FullName
+                      FullName
                       DOB
+                      ProfileImage
                     }
                   }
                 }
@@ -51,6 +52,8 @@ const Profile = ({ navigation }) => {
         DOB: new Date(
           fetchProfile.data.usersPermissionsUser.data.attributes.DOB
         ),
+        Image:
+          fetchProfile.data.usersPermissionsUser.data.attributes.ProfileImage,
       });
     } catch (error) {
       ToastAndroid.show(
@@ -90,7 +93,7 @@ const Profile = ({ navigation }) => {
         "Something went wrong, Please try agiain later!",
         ToastAndroid.SHORT
       );
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -113,7 +116,7 @@ const Profile = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -191,7 +194,11 @@ const Profile = ({ navigation }) => {
               <ProfileImagePlaceholder />
             ) : (
               <Image
-                source={{ uri: FileBase64.profileLogo }}
+                source={{
+                  uri: userProfile.Image
+                    ? userProfile.Image
+                    : FileBase64.profileLogo,
+                }}
                 style={{
                   height: RFPercentage(10),
                   width: RFPercentage(10),
@@ -775,7 +782,7 @@ const Profile = ({ navigation }) => {
               <Card
                 containerStyle={{
                   borderRadius: RFPercentage(1),
-                  backgroundColor: "#423b88",
+                  backgroundColor: "#1F4693",
                   padding: RFPercentage(4),
                 }}
               >

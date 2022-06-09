@@ -93,7 +93,7 @@ const ChatsAndCall = (props) => {
         );
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       ToastAndroid.show(
         "Some error occured, Please try again later",
         ToastAndroid.SHORT
@@ -145,7 +145,7 @@ const ChatsAndCall = (props) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -160,7 +160,7 @@ const ChatsAndCall = (props) => {
         }}
       />
       <ScrollView
-        style={{ backgroundColor: "#e8e6ff", flex: 1 }}
+        style={{ backgroundColor: "#e4e9f5", flex: 1 }}
         automaticallyAdjustContentInsets={true}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
@@ -174,7 +174,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "All" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "All" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -211,7 +211,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "Love" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "Love" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -248,7 +248,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "Career" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "Career" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -285,7 +285,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "Marriage" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "Marriage" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -323,7 +323,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "Health" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "Health" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -361,7 +361,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "Wealth" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "Wealth" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -398,7 +398,7 @@ const ChatsAndCall = (props) => {
               borderRadius: RFPercentage(1),
               width: RFPercentage(12.5),
               height: RFPercentage(10.5),
-              borderColor: category === "Family" ? "#423b88" : "#e8e6ff",
+              borderColor: category === "Family" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
             }}
           >
@@ -429,12 +429,12 @@ const ChatsAndCall = (props) => {
         </TouchableOpacity>
       </ScrollView>
 
-      <View style={{ flex: 5.3, backgroundColor: "#f3f2fc" }}>
+      <View style={{ flex: 5.3, backgroundColor: "#dce4f5" }}>
         {isLoading && (
           <ActivityIndicator
             style={{ marginVertical: RFPercentage(10) }}
             size={RFPercentage(5)}
-            color={"#423b88"}
+            color={"#1F4693"}
           />
         )}
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -713,7 +713,7 @@ const ChatsAndCall = (props) => {
                   <Card
                     containerStyle={{
                       borderRadius: RFPercentage(1),
-                      borderColor: "#423b88",
+                      borderColor: "#1F4693",
                       borderWidth: 1,
                       height: RFPercentage(6),
                       width: RFPercentage(18),
@@ -721,7 +721,7 @@ const ChatsAndCall = (props) => {
                   >
                     <Text
                       style={{
-                        color: "#423b88",
+                        color: "#1F4693",
                         fontFamily: "Dongle-Regular",
                         fontSize: RFPercentage(2),
                         textAlign: "center",
@@ -741,11 +741,13 @@ const ChatsAndCall = (props) => {
                         userBalance
                       ) {
                         const userName = await AsyncStorage.getItem("userName");
+                        const userId = await AsyncStorage.getItem("userId");
                         const astrologerId =
                           JSON.parse(selectedAstrologer).Username;
-                        console.log(userName, astrologerId);
+                        const astrologerName =
+                          JSON.parse(selectedAstrologer).Name;
                         navigation.navigate("VideoCall", {
-                          videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/chatwith/${astrologerId}`,
+                          videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/${userId}/chatwith/${astrologerId}/${astrologerName}`,
                         });
                         setShowContactDialog(false);
                       } else {
@@ -765,7 +767,7 @@ const ChatsAndCall = (props) => {
                   <Card
                     containerStyle={{
                       borderRadius: RFPercentage(1),
-                      borderColor: "#423b88",
+                      borderColor: "#1F4693",
                       borderWidth: 1,
                       width: RFPercentage(18),
                       height: RFPercentage(6),
@@ -773,7 +775,7 @@ const ChatsAndCall = (props) => {
                   >
                     <Text
                       style={{
-                        color: "#423b88",
+                        color: "#1F4693",
                         fontFamily: "Dongle-Regular",
                         fontSize: RFPercentage(2),
                         textAlign: "center",

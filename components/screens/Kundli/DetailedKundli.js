@@ -11,7 +11,7 @@ import TextInput from "react-native-text-input-interactive";
 import { Tab, TabView } from "@rneui/themed";
 import { Table, Row, Rows } from "react-native-table-component";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import React, { useState, Fragment, useEffect } from "react";
+import React, { useState, Fragment } from "react";
 import SvgUri from "react-native-svg-uri";
 import Basic from "./Basic";
 import { SvgXml } from "react-native-svg";
@@ -20,9 +20,6 @@ import Planets from "./Planets";
 
 const DetailedKundli = ({ route, navigation }) => {
   const [index, setIndex] = useState(0);
-  useEffect(() => {
-    console.log(route.params);
-  }, []);
   return (
     <View style={{ flex: 1 }}>
       <StatusBar
@@ -34,7 +31,7 @@ const DetailedKundli = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -53,7 +50,7 @@ const DetailedKundli = ({ route, navigation }) => {
           value={index}
           onChange={(e) => setIndex(e)}
           indicatorStyle={{
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
             height: 3,
           }}
           containerStyle={{
@@ -71,7 +68,7 @@ const DetailedKundli = ({ route, navigation }) => {
             titleStyle={{
               fontSize: RFPercentage(3),
               fontFamily: "Dongle-Regular",
-              color: "#423b88",
+              color: "#1F4693",
             }}
           />
           <Tab.Item
@@ -84,7 +81,7 @@ const DetailedKundli = ({ route, navigation }) => {
             titleStyle={{
               fontSize: RFPercentage(3),
               fontFamily: "Dongle-Regular",
-              color: "#423b88",
+              color: "#1F4693",
             }}
           />
           <Tab.Item
@@ -97,7 +94,7 @@ const DetailedKundli = ({ route, navigation }) => {
             titleStyle={{
               fontSize: RFPercentage(3),
               fontFamily: "Dongle-Regular",
-              color: "#423b88",
+              color: "#1F4693",
             }}
           />
           <Tab.Item
@@ -110,7 +107,7 @@ const DetailedKundli = ({ route, navigation }) => {
             titleStyle={{
               fontSize: RFPercentage(3),
               fontFamily: "Dongle-Regular",
-              color: "#423b88",
+              color: "#1F4693",
             }}
           />
         </Tab>

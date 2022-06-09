@@ -62,7 +62,7 @@ const Blog = ({ route, navigation }) => {
         "Some error occured, Please try again later",
         ToastAndroid.SHORT
       );
-      console.log(error);
+      // console.log(error);
     }
   };
   useEffect(() => {
@@ -79,7 +79,7 @@ const Blog = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}

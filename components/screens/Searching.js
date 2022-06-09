@@ -6,19 +6,27 @@ import {
   ToastAndroid,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Header, Card, SearchBar, Image } from "react-native-elements";
 import FileBase64 from "../helpers/FileBase64";
 import { FetchAPI } from "../helpers/FetchInstance";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { CometChat } from "@cometchat-pro/react-native-chat";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Searching = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const inputRef = React.useRef();
+  const [userBalance, setUserBalance] = useState(null);
   setTimeout(() => inputRef.current.focus(), 100);
   const [astrologers, setAstrologers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [showContactDialog, setShowContactDialog] = useState(false);
+  const [selectedAstrologer, setSelectedAstrologer] = useState();
 
   const fetchAstrologers = async () => {
     try {
@@ -30,17 +38,12 @@ const Searching = ({ navigation }) => {
                     astrologers{
                     data{
                         attributes{
+                            Username
                             Name
                             Languages
                             Experience
                             ChargePerMinute
-                            ProfileImage{
-                                data{
-                                    attributes{
-                                        url
-                                    }
-                                }
-                            }
+                            ProfileImage
                         }
                     }
                     }
@@ -60,8 +63,36 @@ const Searching = ({ navigation }) => {
     }
   };
 
+  const fetchUserBalance = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const getBalance = await FetchAPI({
+        query: `
+            query {
+              usersPermissionsUser(id: ${userId}) {
+                data {
+                  attributes {
+                    Balance
+                  }
+                }
+              }
+            }
+          `,
+      });
+      setUserBalance(
+        getBalance.data.usersPermissionsUser.data.attributes.Balance
+      );
+    } catch (error) {
+      ToastAndroid.show(
+        "Some error occured, Please try again later",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
   useEffect(() => {
     fetchAstrologers();
+    fetchUserBalance();
   }, []);
 
   const searchAstrologer = async () => {
@@ -80,13 +111,7 @@ const Searching = ({ navigation }) => {
                             Languages
                             Experience
                             ChargePerMinute
-                            ProfileImage{
-                                data{
-                                attributes{
-                                    url
-                                }
-                                }
-                            }
+                            ProfileImage
                         }
                     }
                     }
@@ -117,7 +142,7 @@ const Searching = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -147,8 +172,10 @@ const Searching = ({ navigation }) => {
           <View style={{ marginTop: RFPercentage(1) }}>
             <SearchBar
               ref={inputRef}
-              onEndEditing={searchAstrologer}
-              onChangeText={(e) => setSearch(e)}
+              onChangeText={(e) => {
+                setSearch(e);
+                searchAstrologer();
+              }}
               returnKeyType="search"
               onClear={() => {
                 setSearch("");
@@ -182,63 +209,62 @@ const Searching = ({ navigation }) => {
           </View>
           {isLoading && (
             <ActivityIndicator
-              style={{ marginVertical: RFPercentage(1) }}
+              style={{ marginVertical: RFPercentage(5) }}
               size={RFPercentage(5)}
-              color={"#423b88"}
+              color={"#1F4693"}
             />
           )}
           {/* Search Results */}
           <View style={{ paddingBottom: RFPercentage(3) }}>
-            {astrologers &&
-              astrologers.map((astrologer, index) => {
-                return (
-                  <TouchableOpacity key={index} activeOpacity={0.9}>
-                    <Card containerStyle={{ borderRadius: RFPercentage(1) }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <View style={{ justifyContent: "center" }}>
-                          <Image
-                            source={{
-                              uri: astrologer.ProfileImage.data.attributes.url,
-                            }}
-                            style={{
-                              height: 80,
-                              width: 80,
-                              borderRadius: 40,
-                              borderWidth: 1,
-                              borderColor: "black",
-                            }}
-                          />
-                        </View>
-                        <View style={{ justifyContent: "space-around" }}>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={{
-                              fontFamily: "Ubuntu-Bold",
-                              color: "black",
-                              fontSize: RFPercentage(1.5),
-                              maxWidth: RFPercentage(19),
-                            }}
-                          >
-                            {astrologer.Name}
-                          </Text>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={{
-                              fontFamily: "Ubuntu-Regular",
-                              color: "black",
-                              fontSize: RFPercentage(1.2),
-                              maxWidth: RFPercentage(19),
-                            }}
-                          >
-                            {astrologer.Languages.Languages.map(
-                              (language, index) => {
+            {astrologers.length > 0
+              ? astrologers.map((astrologer, index) => {
+                  return (
+                    <TouchableOpacity key={index} activeOpacity={0.9}>
+                      <Card containerStyle={{ borderRadius: RFPercentage(1) }}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <View style={{ justifyContent: "center" }}>
+                            <Image
+                              source={{
+                                uri: astrologer.ProfileImage,
+                              }}
+                              style={{
+                                height: 80,
+                                width: 80,
+                                borderRadius: 40,
+                                borderWidth: 1,
+                                borderColor: "black",
+                              }}
+                            />
+                          </View>
+                          <View style={{ justifyContent: "space-around" }}>
+                            <Text
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              style={{
+                                fontFamily: "Ubuntu-Bold",
+                                color: "black",
+                                fontSize: RFPercentage(1.5),
+                                maxWidth: RFPercentage(19),
+                              }}
+                            >
+                              {astrologer.Name}
+                            </Text>
+                            <Text
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              style={{
+                                fontFamily: "Ubuntu-Regular",
+                                color: "black",
+                                fontSize: RFPercentage(1.2),
+                                maxWidth: RFPercentage(19),
+                              }}
+                            >
+                              {astrologer.Languages.map((language, index) => {
                                 return (
                                   <Text
                                     style={{
@@ -252,63 +278,301 @@ const Searching = ({ navigation }) => {
                                     {language}&nbsp;&nbsp;
                                   </Text>
                                 );
-                              }
-                            )}
-                          </Text>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={{
-                              fontFamily: "Ubuntu-Regular",
-                              color: "black",
-                              fontSize: RFPercentage(1.2),
-                              maxWidth: RFPercentage(19),
-                            }}
-                          >
-                            Experience:- {astrologer.Experience}
-                          </Text>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={{
-                              fontFamily: "Ubuntu-Regular",
-                              color: "black",
-                              fontSize: RFPercentage(1.2),
-                              maxWidth: RFPercentage(19),
-                            }}
-                          >
-                            Charges Per Minute:- {astrologer.ChargePerMinute}
-                          </Text>
-                        </View>
-                        <View>
-                          <Card
-                            containerStyle={{
-                              borderRadius: RFPercentage(1),
-                              borderColor: "green",
-                              borderWidth: 1,
-                            }}
-                          >
+                              })}
+                            </Text>
                             <Text
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
                               style={{
-                                color: "green",
-                                fontFamily: "Dongle-Regular",
-                                fontSize: RFPercentage(2),
-                                textAlign: "center",
-                                alignItems: "center",
+                                fontFamily: "Ubuntu-Regular",
+                                color: "black",
+                                fontSize: RFPercentage(1.2),
+                                maxWidth: RFPercentage(19),
                               }}
                             >
-                              Chats
+                              Experience:- {astrologer.Experience}
                             </Text>
-                          </Card>
+                            <Text
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              style={{
+                                fontFamily: "Ubuntu-Regular",
+                                color: "black",
+                                fontSize: RFPercentage(1.2),
+                                maxWidth: RFPercentage(19),
+                              }}
+                            >
+                              Charges Per Minute:- {astrologer.ChargePerMinute}
+                            </Text>
+                          </View>
+                          <View>
+                            <TouchableOpacity
+                              activeOpacity={0.9}
+                              onPress={async () => {
+                                setStatusLoading(true);
+                                const astrologerStatus =
+                                  await CometChat.getUser(astrologer.Username);
+                                astrologer.status = astrologerStatus.status;
+                                setSelectedAstrologer(
+                                  JSON.stringify(astrologer)
+                                );
+                                setShowContactDialog(true);
+                                setStatusLoading(false);
+                              }}
+                            >
+                              <Card
+                                containerStyle={{
+                                  borderRadius: RFPercentage(1),
+                                  borderColor: "green",
+                                  borderWidth: 1,
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: "green",
+                                    fontFamily: "Dongle-Regular",
+                                    fontSize: RFPercentage(2),
+                                    textAlign: "center",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  Contact
+                                </Text>
+                              </Card>
+                            </TouchableOpacity>
+                          </View>
                         </View>
-                      </View>
-                    </Card>
-                  </TouchableOpacity>
-                );
-              })}
+                      </Card>
+                    </TouchableOpacity>
+                  );
+                })
+              : !isLoading && (
+                  <Text
+                    style={{
+                      color: "black",
+                      fontFamily: "Dongle-Regular",
+                      textAlign: "center",
+                      fontSize: RFPercentage(3),
+                      marginTop: RFPercentage(5),
+                    }}
+                  >
+                    No Astrologer Found
+                  </Text>
+                )}
           </View>
         </View>
       </ScrollView>
+      {selectedAstrologer && (
+        <Modal
+          onRequestClose={() => setShowContactDialog(false)}
+          transparent={true}
+          visible={showContactDialog}
+        >
+          <View style={{ backgroundColor: "#000000aa", flex: 1 }}>
+            <View style={{ flex: 1.9 }} />
+            <View
+              style={{
+                backgroundColor: "white",
+                flex: 1,
+              }}
+            >
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: RFPercentage(4),
+                }}
+              >
+                <Image
+                  source={{
+                    uri: JSON.parse(selectedAstrologer).ProfileImage,
+                  }}
+                  style={{
+                    height: 85,
+                    width: 85,
+                    borderRadius: 42,
+                    borderWidth: 1,
+                    borderColor: "black",
+                    marginBottom: RFPercentage(1.5),
+                  }}
+                />
+                <View>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      fontFamily: "Ubuntu-Bold",
+                      color: "black",
+                      fontSize: RFPercentage(1.8),
+                      maxWidth: RFPercentage(19),
+                    }}
+                  >
+                    {JSON.parse(selectedAstrologer).Name}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      fontFamily: "Ubuntu-Regular",
+                      color: "black",
+                      fontSize: RFPercentage(1.5),
+                      maxWidth: RFPercentage(19),
+                      marginTop: RFPercentage(0.5),
+                    }}
+                  >
+                    Rate:- {JSON.parse(selectedAstrologer).ChargePerMinute}{" "}
+                    <FontAwesome name="inr" color="green" size={10} />
+                    /Min
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      fontFamily: "Ubuntu-Regular",
+                      color: "black",
+                      fontSize: RFPercentage(1.5),
+                      maxWidth: RFPercentage(19),
+                      marginTop: RFPercentage(0.5),
+                    }}
+                  >
+                    Status :-{" "}
+                    {JSON.parse(selectedAstrologer).status === "online" ? (
+                      <Text style={{ color: "green" }}>Online</Text>
+                    ) : (
+                      <Text style={{ color: "red" }}> Offline</Text>
+                    )}
+                  </Text>
+                </View>
+                <View />
+              </View>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  marginTop: RFPercentage(2),
+                }}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    if (JSON.parse(selectedAstrologer).status === "online") {
+                      if (
+                        JSON.parse(selectedAstrologer).ChargePerMinute <=
+                        userBalance
+                      ) {
+                        navigation.navigate("ChatUI", {
+                          userName: JSON.parse(selectedAstrologer).Username,
+                        });
+                        setShowContactDialog(false);
+                      } else {
+                        ToastAndroid.show(
+                          "Insufficient Balance, Please recharge your wallet",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    } else {
+                      ToastAndroid.show(
+                        "Astrologer is offline, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                  }}
+                >
+                  <Card
+                    containerStyle={{
+                      borderRadius: RFPercentage(1),
+                      borderColor: "#1F4693",
+                      borderWidth: 1,
+                      height: RFPercentage(6),
+                      width: RFPercentage(18),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#1F4693",
+                        fontFamily: "Dongle-Regular",
+                        fontSize: RFPercentage(2),
+                        textAlign: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      Chat
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={async () => {
+                    if (JSON.parse(selectedAstrologer).status === "online") {
+                      if (
+                        JSON.parse(selectedAstrologer).ChargePerMinute <=
+                        userBalance
+                      ) {
+                        const userName = await AsyncStorage.getItem("userName");
+                        const userId = await AsyncStorage.getItem("userId");
+                        const astrologerId =
+                          JSON.parse(selectedAstrologer).Username;
+                        const astrologerName =
+                          JSON.parse(selectedAstrologer).Name;
+                        navigation.navigate("VideoCall", {
+                          videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/${userId}/chatwith/${astrologerId}/${astrologerName}`,
+                        });
+                        setShowContactDialog(false);
+                      } else {
+                        ToastAndroid.show(
+                          "Insufficient Balance, Please recharge your wallet",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    } else {
+                      ToastAndroid.show(
+                        "Astrologer is offline, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                  }}
+                >
+                  <Card
+                    containerStyle={{
+                      borderRadius: RFPercentage(1),
+                      borderColor: "#1F4693",
+                      borderWidth: 1,
+                      width: RFPercentage(18),
+                      height: RFPercentage(6),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#1F4693",
+                        fontFamily: "Dongle-Regular",
+                        fontSize: RFPercentage(2),
+                        textAlign: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      Call
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+      {/* Loading Model */}
+      <Modal transparent={true} visible={statusLoading}>
+        <View
+          style={{
+            backgroundColor: "#000000aa",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      </Modal>
     </View>
   );
 };

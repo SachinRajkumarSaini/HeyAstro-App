@@ -26,11 +26,6 @@ const VideoCall = ({ route, navigation }) => {
         buttonPositive: "OK",
       }
     );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("You can use the camera");
-    } else {
-      console.log("Camera permission denied");
-    }
   };
 
   const micPermission = async () => {
@@ -44,11 +39,6 @@ const VideoCall = ({ route, navigation }) => {
         buttonPositive: "OK",
       }
     );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("You can use the Microphone");
-    } else {
-      console.log("Microphone permission denied");
-    }
   };
 
   useEffect(() => {
@@ -66,7 +56,7 @@ const VideoCall = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -102,7 +92,7 @@ const VideoCall = ({ route, navigation }) => {
         renderLoadingView={() => {
           return (
             <ActivityIndicator
-              color="#423b88"
+              color="#1F4693"
               size="large"
               style={{
                 flex: 1,

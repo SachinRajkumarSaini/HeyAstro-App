@@ -16,6 +16,7 @@ import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Fetch_API } from "../../helpers/FetchInstance";
 import { STRAPI_API_URL } from "@env";
+import uuid from "react-native-uuid";
 
 const CreateKundli = ({ navigation }) => {
   const [fullName, setFullName] = useState("");
@@ -100,13 +101,14 @@ const CreateKundli = ({ navigation }) => {
 
         const userId = await AsyncStorage.getItem("userId");
 
-        console.log(kundli, lagna, navamsa, saptamsa);
-        console.log("new", fullName, DOB, place);
+        // console.log(kundli, lagna, navamsa, saptamsa);
+        // console.log("new", fullName, DOB, place);
 
         const addKundli = await Fetch_API(
           `${STRAPI_API_URL}/api/users/kundli/${userId}`,
           {
             Kundli: {
+              id: uuid.v4(),
               Name: fullName,
               DOB: DOB.toISOString(),
               Place: `${place.City}, ${place.State}, ${place.Country}`,
@@ -133,12 +135,7 @@ const CreateKundli = ({ navigation }) => {
             "Content-Type": "application/json",
           }
         );
-        // ,
-        //         {
-        //           Name: "Rasi Chart",
-        //           SVG_XML: rasi,
-        //         },
-        console.log(addKundli);
+        // console.log(addKundli.updatedKundli);
         setIsLoading(false);
         navigation.navigate("DetailedKundli", {
           Kundli: kundli.kundli,
@@ -172,7 +169,7 @@ const CreateKundli = ({ navigation }) => {
         "Something went wrong, Please try again later",
         ToastAndroid.SHORT
       );
-      console.log(error);
+      // console.log(error);
       setIsLoading(false);
     }
   };
@@ -188,7 +185,7 @@ const CreateKundli = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -337,7 +334,7 @@ const CreateKundli = ({ navigation }) => {
           titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
           }}
           containerStyle={{
             width: "100%",

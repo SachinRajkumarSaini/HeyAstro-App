@@ -167,7 +167,7 @@ const Home = ({ navigation }) => {
         "Something went wrong, Please try again later!",
         ToastAndroid.SHORT
       );
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -186,7 +186,7 @@ const Home = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -404,9 +404,10 @@ const Home = ({ navigation }) => {
                 data={carousels}
                 imageKey={"url"}
                 height={RFPercentage(15)}
+                onPress={(item) => null}
                 timer={2000}
                 indicatorContainerStyle={{ position: "absolute", bottom: 20 }}
-                indicatorActiveColor={"#423b88"}
+                indicatorActiveColor={"#1F4693"}
                 indicatorInActiveColor={"#ffffff"}
                 indicatorActiveWidth={15}
                 animation
@@ -816,7 +817,7 @@ const Home = ({ navigation }) => {
           <Ionicons name="ios-chatbubbles" color={"white"} size={28} />
         )}
         placement="right"
-        color="#423b88"
+        color="#1F4693"
       />
     </View>
   );

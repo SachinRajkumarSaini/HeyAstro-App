@@ -1,13 +1,10 @@
 import { View, Text, ScrollView } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { Table, Row, Rows } from "react-native-table-component";
 import { Card } from "react-native-elements";
 import { RFPercentage } from "react-native-responsive-fontsize";
 
 const Basic = (props) => {
-  useEffect(() => {
-    console.log("Basic", props.mangal_dasha.has_dosha);
-  }, []);
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <Text
@@ -23,7 +20,7 @@ const Basic = (props) => {
       </Text>
       <Table
         style={{ margin: RFPercentage(2) }}
-        borderStyle={{ borderWidth: 2, borderColor: "#423b88" }}
+        borderStyle={{ borderWidth: 2, borderColor: "#1F4693" }}
       >
         <Row
           data={["Name", props.userData.Name]}
@@ -229,104 +226,105 @@ const Basic = (props) => {
         </View>
       </Card>
 
-      {/* Expections */}
-      <Card
-        containerStyle={{
-          borderRadius: RFPercentage(1.5),
-          marginBottom: RFPercentage(2),
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View style={{ flex: 10 }}>
-            <Text
-              style={{
-                fontFamily: "Dongle-Bold",
-                fontSize: RFPercentage(2.5),
-                color: "black",
-                textAlign: "center",
-              }}
-            >
-              Exceptions
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Dongle-Regular",
-                color: "black",
-                fontSize: RFPercentage(1.8),
-                lineHeight: 15,
-                marginTop: RFPercentage(1),
-              }}
-            >
-              {props.mangal_dasha.exceptions.map((item, index) => {
-                return (
-                  <Text style={{ color: "black" }} key={index}>
-                    {index + 1}
-                    {". "}
-                    {item}
-                    {"\n"}
-                  </Text>
-                );
-              })}
-            </Text>
-          </View>
-        </View>
-      </Card>
-
       {/* Remedies */}
       {props.mangal_dasha.has_dosha && props.mangal_dasha.has_exception && (
-        <Card
-          containerStyle={{
-            borderRadius: RFPercentage(1.5),
-            marginBottom: RFPercentage(3),
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
+        <View>
+          {/* Expections */}
+          <Card
+            containerStyle={{
+              borderRadius: RFPercentage(1.5),
+              marginBottom: RFPercentage(2),
             }}
           >
-            <View style={{ flex: 10 }}>
-              <Text
-                style={{
-                  fontFamily: "Dongle-Bold",
-                  fontSize: RFPercentage(2.5),
-                  color: "black",
-                  textAlign: "center",
-                }}
-              >
-                Remedies
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "Dongle-Regular",
-                  color: "black",
-                  fontSize: RFPercentage(1.8),
-                  lineHeight: 15,
-                  marginTop: RFPercentage(1),
-                }}
-              >
-                {props.mangal_dasha.remedies.map((item, index) => {
-                  return (
-                    <Text style={{ color: "black" }} key={index}>
-                      {index + 1}
-                      {". "}
-                      {item}
-                      {"\n"}
-                    </Text>
-                  );
-                })}
-              </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flex: 10 }}>
+                <Text
+                  style={{
+                    fontFamily: "Dongle-Bold",
+                    fontSize: RFPercentage(2.5),
+                    color: "black",
+                    textAlign: "center",
+                  }}
+                >
+                  Exceptions
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Dongle-Regular",
+                    color: "black",
+                    fontSize: RFPercentage(1.8),
+                    lineHeight: 15,
+                    marginTop: RFPercentage(1),
+                  }}
+                >
+                  {props.mangal_dasha.exceptions.map((item, index) => {
+                    return (
+                      <Text style={{ color: "black" }} key={index}>
+                        {index + 1}
+                        {". "}
+                        {item}
+                        {"\n"}
+                      </Text>
+                    );
+                  })}
+                </Text>
+              </View>
             </View>
-          </View>
-        </Card>
+          </Card>
+          <Card
+            containerStyle={{
+              borderRadius: RFPercentage(1.5),
+              marginBottom: RFPercentage(3),
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flex: 10 }}>
+                <Text
+                  style={{
+                    fontFamily: "Dongle-Bold",
+                    fontSize: RFPercentage(2.5),
+                    color: "black",
+                    textAlign: "center",
+                  }}
+                >
+                  Remedies
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Dongle-Regular",
+                    color: "black",
+                    fontSize: RFPercentage(1.8),
+                    lineHeight: 15,
+                    marginTop: RFPercentage(1),
+                  }}
+                >
+                  {props.mangal_dasha.remedies.map((item, index) => {
+                    return (
+                      <Text style={{ color: "black" }} key={index}>
+                        {index + 1}
+                        {". "}
+                        {item}
+                        {"\n"}
+                      </Text>
+                    );
+                  })}
+                </Text>
+              </View>
+            </View>
+          </Card>
+        </View>
       )}
     </ScrollView>
   );

@@ -24,7 +24,7 @@ const IntroScreen = ({ navigation }) => {
           style={{
             textAlign: "center",
             fontSize: RFPercentage(4),
-            color: "#423b88",
+            color: "#1F4693",
             fontFamily: "Dongle-Regular",
           }}
         >
@@ -48,7 +48,7 @@ const IntroScreen = ({ navigation }) => {
             fontFamily: "Ubuntu-Regular",
           }}
         >
-          lorem10 o know your horoscope by the stars from our specialists.
+          Extend your arms in welcome to the future.
         </Text>
         <Button
           title="CONTINUE"
@@ -58,7 +58,7 @@ const IntroScreen = ({ navigation }) => {
             fontSize: RFPercentage(3.5),
           }}
           buttonStyle={{
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
             borderRadius: RFPercentage(1),
           }}
           containerStyle={{

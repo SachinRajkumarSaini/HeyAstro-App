@@ -10,6 +10,7 @@ import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Header, Card } from "react-native-elements";
 import { FetchAPI } from "../helpers/FetchInstance";
+import Markdown from "react-native-markdown-display";
 
 const PrivacyPolicy = ({ navigation }) => {
   const [privacyPolicy, setPrivacyPolicy] = useState();
@@ -52,7 +53,7 @@ const PrivacyPolicy = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -75,7 +76,18 @@ const PrivacyPolicy = ({ navigation }) => {
           onPress: () => navigation.goBack(),
         }}
       />
-      <Text>{privacyPolicy && privacyPolicy}</Text>
+      <ScrollView
+        style={{ paddingHorizontal: RFPercentage(1) }}
+        showsVerticalScrollIndicator={true}
+      >
+        {privacyPolicy && (
+          <Markdown
+            style={{
+              body: { color: "black" },
+            }}
+          >{`${privacyPolicy}`}</Markdown>
+        )}
+      </ScrollView>
     </View>
   );
 };

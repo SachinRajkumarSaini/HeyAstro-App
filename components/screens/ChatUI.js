@@ -11,11 +11,15 @@ export default function CometChatMessagesView({ route, navigation }) {
   const getLoggedinUser = () => {
     CometChat.getLoggedinUser().then(
       (user) => {
-        console.log("user details:", { user });
+        // console.log("user details:", { user });
         setLocalUser(user);
       },
       (error) => {
-        console.log("error getting details:", { error });
+        // console.log("error getting details:", { error });
+        ToastAndroid.show(
+          "Some error occured, Please try again later",
+          ToastAndroid.SHORT
+        );
       }
     );
   };
@@ -24,11 +28,15 @@ export default function CometChatMessagesView({ route, navigation }) {
     const astrologerUsername = route.params.userName;
     CometChat.getUser(astrologerUsername).then(
       (user) => {
-        console.log("User details fetched for user:", user);
+        // console.log("User details fetched for user:", user);
         setAstrologerUser(user);
       },
       (error) => {
-        console.log("User details fetching failed with error:", error);
+        // console.log("User details fetching failed with error:", error);
+        ToastAndroid.show(
+          "Some error occured, Please try again later",
+          ToastAndroid.SHORT
+        );
       }
     );
   };
@@ -52,12 +60,12 @@ export default function CometChatMessagesView({ route, navigation }) {
           loggedInUser={localUser}
           navigation={navigation}
           actionGenerated={(actionType) => {
-            console.log(actionType);
+            // console.log(actionType);
           }}
         />
       ) : (
         <ActivityIndicator
-          color="#423b88"
+          color="#1F4693"
           size={RFPercentage(8)}
           style={{
             flex: 1,

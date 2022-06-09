@@ -44,7 +44,7 @@ const Signup = ({ navigation }) => {
       );
       return gettingLocation;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       ToastAndroid.show("Pincode is not valid", ToastAndroid.SHORT);
       setIsLoading(false);
     }
@@ -139,16 +139,16 @@ const Signup = ({ navigation }) => {
           cometChatUser.setName(fullName);
           CometChat.createUser(cometChatUser, COMETCHAT_AUTH_KEY).then(
             async (cometChatSignupUser) => {
-              console.log("user created", cometChatSignupUser);
+              // console.log("user created", cometChatSignupUser);
               // Login CometChat App
               CometChat.getLoggedinUser().then(
                 (cometChatLoginUser) => {
                   if (!cometChatLoginUser) {
                     CometChat.login(userName, COMETCHAT_AUTH_KEY).then(
                       async (cometChatLoginUser) => {
-                        console.log("Login Successful:", {
-                          cometChatLoginUser,
-                        });
+                        // console.log("Login Successful:", {
+                        //   cometChatLoginUser,
+                        // });
                         // Login in APP
                         const login = await FetchAPI({
                           query: `
@@ -177,19 +177,31 @@ const Signup = ({ navigation }) => {
                         }
                       },
                       (error) => {
-                        console.log("Login failed with exception:", { error });
+                        // console.log("Login failed with exception:", { error });
+                        ToastAndroid.show(
+                          "Something went wrong, Please try again later!",
+                          ToastAndroid.SHORT
+                        );
                       }
                     );
                   }
                 },
                 (error) => {
-                  console.log("Something went wrong", error);
+                  // console.log("Something went wrong", error);
+                  ToastAndroid.show(
+                    "Something went wrong, Please try again later!",
+                    ToastAndroid.SHORT
+                  );
                 }
               );
             },
             (error) => {
-              console.log("error", error);
+              // console.log("error", error);
               setIsLoading(false);
+              ToastAndroid.show(
+                "Something went wrong, Please try again later!",
+                ToastAndroid.SHORT
+              );
             }
           );
         }
@@ -255,7 +267,7 @@ const Signup = ({ navigation }) => {
                 marginTop: RFPercentage(2),
                 width: "90%",
               }}
-              buttonStyle={{ backgroundColor: "#423b88" }}
+              buttonStyle={{ backgroundColor: "#1F4693" }}
               titleStyle={{
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(2.5),
@@ -408,7 +420,7 @@ const Signup = ({ navigation }) => {
                   marginTop: RFPercentage(2),
                   width: "90%",
                 }}
-                buttonStyle={{ backgroundColor: "#423b88" }}
+                buttonStyle={{ backgroundColor: "#1F4693" }}
                 titleStyle={{
                   fontFamily: "Dongle-Regular",
                   fontSize: RFPercentage(2.5),

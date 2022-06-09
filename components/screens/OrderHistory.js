@@ -38,16 +38,19 @@ const OrderHistory = ({ navigation }) => {
           }     
         `,
       });
-      setChatOrderHistories(
-        getHistories.data.usersPermissionsUser.data.attributes.OrderHistory.filter(
-          (item) => JSON.parse(item.OrderType) === "Chat"
-        )
-      );
-      setCallOrderHistories(
-        getHistories.data.usersPermissionsUser.data.attributes.OrderHistory.filter(
-          (item) => JSON.parse(item.OrderType) === "Call"
-        )
-      );
+
+      if (getHistories.data.usersPermissionsUser.data.attributes.OrderHistory) {
+        setChatOrderHistories(
+          getHistories.data.usersPermissionsUser.data.attributes.OrderHistory.filter(
+            (item) => JSON.parse(item.OrderType) === "Chat"
+          )
+        );
+        setCallOrderHistories(
+          getHistories.data.usersPermissionsUser.data.attributes.OrderHistory.filter(
+            (item) => JSON.parse(item.OrderType) === "Call"
+          )
+        );
+      }
       setIsLoading(false);
     } catch (error) {
       ToastAndroid.show(
@@ -55,7 +58,7 @@ const OrderHistory = ({ navigation }) => {
         ToastAndroid.SHORT
       );
       setIsLoading(false);
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -73,7 +76,7 @@ const OrderHistory = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -131,15 +134,15 @@ const OrderHistory = ({ navigation }) => {
       </View>
 
       {/* Order History */}
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {callOrderHistory ? (
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#f3f2fc",
-              paddingBottom: RFPercentage(3),
-            }}
-          >
+      {callOrderHistory ? (
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#dce4f5",
+            paddingBottom: RFPercentage(3),
+          }}
+        >
+          <ScrollView showsVerticalScrollIndicator={false}>
             {isLoading ? (
               <OrderHistoryPlaceholder />
             ) : callOrderhistories.length > 0 ? (
@@ -245,15 +248,17 @@ const OrderHistory = ({ navigation }) => {
                 No Call Order History
               </Text>
             )}
-          </View>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#f3f2fc",
-              paddingBottom: RFPercentage(3),
-            }}
-          >
+          </ScrollView>
+        </View>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#dce4f5",
+            paddingBottom: RFPercentage(3),
+          }}
+        >
+          <ScrollView showsVerticalScrollIndicator={false}>
             {isLoading ? (
               <OrderHistoryPlaceholder />
             ) : chatOrderhistories.length > 0 ? (
@@ -359,9 +364,9 @@ const OrderHistory = ({ navigation }) => {
                 No Chat Order History
               </Text>
             )}
-          </View>
-        )}
-      </ScrollView>
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 };

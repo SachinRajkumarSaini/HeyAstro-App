@@ -73,7 +73,7 @@ const Wallet = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -154,7 +154,7 @@ const Wallet = ({ route, navigation }) => {
             >
               <Card
                 containerStyle={{
-                  backgroundColor: "#352f70",
+                  backgroundColor: "#1F4693",
                   borderRadius: RFPercentage(1),
                   height: RFPercentage(5.5),
                   alignItems: "center",
@@ -177,7 +177,7 @@ const Wallet = ({ route, navigation }) => {
             containerStyle={{
               backgroundColor: "#f4f4f4",
               borderRadius: RFPercentage(2.2),
-              borderColor: "#352f70",
+              borderColor: "#1F4693",
               height: RFPercentage(5.5),
               alignItems: "center",
               justifyContent: "center",
@@ -370,7 +370,7 @@ const Wallet = ({ route, navigation }) => {
                 marginTop: RFPercentage(2),
                 width: "90%",
               }}
-              buttonStyle={{ backgroundColor: "#423b88" }}
+              buttonStyle={{ backgroundColor: "#1F4693" }}
               titleStyle={{
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(2.5),
@@ -395,7 +395,7 @@ const Wallet = ({ route, navigation }) => {
               titleStyle={{
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(2.5),
-                color: "#423b88",
+                color: "#1F4693",
               }}
               onPress={() => setShowAddBalance(false)}
               title="Cancel"

@@ -1,13 +1,10 @@
 import { View, Text, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Table, Row, Rows } from "react-native-table-component";
 import { RFPercentage } from "react-native-responsive-fontsize";
 
 const Planets = (props) => {
   const [planets] = useState(props.data);
-  useEffect(() => {
-    console.log("Planets", props.data);
-  }, []);
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={{ flex: 1 }}>
@@ -24,7 +21,7 @@ const Planets = (props) => {
         </Text>
         <Table
           style={{ margin: RFPercentage(2), marginBottom: RFPercentage(3) }}
-          borderStyle={{ borderWidth: 2, borderColor: "#423b88" }}
+          borderStyle={{ borderWidth: 2, borderColor: "#1F4693" }}
         >
           <Row
             data={["Planet", "Rashi", "Naksh Lord", "Degree", "House"]}

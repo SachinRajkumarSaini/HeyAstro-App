@@ -90,16 +90,14 @@ const PaymentInformation = ({ route, navigation }) => {
               "Content-Type": "application/json",
             }
           );
-          console.log(addTransactions);
-          if (addTransactions.Balance) {
+          // console.log(addTransactions);
+          if (addTransactions.updatedTransactions) {
             setStatus("Success");
             setIsLoading(false);
             setShowPaymentStatus(true);
             setTimeout(() => {
               setShowPaymentStatus(false);
-              navigation.navigate("Settings", {
-                balance: addTransactions.Balance,
-              });
+              navigation.navigate("Settings");
             }, 2000);
             ToastAndroid.show("Payment Success", ToastAndroid.SHORT);
           }
@@ -137,7 +135,7 @@ const PaymentInformation = ({ route, navigation }) => {
             "Content-Type": "application/json",
           }
         );
-        if (addTransactions.Balance) {
+        if (addTransactions.updatedTransactions) {
           setStatus("Failed");
           setIsLoading(false);
           setShowPaymentStatus(true);
@@ -157,7 +155,6 @@ const PaymentInformation = ({ route, navigation }) => {
         "Payment Failed, You'll get refund soon",
         ToastAndroid.SHORT
       );
-      console.log("error rrrr", error);
       setIsLoading(false);
     }
   };
@@ -184,26 +181,26 @@ const PaymentInformation = ({ route, navigation }) => {
           "Content-Type": "application/json",
         }
       );
-      console.log(createOrder);
+      // console.log(createOrder);
 
       // Make Payment
       let options = {
-        description: createOrder.notes.description,
+        description: createOrder.order.notes.description,
         image:
-          "https://heyastrostorage.sgp1.digitaloceanspaces.com/media/0130c17883f0c32295cd1bd02767b092.png?updated_at=2022-05-23T17:44:01.472Z",
+          "https://heyastrostorage.sgp1.digitaloceanspaces.com/media/836512b0e02da68c294778d8c2dd4194.png?updated_at=2022-05-28T17:49:02.149Z",
         currency: "INR",
-        key: "rzp_test_ykpbNGeZA2KkNC",
-        amount: createOrder.amount,
+        key: createOrder.razorpay_key,
+        amount: createOrder.order.amount,
         name: "Hey Astro",
-        order_id: createOrder.id, //Replace this with an order_id created using Orders API.
-        theme: { color: "#423b88" },
+        order_id: createOrder.order.id, //Replace this with an order_id created using Orders API.
+        theme: { color: "#1F4693" },
       };
 
       RazorpayCheckout.open(options)
         .then((data) => {
           setIsLoading(true);
-          console.log(data);
-          verifyPayment(data, createOrder.id);
+          // console.log(data);
+          verifyPayment(data, createOrder.order.id);
         })
         .catch((error) => {
           setIsLoading(false);
@@ -215,7 +212,7 @@ const PaymentInformation = ({ route, navigation }) => {
         ToastAndroid.SHORT
       );
       setIsLoading(false);
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -230,7 +227,7 @@ const PaymentInformation = ({ route, navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -351,7 +348,7 @@ const PaymentInformation = ({ route, navigation }) => {
           titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
           }}
           containerStyle={{
             width: "100%",
@@ -367,7 +364,7 @@ const PaymentInformation = ({ route, navigation }) => {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size={RFPercentage(8)} color="#423b88" />
+          <ActivityIndicator size={RFPercentage(8)} color="#1F4693" />
         </View>
       </Modal>
 

@@ -64,7 +64,7 @@ const Feedback = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -127,7 +127,7 @@ const Feedback = ({ navigation }) => {
                 titleStyle={{ fontFamily: "Ubuntu-Regular" }}
                 buttonStyle={{
                   borderRadius: RFPercentage(1),
-                  backgroundColor: "#423b88",
+                  backgroundColor: "#1F4693",
                 }}
                 containerStyle={{
                   width: "100%",

@@ -19,7 +19,7 @@ const ReferAndEarn = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -47,7 +47,7 @@ const ReferAndEarn = ({ navigation }) => {
         <Card
           containerStyle={{
             borderRadius: RFPercentage(2),
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
           }}
         >
           <Text

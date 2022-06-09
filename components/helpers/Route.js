@@ -32,6 +32,7 @@ import Login from "../screens/Login";
 import Signup from "../screens/Signup";
 import Blog from "../screens/Blog";
 import EmbbedPlayer from "./EmbbedPlayer";
+import UploadImage from "./UploadImage";
 import VideoCall from "../screens/VideoCall";
 import Kundli from "../screens/Kundli/Kundli";
 import CreateKundli from "../screens/Kundli/CreateKundli";
@@ -64,6 +65,7 @@ const StackNavigator = () => {
         <Stack.Screen name="Blog" component={Blog} />
         <Stack.Screen name="EmbbedPlayer" component={EmbbedPlayer} />
         <Stack.Screen name="VideoCall" component={VideoCall} />
+        <Stack.Screen name="UploadImage" component={UploadImage} />
         <Stack.Screen name="MoreSettings" component={MoreSettings} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="ChatUI" component={CometChatUIView} />

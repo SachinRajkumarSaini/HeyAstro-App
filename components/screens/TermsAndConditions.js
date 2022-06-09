@@ -10,6 +10,7 @@ import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Header, Card } from "react-native-elements";
 import { FetchAPI } from "../helpers/FetchInstance";
+import Markdown from "react-native-markdown-display";
 
 const TermsAndConditions = ({ navigation }) => {
   const [termsAndConditions, setTermsAndConditions] = useState();
@@ -52,7 +53,7 @@ const TermsAndConditions = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -75,7 +76,18 @@ const TermsAndConditions = ({ navigation }) => {
           onPress: () => navigation.goBack(),
         }}
       />
-      <Text>{termsAndConditions && termsAndConditions}</Text>
+      <ScrollView
+        style={{ paddingHorizontal: RFPercentage(1) }}
+        showsVerticalScrollIndicator={true}
+      >
+        {termsAndConditions && (
+          <Markdown
+            style={{
+              body: { color: "black" },
+            }}
+          >{`${termsAndConditions}`}</Markdown>
+        )}
+      </ScrollView>
     </View>
   );
 };

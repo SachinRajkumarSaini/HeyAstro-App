@@ -109,7 +109,7 @@ const KundliMatching = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -369,7 +369,7 @@ const KundliMatching = ({ navigation }) => {
                   color: "black",
                 }}
               >
-                If you don't know time, then select 12:12 AM
+                If you don't know time, then select 12:00 AM
               </Text>
               <Text
                 style={{
@@ -409,7 +409,7 @@ const KundliMatching = ({ navigation }) => {
           titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: "#423b88",
+            backgroundColor: "#1F4693",
           }}
           containerStyle={{
             width: "100%",

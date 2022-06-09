@@ -47,7 +47,7 @@ const Blogs = ({ navigation }) => {
       setBlogs(getBlogs.data.blogs.data);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
         ToastAndroid.SHORT
@@ -86,7 +86,7 @@ const Blogs = ({ navigation }) => {
       setBlogs(getSearchBlog.data.blogs.data);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setIsLoading(false);
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
@@ -110,7 +110,7 @@ const Blogs = ({ navigation }) => {
       <Header
         statusBarProps={{ backgroundColor: "transparent" }}
         containerStyle={{
-          backgroundColor: "#423b88",
+          backgroundColor: "#1F4693",
           paddingVertical: 6,
           borderBottomWidth: 0,
         }}
@@ -176,7 +176,7 @@ const Blogs = ({ navigation }) => {
             <ActivityIndicator
               style={{ marginVertical: RFPercentage(1) }}
               size={RFPercentage(5)}
-              color={"#423b88"}
+              color={"#1F4693"}
             />
           )}
           {/* Blogs */}
