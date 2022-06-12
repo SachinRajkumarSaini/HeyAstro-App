@@ -1,4 +1,4 @@
-import { View, Text, ToastAndroid } from "react-native";
+import { View, Text, ToastAndroid, ActivityIndicator } from "react-native";
 import React, { useEffect } from "react";
 import { WebView } from "react-native-webview";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -30,10 +30,28 @@ const EmbbedPlayer = ({ route, navigation }) => {
         <WebView
           scrollEnabled={false}
           allowsFullscreenVideo={true}
-          javaScriptEnabled={true}
           domStorageEnabled={true}
           style={{ height: RFPercentage(40) }}
+          originWhitelist={["*"]}
+          allowsInlineMediaPlayback
+          bounces={true}
           source={{ uri: route.params.videoUrl }}
+          startInLoadingState
+          scalesPageToFit
+          javaScriptEnabled={true}
+          renderLoadingView={() => {
+            return (
+              <ActivityIndicator
+                color="#1F4693"
+                size="large"
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              />
+            );
+          }}
         />
       </View>
       <View style={{ flex: 1.5 }} />

@@ -56,7 +56,7 @@ const Login = ({ navigation }) => {
                       await AsyncStorage.setItem("jwtToken", jwt);
                       await AsyncStorage.setItem("userId", user.id);
                       await AsyncStorage.setItem("userName", user.username);
-                      navigation.navigate("Home");
+                      navigation.navigate("ChatsAndCalls");
                     },
                     (error) => {
                       // console.log("Login failed with exception:", { error });

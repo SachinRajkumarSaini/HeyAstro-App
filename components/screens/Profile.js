@@ -29,44 +29,10 @@ const Profile = ({ navigation }) => {
     quote: "",
   });
 
-  const fetchProfile = async () => {
+  const fetchHorocope = async (DOB) => {
     try {
-      const userId = await AsyncStorage.getItem("userId");
-      const fetchProfile = await FetchAPI({
-        query: `
-              query{
-                usersPermissionsUser(id:${userId}){
-                  data{
-                    attributes{
-                      FullName
-                      DOB
-                      ProfileImage
-                    }
-                  }
-                }
-              }
-        `,
-      });
-      setUserProfile({
-        Name: fetchProfile.data.usersPermissionsUser.data.attributes.FullName,
-        DOB: new Date(
-          fetchProfile.data.usersPermissionsUser.data.attributes.DOB
-        ),
-        Image:
-          fetchProfile.data.usersPermissionsUser.data.attributes.ProfileImage,
-      });
-    } catch (error) {
-      ToastAndroid.show(
-        "Something went wrong, Please try agiain later!",
-        ToastAndroid.SHORT
-      );
-    }
-  };
-
-  const fetchHorocope = async () => {
-    try {
-      const month = new Date(userProfile.DOB).getMonth() + 1;
-      const day = new Date(userProfile.DOB).getDate();
+      const month = new Date(DOB).getMonth() + 1;
+      const day = new Date(DOB).getDate();
       const getHoroscope = await Fetch_API(
         `${process.env.HEYASTRO_API_URL}/horoscope`,
         {
@@ -97,13 +63,49 @@ const Profile = ({ navigation }) => {
     }
   };
 
+  const fetchProfile = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const fetchProfile = await FetchAPI({
+        query: `
+              query{
+                usersPermissionsUser(id:${userId}){
+                  data{
+                    attributes{
+                      FullName
+                      DOB
+                      ProfileImage
+                    }
+                  }
+                }
+              }
+        `,
+      });
+      setUserProfile(
+        {
+          Name: fetchProfile.data.usersPermissionsUser.data.attributes.FullName,
+          DOB: new Date(
+            fetchProfile.data.usersPermissionsUser.data.attributes.DOB
+          ),
+          Image:
+            fetchProfile.data.usersPermissionsUser.data.attributes.ProfileImage,
+        },
+        fetchHorocope(
+          fetchProfile.data.usersPermissionsUser.data.attributes.DOB
+        )
+      );
+    } catch (error) {
+      ToastAndroid.show(
+        "Something went wrong, Please try agiain later!",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
   }, [isFocused]);
 
-  useEffect(() => {
-    fetchHorocope();
-  }, []);
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar

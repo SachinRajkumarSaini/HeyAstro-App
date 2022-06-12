@@ -173,7 +173,7 @@ const Signup = ({ navigation }) => {
                           await AsyncStorage.setItem("userId", user.id);
                           await AsyncStorage.setItem("userName", user.username);
                           setIsLoading(false);
-                          navigation.navigate("Home");
+                          navigation.navigate("ChatsAndCalls");
                         }
                       },
                       (error) => {

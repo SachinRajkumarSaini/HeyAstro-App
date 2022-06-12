@@ -21,10 +21,8 @@ import moment from "moment";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { STRAPI_API_URL } from "@env";
-import { useIsFocused } from "@react-navigation/native";
 
 const EditProfile = ({ navigation }) => {
-  const isFocused = useIsFocused();
   const [DOB, setDOB] = useState(new Date());
   const [showDOB, setShowDOB] = useState(false);
   const [showTOB, setShowTOB] = useState(false);
@@ -128,7 +126,7 @@ const EditProfile = ({ navigation }) => {
 
   useEffect(() => {
     fetchProfile();
-  }, [isFocused]);
+  }, []);
 
   const updateProfile = async () => {
     try {

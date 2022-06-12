@@ -7,6 +7,8 @@ import {
   ToastAndroid,
   Linking,
   ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Header } from "react-native-elements";
@@ -29,6 +31,7 @@ const Settings = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [settings, setSettings] = useState();
   const [balance, setBalance] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const customShare = () => {
     try {
       const ShareOptions = {
@@ -47,6 +50,7 @@ const Settings = ({ navigation }) => {
 
   const fetchSettings = async () => {
     try {
+      setIsLoading(true);
       const getSettings = await FetchAPI({
         query: `
                     query{
@@ -68,7 +72,10 @@ const Settings = ({ navigation }) => {
                     }
               `,
       });
-      setSettings(getSettings.data.setting.data.attributes);
+      setSettings(
+        getSettings.data.setting.data.attributes,
+        setIsLoading(false)
+      );
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
@@ -538,133 +545,150 @@ const Settings = ({ navigation }) => {
 
           <View style={styles.horizontalLine} />
 
-          {/* Social Media Handles */}
-          <View style={{ margin: RFPercentage(2) }}>
-            <Text
-              style={{
-                color: "black",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.3),
-                marginTop: RFPercentage(0.5),
-              }}
-            >
-              Also available on
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                width: "70%",
-                marginTop: RFPercentage(1),
-              }}
-            >
-              <AntDesign
-                onPress={() => {
-                  Linking.openURL(settings.MediaLinks.Instagram).catch(
-                    (error) => {
-                      ToastAndroid.show(
-                        "Some error occurred, Please try again!",
-                        ToastAndroid.SHORT
+          {settings && (
+            <View>
+              {/* Social Media Handles */}
+              <View style={{ margin: RFPercentage(2) }}>
+                <Text
+                  style={{
+                    color: "black",
+                    fontFamily: "Ubuntu-Regular",
+                    fontSize: RFPercentage(1.3),
+                    marginTop: RFPercentage(0.5),
+                  }}
+                >
+                  Also available on
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: "70%",
+                    marginTop: RFPercentage(1),
+                  }}
+                >
+                  <AntDesign
+                    onPress={() => {
+                      Linking.openURL(settings.MediaLinks.Instagram).catch(
+                        (error) => {
+                          ToastAndroid.show(
+                            "Some error occurred, Please try again!",
+                            ToastAndroid.SHORT
+                          );
+                        }
                       );
-                    }
-                  );
-                }}
-                name="instagram"
-                color={"#c6408e"}
-                size={15}
-              />
-              <FontAwesome
-                onPress={() => {
-                  Linking.openURL(settings.MediaLinks.Whatsapp).catch(
-                    (error) => {
-                      ToastAndroid.show(
-                        "Some error occurred, Please try again!",
-                        ToastAndroid.SHORT
+                    }}
+                    name="instagram"
+                    color={"#c6408e"}
+                    size={15}
+                  />
+                  <FontAwesome
+                    onPress={() => {
+                      Linking.openURL(settings.MediaLinks.Whatsapp).catch(
+                        (error) => {
+                          ToastAndroid.show(
+                            "Some error occurred, Please try again!",
+                            ToastAndroid.SHORT
+                          );
+                        }
                       );
-                    }
-                  );
-                }}
-                name="whatsapp"
-                color={"#58aa14"}
-                size={15}
-              />
-              <FontAwesome
-                onPress={() => {
-                  Linking.openURL(settings.MediaLinks.Facebook).catch(
-                    (error) => {
-                      ToastAndroid.show(
-                        "Some error occurred, Please try again!",
-                        ToastAndroid.SHORT
+                    }}
+                    name="whatsapp"
+                    color={"#58aa14"}
+                    size={15}
+                  />
+                  <FontAwesome
+                    onPress={() => {
+                      Linking.openURL(settings.MediaLinks.Facebook).catch(
+                        (error) => {
+                          ToastAndroid.show(
+                            "Some error occurred, Please try again!",
+                            ToastAndroid.SHORT
+                          );
+                        }
                       );
-                    }
-                  );
-                }}
-                name="facebook-square"
-                color={"#0b529f"}
-                size={15}
-              />
-              <FontAwesome5
-                onPress={() => {
-                  Linking.openURL(settings.MediaLinks.Youtube).catch(
-                    (error) => {
-                      ToastAndroid.show(
-                        "Some error occurred, Please try again!",
-                        ToastAndroid.SHORT
+                    }}
+                    name="facebook-square"
+                    color={"#0b529f"}
+                    size={15}
+                  />
+                  <FontAwesome5
+                    onPress={() => {
+                      Linking.openURL(settings.MediaLinks.Youtube).catch(
+                        (error) => {
+                          ToastAndroid.show(
+                            "Some error occurred, Please try again!",
+                            ToastAndroid.SHORT
+                          );
+                        }
                       );
-                    }
-                  );
-                }}
-                name="youtube"
-                size={15}
-                color={"#e53d32"}
-              />
-              <AntDesign
-                onPress={() => {
-                  Linking.openURL(settings.MediaLinks.Twitter).catch(
-                    (error) => {
-                      ToastAndroid.show(
-                        "Some error occurred, Please try again!",
-                        ToastAndroid.SHORT
+                    }}
+                    name="youtube"
+                    size={15}
+                    color={"#e53d32"}
+                  />
+                  <AntDesign
+                    onPress={() => {
+                      Linking.openURL(settings.MediaLinks.Twitter).catch(
+                        (error) => {
+                          ToastAndroid.show(
+                            "Some error occurred, Please try again!",
+                            ToastAndroid.SHORT
+                          );
+                        }
                       );
-                    }
-                  );
-                }}
-                name="twitter"
-                size={15}
-                color={"#46aeeb"}
-              />
-              <Foundation
-                onPress={() => {
-                  Linking.openURL(settings.MediaLinks.Linkedin).catch(
-                    (error) => {
-                      ToastAndroid.show(
-                        "Some error occurred, Please try again!",
-                        ToastAndroid.SHORT
+                    }}
+                    name="twitter"
+                    size={15}
+                    color={"#46aeeb"}
+                  />
+                  <Foundation
+                    onPress={() => {
+                      Linking.openURL(settings.MediaLinks.Linkedin).catch(
+                        (error) => {
+                          ToastAndroid.show(
+                            "Some error occurred, Please try again!",
+                            ToastAndroid.SHORT
+                          );
+                        }
                       );
-                    }
-                  );
-                }}
-                name="social-linkedin"
-                color={"#0b529f"}
-                size={15}
-              />
-            </View>
-          </View>
+                    }}
+                    name="social-linkedin"
+                    color={"#0b529f"}
+                    size={15}
+                  />
+                </View>
+              </View>
 
-          {/* Versions */}
-          <View style={{ marginTop: RFPercentage(1) }}>
-            <Text
-              style={{
-                textAlign: "center",
-                fontFamily: "Ubuntu-Bold",
-                color: "green",
-              }}
-            >
-              Version {settings ? settings.Version : parseFloat(0.0).toFixed(1)}
-            </Text>
-          </View>
+              {/* Versions */}
+              <View style={{ marginTop: RFPercentage(1) }}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "Ubuntu-Bold",
+                    color: "green",
+                  }}
+                >
+                  Version {settings.Version}
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
+      {/* Loading Model */}
+      <Modal transparent={true} visible={isLoading}>
+        <View
+          style={{
+            backgroundColor: "#000000aa",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      </Modal>
     </View>
   );
 };

@@ -19,9 +19,11 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CometChat } from "@cometchat-pro/react-native-chat";
+import { useIsFocused } from "@react-navigation/native";
 
 const ChatsAndCall = (props) => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const [astrologers, setAstrologers] = useState([]);
   const [category, setCategory] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
@@ -131,8 +133,11 @@ const ChatsAndCall = (props) => {
 
   useEffect(() => {
     fetchAstrologers();
-    fetchUserBalance();
   }, [category]);
+
+  useEffect(() => {
+    fetchUserBalance();
+  }, [isFocused]);
 
   return (
     <View style={{ flex: 1 }}>

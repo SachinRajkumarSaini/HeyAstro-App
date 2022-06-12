@@ -14,10 +14,12 @@ import Foundation from "react-native-vector-icons/Foundation";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FileBase64 from "../helpers/FileBase64";
 import { FetchAPI } from "../helpers/FetchInstance";
+import { MediaLinksPlaceholder } from "../helpers/SkeletonPlaceholder";
 
 const HelpAndSupport = ({ navigation }) => {
   const [showFAQ, setShowFAQ] = useState(false);
   const [contactData, setContactData] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchContactData = async () => {
     try {
@@ -38,7 +40,10 @@ const HelpAndSupport = ({ navigation }) => {
           }  
         `,
       });
-      setContactData(getContactData.data.setting.data.attributes.MediaLinks);
+      setContactData(
+        getContactData.data.setting.data.attributes.MediaLinks,
+        setIsLoading(false)
+      );
     } catch (error) {
       ToastAndroid.show(
         "Some error occured, Please try again later",
@@ -132,24 +137,38 @@ const HelpAndSupport = ({ navigation }) => {
                   marginTop: RFPercentage(2),
                 }}
               >
-                <MaterialCommunityIcons
-                  name="gmail"
-                  onPress={() => Linking.openURL(`mailto:${contactData.Email}`)}
-                  color={"#EA4335"}
-                  size={30}
-                />
-                <FontAwesome
-                  onPress={() => Linking.openURL(contactData.Whatsapp)}
-                  name="whatsapp"
-                  color={"#58aa14"}
-                  size={30}
-                />
-                <Foundation
-                  onPress={() => Linking.openURL(contactData.Website)}
-                  name="web"
-                  color={"#FF8A66"}
-                  size={30}
-                />
+                {isLoading ? (
+                  <MediaLinksPlaceholder />
+                ) : (
+                  <MaterialCommunityIcons
+                    name="gmail"
+                    onPress={() =>
+                      Linking.openURL(`mailto:${contactData.Email}`)
+                    }
+                    color={"#EA4335"}
+                    size={30}
+                  />
+                )}
+                {isLoading ? (
+                  <MediaLinksPlaceholder />
+                ) : (
+                  <FontAwesome
+                    onPress={() => Linking.openURL(contactData.Whatsapp)}
+                    name="whatsapp"
+                    color={"#58aa14"}
+                    size={30}
+                  />
+                )}
+                {isLoading ? (
+                  <MediaLinksPlaceholder />
+                ) : (
+                  <Foundation
+                    onPress={() => Linking.openURL(contactData.Website)}
+                    name="web"
+                    color={"#FF8A66"}
+                    size={30}
+                  />
+                )}
               </View>
             </View>
           </Card>

@@ -6,6 +6,7 @@ import {
   ScrollView,
   ToastAndroid,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -24,6 +25,8 @@ const Blog = ({ route, navigation }) => {
     coverImage: "",
     content: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
+
   const fetchBlog = async () => {
     try {
       const { blogId } = route.params;
@@ -50,18 +53,22 @@ const Blog = ({ route, navigation }) => {
         `,
       });
       let date = new Date(getBlog.data.blog.data.attributes.createdAt);
-      setBlogData({
-        title: getBlog.data.blog.data.attributes.Title,
-        createdAt: date,
-        coverImage:
-          getBlog.data.blog.data.attributes.CoverImage.data.attributes.url,
-        content: getBlog.data.blog.data.attributes.Content,
-      });
+      setBlogData(
+        {
+          title: getBlog.data.blog.data.attributes.Title,
+          createdAt: date,
+          coverImage:
+            getBlog.data.blog.data.attributes.CoverImage.data.attributes.url,
+          content: getBlog.data.blog.data.attributes.Content,
+        },
+        setIsLoading(false)
+      );
     } catch (error) {
       ToastAndroid.show(
         "Some error occured, Please try again later",
         ToastAndroid.SHORT
       );
+      setIsLoading(false);
       // console.log(error);
     }
   };
@@ -107,52 +114,65 @@ const Blog = ({ route, navigation }) => {
         showsVerticalScrollIndicator={false}
         style={{ height: "100%", flex: 1 }}
       >
-        <View style={{ flex: 1, padding: RFPercentage(1.5) }}>
-          <View>
-            <Text
-              style={{
-                fontSize: RFPercentage(4.5),
-                color: "black",
-                fontFamily: "Dongle-Regular",
-              }}
-            >
-              {blogData.title}
-            </Text>
+        {isLoading ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: RFPercentage(42),
+            }}
+          >
+            <ActivityIndicator size="large" color="#1F4693" />
           </View>
-          {blogData.coverImage ? (
-            <View style={{ marginTop: RFPercentage(1) }}>
-              <Image
-                source={{
-                  uri: blogData.coverImage,
+        ) : (
+          <View style={{ flex: 1, padding: RFPercentage(1.5) }}>
+            <View>
+              <Text
+                style={{
+                  fontSize: RFPercentage(4.5),
+                  color: "black",
+                  fontFamily: "Dongle-Regular",
                 }}
-                containerStyle={{
-                  height: RFPercentage(20),
-                  width: "100%",
-                  borderRadius: RFPercentage(1),
-                }}
-              />
+              >
+                {blogData.title}
+              </Text>
             </View>
-          ) : null}
-          <View style={{ marginTop: RFPercentage(2) }}>
-            <Markdown
-              style={{
-                body: { color: "black" },
-              }}
-            >{`${blogData.content}`}</Markdown>
+            {blogData.coverImage ? (
+              <View style={{ marginTop: RFPercentage(1) }}>
+                <Image
+                  source={{
+                    uri: blogData.coverImage,
+                  }}
+                  containerStyle={{
+                    height: RFPercentage(20),
+                    width: "100%",
+                    borderRadius: RFPercentage(1),
+                  }}
+                />
+              </View>
+            ) : null}
+            <View style={{ marginTop: RFPercentage(2) }}>
+              <Markdown
+                style={{
+                  body: { color: "black" },
+                }}
+              >{`${blogData.content}`}</Markdown>
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontSize: RFPercentage(2.5),
+                  color: "black",
+                  fontFamily: "Dongle-Regular",
+                  marginTop: RFPercentage(2),
+                }}
+              >
+                Published Date:- {blogData.createdAt.toDateString()}
+              </Text>
+            </View>
           </View>
-          <View>
-            <Text
-              style={{
-                fontSize: RFPercentage(2.5),
-                color: "black",
-                fontFamily: "Dongle-Regular",
-                marginTop: RFPercentage(2),
-              }}
-            >
-              Published Date:- {blogData.createdAt.toDateString()}
-            </Text>
-          </View>
-        </View>
+        )}
       </ScrollView>
     </View>
   );
