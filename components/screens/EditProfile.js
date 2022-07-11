@@ -239,7 +239,7 @@ const EditProfile = ({ navigation }) => {
                 const userName = await AsyncStorage.getItem("userName");
                 const userId = await AsyncStorage.getItem("userId");
                 navigation.navigate("UploadImage", {
-                  uploadImageUrl: `https://hey-astro-video-call.vercel.app/user/uploadImage/${userName}/${userId}`,
+                  uploadImageUrl: `https://heyastro.vercel.app/user/uploadImage/${userName}/${userId}`,
                 });
               }}
               style={{

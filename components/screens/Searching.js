@@ -516,7 +516,7 @@ const Searching = ({ navigation }) => {
                         const astrologerName =
                           JSON.parse(selectedAstrologer).Name;
                         navigation.navigate("VideoCall", {
-                          videoCallUrl: `https://hey-astro-video-call.vercel.app/user/${userName}/${userId}/chatwith/${astrologerId}/${astrologerName}`,
+                          videoCallUrl: `https://heyastro.vercel.app/user/${userName}/${userId}/chatwith/${astrologerId}/${astrologerName}`,
                         });
                         setShowContactDialog(false);
                       } else {

@@ -158,13 +158,17 @@ const Login = ({ navigation }) => {
         <TextInput
           textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
           placeholder="Email or Username"
-          onChangeText={(identifier) => setIdentifier(identifier)}
+          onChangeText={(identifier) =>
+            setIdentifier(identifier.replace(/^\s+|\s+$/gm, ""))
+          }
         />
         <TextInput
           textInputStyle={{ marginTop: RFPercentage(2), color: "black" }}
           placeholder="Password"
           secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
+          onChangeText={(password) =>
+            setPassword(password.replace(/^\s+|\s+$/gm, ""))
+          }
         />
         <Button
           containerStyle={{

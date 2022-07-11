@@ -1,0 +1,39 @@
+{
+    "project_info": {
+        "project_number": "60137023168",
+        "project_id": "heyastro",
+        "storage_bucket": "heyastro.appspot.com"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:60137023168:android:085aa1eb00702645f4af25",
+                "android_client_info": {
+                    "package_name": "com.heyastro"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "60137023168-ipte4a5cgc4vql6i3deko62eh6o8drgv.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyA90vu0sM6IZJyWIoXHCMHymKowMmAFBBg"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "60137023168-ipte4a5cgc4vql6i3deko62eh6o8drgv.apps.googleusercontent.com",
+                            "client_type": 3
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

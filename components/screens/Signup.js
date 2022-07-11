@@ -254,13 +254,17 @@ const Signup = ({ navigation }) => {
             <TextInput
               textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
               placeholder="Email"
-              onChangeText={(email) => setEmail(email)}
+              onChangeText={(email) =>
+                setEmail(email.replace(/^\s+|\s+$/gm, ""))
+              }
             />
             <TextInput
               textInputStyle={{ marginTop: RFPercentage(2), color: "black" }}
               placeholder="Password"
               secureTextEntry={true}
-              onChangeText={(password) => setPassword(password)}
+              onChangeText={(password) =>
+                setPassword(password.replace(/^\s+|\s+$/gm, ""))
+              }
             />
             <Button
               containerStyle={{

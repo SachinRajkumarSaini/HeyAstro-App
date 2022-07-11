@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: 'com.google.gms.google-services'
 
 // React Native Vector Icons
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
@@ -269,6 +270,11 @@ dependencies {
     implementation project(':react-native-vector-icons') // React Native Vector Icons
 
     implementation project(':react-native-razorpay') // React Native Razorpay
+
+    implementation project(path: ":@react-native-firebase_app") // React Native Firebase App
+    implementation 'com.google.firebase:firebase-analytics:17.5.0' 
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation platform('com.google.firebase:firebase-bom:26.1.0')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 

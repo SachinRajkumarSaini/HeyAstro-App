@@ -115,6 +115,7 @@ const TabNavigator = () => {
   const Tab = createBottomTabNavigator();
   return (
     <Tab.Navigator
+      initialRouteName="ChatsAndCalls"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,

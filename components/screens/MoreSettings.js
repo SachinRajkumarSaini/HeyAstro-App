@@ -111,9 +111,9 @@ const MoreSettings = ({ navigation }) => {
                       }
                     );
                     navigation.navigate("Login");
-                    await AsyncStorage.setItem("jwtToken", "null");
-                    await AsyncStorage.setItem("userId", "null");
-                    await AsyncStorage.setItem("userName", "null");
+                    await AsyncStorage.setItem("jwtToken", "");
+                    await AsyncStorage.setItem("userId", "");
+                    await AsyncStorage.setItem("userName", "");
                   },
                 },
               ],

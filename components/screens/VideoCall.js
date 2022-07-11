@@ -82,6 +82,7 @@ const VideoCall = ({ route, navigation }) => {
 
       <WebView
         userAgent={userAgent} //Set your useragent (Browser) **Very Important
+        mediaPlaybackRequiresUserAction={false}
         originWhitelist={["*"]}
         allowsInlineMediaPlayback
         bounces={true}
