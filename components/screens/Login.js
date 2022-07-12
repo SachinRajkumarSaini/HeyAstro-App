@@ -50,7 +50,7 @@ const Login = ({ navigation }) => {
                 if (!cometChatUser) {
                   CometChat.login(user.username, COMETCHAT_AUTH_KEY).then(
                     async (cometChatUser) => {
-                      // console.log("Login Successful:", { cometChatUser });
+                      console.log("Login Successful:", { cometChatUser });
                       setIsLoading(false);
                       // Main App Login Logic
                       await AsyncStorage.setItem("jwtToken", jwt);
@@ -170,6 +170,34 @@ const Login = ({ navigation }) => {
             setPassword(password.replace(/^\s+|\s+$/gm, ""))
           }
         />
+        <View
+          style={{
+            flex: 0,
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            textAlign: "left",
+            width: "100%",
+          }}
+        >
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => {
+              navigation.navigate("ForgotPassword");
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Dongle-Regular",
+                fontSize: RFPercentage(2.5),
+                marginTop: RFPercentage(1.5),
+                marginStart: RFPercentage(4),
+                color: "#1F4693",
+              }}
+            >
+              Forgot password?
+            </Text>
+          </TouchableOpacity>
+        </View>
         <Button
           containerStyle={{
             marginTop: RFPercentage(2),

@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   ScrollView,
   ToastAndroid,
+  Modal,
 } from "react-native";
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import TextInput from "react-native-text-input-interactive";
 import { Button, Image } from "@rneui/themed";
@@ -17,10 +18,15 @@ import DatePicker from "react-native-date-picker";
 import moment from "moment";
 import { CometChat } from "@cometchat-pro/react-native-chat";
 import { COMETCHAT_AUTH_KEY } from "@env";
+import auth from "@react-native-firebase/auth";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Feather from "react-native-vector-icons/Feather";
+import { useIsFocused } from "@react-navigation/core";
 
 const Signup = ({ navigation }) => {
+  const isFocused = useIsFocused();
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
   const [DOB, setDOB] = useState(new Date());
   const [password, setPassword] = useState();
@@ -29,6 +35,15 @@ const Signup = ({ navigation }) => {
   const [openTime, setOpenTime] = useState(false);
   const [pincode, setPincode] = useState();
   const [firstScreen, setFirstScreen] = useState(true);
+  const [otpModal, setOtpModal] = useState(false);
+  const [isOTPLoading, setisOTPLoading] = useState(false);
+  const [otpErrorText, setOtpErrorText] = useState("");
+  const [Confirm, SetConfirm] = useState();
+  const [Code, SetCode] = useState();
+
+  useEffect(() => {
+    setOtpErrorText("");
+  }, [isFocused]);
 
   const getLocation = async () => {
     try {
@@ -66,6 +81,7 @@ const Signup = ({ navigation }) => {
                       password: ${JSON.stringify(password)},
                       confirmed: true
                       FullName: ${JSON.stringify(fullName)},
+                      Phone: ${phone},
                       DOB: ${JSON.stringify(DOB.toISOString())}
                       BirthPlacePincode: ${pincode},
                       Balance: ${parseFloat(0)},
@@ -124,6 +140,39 @@ const Signup = ({ navigation }) => {
         ToastAndroid.SHORT
       );
       setIsLoading(false);
+    }
+  };
+
+  const verifyNumber = async () => {
+    setisOTPLoading(true);
+    setOtpErrorText("");
+    if (Code) {
+      try {
+        await Confirm.confirm(Code);
+        setOtpModal(false);
+        setisOTPLoading(false);
+        setFirstScreen(false);
+      } catch (error) {
+        if (
+          error.message ===
+          "[auth/invalid-verification-code] The sms verification code used to create the phone auth credential is invalid. Please resend the verification code sms and be sure use the verification code provided by the user."
+        ) {
+          setOtpErrorText("Invalid OTP");
+          setisOTPLoading(false);
+        }
+        if (
+          error.message ===
+          "[auth/session-expired] The sms code has expired. Please re-send the verification code to try again."
+        ) {
+          setOtpErrorText("OTP Session Expired!");
+          setisOTPLoading(false);
+        }
+        setOtpErrorText("Invalid OTP");
+        setisOTPLoading(false);
+      }
+    } else {
+      otpErrorText("Invalid OTP");
+      setisOTPLoading(false);
     }
   };
 
@@ -253,6 +302,15 @@ const Signup = ({ navigation }) => {
           <View style={{ alignItems: "center" }}>
             <TextInput
               textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
+              placeholder="Mobile Number"
+              keyboardType="numeric"
+              maxLength={10}
+              onChangeText={(number) =>
+                setPhone(number.replace(/^\s+|\s+$/gm, ""))
+              }
+            />
+            <TextInput
+              textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
               placeholder="Email"
               onChangeText={(email) =>
                 setEmail(email.replace(/^\s+|\s+$/gm, ""))
@@ -276,10 +334,51 @@ const Signup = ({ navigation }) => {
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(2.5),
               }}
-              onPress={() => {
-                if (email && password) {
-                  if (email.includes("@") && password.length >= 6) {
-                    setFirstScreen(false);
+              onPress={async () => {
+                if (email && password && phone) {
+                  if (
+                    email.includes("@") &&
+                    password.length >= 6 &&
+                    phone.length === 10
+                  ) {
+                    try {
+                      setIsLoading(true);
+                      const confirmation = await auth().signInWithPhoneNumber(
+                        `+91 ${phone}`
+                      );
+                      ToastAndroid.show(
+                        "OTP Sent Successfully",
+                        ToastAndroid.SHORT
+                      );
+                      SetConfirm(confirmation);
+                      setIsLoading(false);
+                      setOtpModal(true);
+                    } catch (error) {
+                      console.log(error);
+                      ToastAndroid.show("OTP Not Sent", ToastAndroid.LONG);
+                      if (
+                        error.message ===
+                        "[auth/invalid-phone-number] The format of the phone number provided is incorrect. Please enter the phone number in a format that can be parsed into E.164 format. E.164 phone numbers are written in the format [+][country code][subscriber number including area code]. [ TOO_SHORT ]"
+                      ) {
+                        ToastAndroid.show("Invalid Number", ToastAndroid.SHORT);
+                        setIsLoading(false);
+                      } else if (
+                        error.message ===
+                        "[auth/network-request-failed] A network error (such as timeout, interrupted connection or unreachable host) has occurred."
+                      ) {
+                        setIsLoading(false);
+                        ToastAndroid.show(
+                          "Network Error,  Please try again later",
+                          ToastAndroid.SHORT
+                        );
+                      } else {
+                        setIsLoading(false);
+                        ToastAndroid.show(
+                          "Usage limit exceeded, Please try again later",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    }
                   }
                   if (!email.includes("@")) {
                     ToastAndroid.show(
@@ -290,6 +389,12 @@ const Signup = ({ navigation }) => {
                   if (password.length < 6) {
                     ToastAndroid.show(
                       "Password must be at least 6 characters",
+                      ToastAndroid.SHORT
+                    );
+                  }
+                  if (!phone.length === 10) {
+                    ToastAndroid.show(
+                      "Please enter valid phone number",
                       ToastAndroid.SHORT
                     );
                   }
@@ -457,6 +562,147 @@ const Signup = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Modal View of OTP Screen For Changing Mobile Number */}
+      <Modal
+        visible={otpModal}
+        onRequestClose={() => setOtpModal(false)}
+        transparent={true}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#000000aa",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              flex: 1,
+              paddingBottom: RFPercentage(4),
+              justifyContent: "center",
+            }}
+          >
+            <View style={{ flexDirection: "row", paddingTop: RFPercentage(2) }}>
+              <View
+                style={{
+                  flex: 3,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#1F4693",
+                    fontSize: RFPercentage(5),
+                    fontFamily: "Dongle-Bold",
+                  }}
+                >
+                  Verify Number
+                </Text>
+                <Text
+                  style={{
+                    color: "#696969",
+                    fontSize: 12,
+                    fontFamily: "Ubuntu-Regular",
+                  }}
+                >
+                  We Have Sent an OTP to
+                </Text>
+                <View style={{ flexDirection: "row", paddingTop: 10 }}>
+                  <Text
+                    style={{
+                      color: "#696969",
+                      fontSize: 12,
+                      fontFamily: "Ubuntu-Bold",
+                    }}
+                  >
+                    {phone}
+                  </Text>
+                  <Feather
+                    style={{ paddingStart: 5, color: "#1F4693" }}
+                    onPress={() => {
+                      setOtpModal(false);
+                    }}
+                    size={12}
+                    name="edit"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={{
+                paddingTop: RFPercentage(1),
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: RFPercentage(5),
+              }}
+            >
+              <TextInput
+                textInputStyle={{
+                  marginTop: RFPercentage(1),
+                  color: "black",
+                  fontFamily: "Ubuntu-Regular",
+                }}
+                keyboardType="numeric"
+                placeholder="OTP"
+                onChangeText={(code) =>
+                  SetCode(code.replace(/^\s+|\s+$/gm, ""))
+                }
+              />
+              <Text
+                style={{
+                  color: "#b00020",
+                  fontSize: RFPercentage(1.5),
+                  fontFamily: "Ubuntu-Regular",
+                  marginHorizontal: RFPercentage(4),
+                  textAlign: "center",
+                  marginTop: RFPercentage(0.5),
+                }}
+              >
+                {otpErrorText}
+              </Text>
+              <Button
+                containerStyle={{
+                  marginTop: RFPercentage(2),
+                  width: "90%",
+                }}
+                buttonStyle={{ backgroundColor: "#1F4693" }}
+                titleStyle={{
+                  fontFamily: "Dongle-Regular",
+                  fontSize: RFPercentage(2.5),
+                }}
+                onPress={verifyNumber}
+                title="Submit"
+                loading={isOTPLoading}
+                type="solid"
+              />
+              <Button
+                containerStyle={{
+                  marginTop: RFPercentage(2),
+                  width: "90%",
+                }}
+                buttonStyle={{
+                  backgroundColor: "white",
+                  borderWidth: 1,
+                  borderColor: "#1F4693",
+                }}
+                titleStyle={{
+                  fontFamily: "Dongle-Regular",
+                  fontSize: RFPercentage(2.5),
+                  color: "#1F4693",
+                }}
+                onPress={() => {
+                  setOtpModal(false);
+                  setOtpErrorText("");
+                }}
+                title="Cancel"
+                type="solid"
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

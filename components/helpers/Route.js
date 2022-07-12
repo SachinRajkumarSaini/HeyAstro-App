@@ -27,6 +27,8 @@ import Feedback from "../screens/Feedback";
 import Searching from "../screens/Searching";
 import Blogs from "../screens/Blogs";
 import TermsAndConditions from "../screens/TermsAndConditions";
+import ForgotPassword from "../screens/ForgotPassword";
+import ResetPassword from "../screens/ResetPassword";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import Login from "../screens/Login";
 import Signup from "../screens/Signup";
@@ -59,6 +61,8 @@ const StackNavigator = () => {
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="Home" component={TabNavigator} />
         <Stack.Screen name="Searching" component={Searching} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} />
         <Stack.Screen name="IntroScreen" component={IntroScreen} />
         {/* <Stack.Screen name="Following" component={Following} /> */}
         <Stack.Screen name="Blogs" component={Blogs} />
