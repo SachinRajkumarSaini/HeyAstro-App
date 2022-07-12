@@ -16,8 +16,6 @@ import FileBase64 from "../helpers/FileBase64";
 import { FetchAPI } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-import { CometChat } from "@cometchat-pro/react-native-chat";
-import { COMETCHAT_AUTH_KEY } from "@env";
 
 const Login = ({ navigation }) => {
   const [identifier, setIdentifier] = useState();
@@ -45,39 +43,13 @@ const Login = ({ navigation }) => {
         if (getLogin.data) {
           if (getLogin.data.login.jwt) {
             const { jwt, user } = getLogin.data.login;
-            CometChat.getLoggedinUser().then(
-              async (cometChatUser) => {
-                if (!cometChatUser) {
-                  CometChat.login(user.username, COMETCHAT_AUTH_KEY).then(
-                    async (cometChatUser) => {
-                      console.log("Login Successful:", { cometChatUser });
-                      setIsLoading(false);
-                      // Main App Login Logic
-                      await AsyncStorage.setItem("jwtToken", jwt);
-                      await AsyncStorage.setItem("userId", user.id);
-                      await AsyncStorage.setItem("userName", user.username);
-                      navigation.navigate("ChatsAndCalls");
-                    },
-                    (error) => {
-                      // console.log("Login failed with exception:", { error });
-                      ToastAndroid.show(
-                        "Something went wrong, Please try again later!",
-                        ToastAndroid.SHORT
-                      );
-                      setIsLoading(false);
-                    }
-                  );
-                }
-              },
-              (error) => {
-                // console.log("Something went wrong", error);
-                ToastAndroid.show(
-                  "Something went wrong, Please try again later!",
-                  ToastAndroid.SHORT
-                );
-                setIsLoading(false);
-              }
-            );
+            // Main App Login Logic
+            setIsLoading(false);
+            await AsyncStorage.setItem("jwtToken", jwt);
+            await AsyncStorage.setItem("userId", user.id);
+            await AsyncStorage.setItem("userFullName", user.username);
+            await AsyncStorage.setItem("userName", user.username);
+            navigation.navigate("Home");
           }
         }
         if (getLogin.errors) {

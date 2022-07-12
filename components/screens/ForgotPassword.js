@@ -102,8 +102,8 @@ const ForgotPassword = ({ navigation }) => {
         setOtpErrorText("");
         await Confirm.confirm(Code);
         setIsLoading(false);
-        navigation.navigate("ResetPassword", { userId });
         setOtpModal(false);
+        navigation.navigate("ResetPassword", { userId });
       } catch (error) {
         if (
           error.message ===
@@ -189,139 +189,122 @@ const ForgotPassword = ({ navigation }) => {
         onRequestClose={() => setOtpModal(false)}
         transparent={true}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#000000aa",
-          }}
+        <ScrollView
+          contentContainerStyle={{ flex: 1, backgroundColor: "white" }}
         >
           <View
             style={{
-              backgroundColor: "white",
               flex: 1,
-              paddingBottom: RFPercentage(4),
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <View style={{ flexDirection: "row", paddingTop: RFPercentage(2) }}>
-              <View
-                style={{
-                  flex: 3,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#1F4693",
-                    fontSize: RFPercentage(5),
-                    fontFamily: "Dongle-Bold",
-                  }}
-                >
-                  Verify Number
-                </Text>
-                <Text
-                  style={{
-                    color: "#696969",
-                    fontSize: 12,
-                    fontFamily: "Ubuntu-Regular",
-                  }}
-                >
-                  We Have Sent an OTP to
-                </Text>
-                <View style={{ flexDirection: "row", paddingTop: 10 }}>
-                  <Text
-                    style={{
-                      color: "#696969",
-                      fontSize: 12,
-                      fontFamily: "Ubuntu-Bold",
-                    }}
-                  >
-                    {phone}
-                  </Text>
-                  <Feather
-                    style={{ paddingStart: 5, color: "#1F4693" }}
-                    onPress={() => {
-                      setOtpModal(false);
-                    }}
-                    size={12}
-                    name="edit"
-                  />
-                </View>
-              </View>
-            </View>
-            <View
+            <Image
+              source={{ uri: FileBase64.heyAstro }}
+              containerStyle={{
+                height: RFPercentage(20),
+                width: RFPercentage(20),
+              }}
+            />
+            <Text
               style={{
-                paddingTop: RFPercentage(1),
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: RFPercentage(5),
+                fontFamily: "Dongle-Bold",
+                color: "#4d148c",
+                fontSize: RFPercentage(4),
+                marginTop: RFPercentage(1),
               }}
             >
-              <TextInput
-                textInputStyle={{
-                  marginTop: RFPercentage(1),
-                  color: "black",
-                  fontFamily: "Ubuntu-Regular",
-                }}
-                keyboardType="numeric"
-                placeholder="OTP"
-                onChangeText={(code) =>
-                  SetCode(code.replace(/^\s+|\s+$/gm, ""))
-                }
-              />
+              Verify Number
+            </Text>
+            <Text
+              style={{
+                color: "#696969",
+                fontSize: 12,
+                fontFamily: "Ubuntu-Regular",
+              }}
+            >
+              We Have Sent an OTP to
+            </Text>
+            <View style={{ flexDirection: "row", paddingTop: 10 }}>
               <Text
                 style={{
-                  color: "#b00020",
-                  fontSize: RFPercentage(1.5),
-                  fontFamily: "Ubuntu-Regular",
-                  marginHorizontal: RFPercentage(4),
-                  textAlign: "center",
-                  marginTop: RFPercentage(0.5),
+                  color: "#696969",
+                  fontSize: 12,
+                  fontFamily: "Ubuntu-Bold",
                 }}
               >
-                {otpErrorText}
+                {phone}
               </Text>
-              <Button
-                containerStyle={{
-                  marginTop: RFPercentage(2),
-                  width: "90%",
-                }}
-                buttonStyle={{ backgroundColor: "#1F4693" }}
-                titleStyle={{
-                  fontFamily: "Dongle-Regular",
-                  fontSize: RFPercentage(2.5),
-                }}
-                onPress={verifyNumber}
-                title="Submit"
-                loading={isLoading}
-                type="solid"
-              />
-              <Button
-                containerStyle={{
-                  marginTop: RFPercentage(2),
-                  width: "90%",
-                }}
-                buttonStyle={{
-                  backgroundColor: "white",
-                  borderWidth: 1,
-                  borderColor: "#1F4693",
-                }}
-                titleStyle={{
-                  fontFamily: "Dongle-Regular",
-                  fontSize: RFPercentage(2.5),
-                  color: "#1F4693",
-                }}
+              <Feather
+                style={{ paddingStart: 5, color: "#1F4693" }}
                 onPress={() => {
                   setOtpModal(false);
-                  setOtpErrorText("");
                 }}
-                title="Cancel"
-                type="solid"
+                size={12}
+                name="edit"
               />
             </View>
+            <TextInput
+              textInputStyle={{
+                marginTop: RFPercentage(2),
+                color: "black",
+                fontFamily: "Ubuntu-Regular",
+              }}
+              keyboardType="numeric"
+              placeholder="OTP"
+              onChangeText={(code) => SetCode(code.replace(/^\s+|\s+$/gm, ""))}
+            />
+            <Text
+              style={{
+                color: "#b00020",
+                fontSize: RFPercentage(1.5),
+                fontFamily: "Ubuntu-Regular",
+                marginHorizontal: RFPercentage(4),
+                textAlign: "center",
+                marginTop: RFPercentage(0.5),
+              }}
+            >
+              {otpErrorText}
+            </Text>
+            <Button
+              containerStyle={{
+                marginTop: RFPercentage(2),
+                width: "80%",
+              }}
+              buttonStyle={{ backgroundColor: "#1F4693" }}
+              titleStyle={{
+                fontFamily: "Dongle-Regular",
+                fontSize: RFPercentage(2.5),
+              }}
+              onPress={verifyNumber}
+              title="Submit"
+              loading={isLoading}
+              type="solid"
+            />
+            <Button
+              containerStyle={{
+                marginTop: RFPercentage(2),
+                width: "80%",
+              }}
+              buttonStyle={{
+                backgroundColor: "white",
+                borderWidth: 1,
+                borderColor: "#1F4693",
+              }}
+              titleStyle={{
+                fontFamily: "Dongle-Regular",
+                fontSize: RFPercentage(2.5),
+                color: "#1F4693",
+              }}
+              onPress={() => {
+                setOtpModal(false);
+                setOtpErrorText("");
+              }}
+              title="Cancel"
+              type="solid"
+            />
           </View>
-        </View>
+        </ScrollView>
       </Modal>
     </ScrollView>
   );

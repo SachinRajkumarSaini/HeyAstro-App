@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CometChat } from "@cometchat-pro/react-native-chat";
 import { useIsFocused } from "@react-navigation/native";
+import { CometChatAuth } from "../helpers/CometChatAuth";
 
 const ChatsAndCall = (props) => {
   const navigation = useNavigation();
@@ -541,12 +542,21 @@ const ChatsAndCall = (props) => {
                             activeOpacity={0.9}
                             onPress={async () => {
                               setStatusLoading(true);
-                              const astrologerStatus = await CometChat.getUser(
-                                astrologer.Username
-                              );
-                              astrologer.status = astrologerStatus.status;
-                              setSelectedAstrologer(JSON.stringify(astrologer));
-                              setShowContactDialog(true);
+                              const authCometChat = await CometChatAuth();
+                              if (authCometChat) {
+                                const astrologerStatus =
+                                  await CometChat.getUser(astrologer.Username);
+                                astrologer.status = astrologerStatus.status;
+                                setSelectedAstrologer(
+                                  JSON.stringify(astrologer)
+                                );
+                                setShowContactDialog(true);
+                              } else {
+                                ToastAndroid.show(
+                                  "Something went wrong, Please try again later!",
+                                  ToastAndroid.SHORT
+                                );
+                              }
                               setStatusLoading(false);
                             }}
                           >

@@ -21,9 +21,10 @@ const ResetPassword = ({ route, navigation }) => {
   const onSubmit = async () => {
     try {
       if (password === confirmPassword) {
-        setIsLoading(true);
-        const updatePassword = await FetchAPI({
-          query: `
+        if (password.length >= 6) {
+          setIsLoading(true);
+          const updatePassword = await FetchAPI({
+            query: `
                     mutation {
                         updateUsersPermissionsUser(id: ${
                           route.params.userId
@@ -36,23 +37,29 @@ const ResetPassword = ({ route, navigation }) => {
                         }
                     }                
                 `,
-        });
-        if (
-          updatePassword.data.updateUsersPermissionsUser.data.attributes.email
-        ) {
+          });
+          if (
+            updatePassword.data.updateUsersPermissionsUser.data.attributes.email
+          ) {
+            ToastAndroid.show(
+              "Password updated successfully",
+              ToastAndroid.SHORT
+            );
+            navigation.navigate("Login");
+          }
+          if (updatePassword.errors) {
+            ToastAndroid.show(
+              "Something went wrong, Please try again later!",
+              ToastAndroid.SHORT
+            );
+          }
+          setIsLoading(false);
+        } else {
           ToastAndroid.show(
-            "Password updated successfully",
+            "Password must be at least 6 characters",
             ToastAndroid.SHORT
           );
-          navigation.navigate("Login");
         }
-        if (updatePassword.errors) {
-          ToastAndroid.show(
-            "Something went wrong, Please try again later!",
-            ToastAndroid.SHORT
-          );
-        }
-        setIsLoading(false);
       } else {
         ToastAndroid.show(
           "Password and confirm password does not match",
