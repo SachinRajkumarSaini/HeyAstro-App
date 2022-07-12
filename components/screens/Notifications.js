@@ -11,15 +11,19 @@ import { RFPercentage } from "react-native-responsive-fontsize";
 import { Header, Card } from "react-native-elements";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { FetchAPI } from "../helpers/FetchInstance";
+import { WalletTransactionPlaceholder } from "../helpers/SkeletonPlaceholder";
+import moment from "moment";
 
 const Notifications = ({ navigation }) => {
   const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const fetchNotifications = async () => {
     try {
+      setIsLoading(true);
       const getNotifications = await FetchAPI({
         query: `
                     query{
-                        notifications{
+                        notifications(sort: "createdAt:desc"){
                             data{
                                 attributes{
                                     Title
@@ -32,11 +36,13 @@ const Notifications = ({ navigation }) => {
                 `,
       });
       setNotifications(getNotifications.data.notifications.data);
+      setIsLoading(false);
     } catch (error) {
       ToastAndroid.show(
         "Some error occured, Please try again later",
         ToastAndroid.SHORT
       );
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -102,8 +108,12 @@ const Notifications = ({ navigation }) => {
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ flex: 1, paddingBottom: RFPercentage(2) }}>
-          {notifications &&
+          {isLoading ? (
+            <WalletTransactionPlaceholder />
+          ) : notifications ? (
             notifications.map((notification, index) => {
+              const date = new Date(notification.attributes.createdAt);
+              const formattedDate = moment(date).format("DD MMM YYYY hh:mm A");
               return (
                 <Card
                   key={index}
@@ -130,7 +140,7 @@ const Notifications = ({ navigation }) => {
                           marginStart: RFPercentage(1.5),
                         }}
                       >
-                        {notification.Title}
+                        {notification.attributes.Title}
                       </Text>
                       <Text
                         numberOfLines={3}
@@ -143,7 +153,7 @@ const Notifications = ({ navigation }) => {
                           marginStart: RFPercentage(1.5),
                         }}
                       >
-                        {notification.Description}
+                        {notification.attributes.Description}
                       </Text>
                     </View>
                     <View style={{ justifyContent: "center" }}>
@@ -161,11 +171,24 @@ const Notifications = ({ navigation }) => {
                       marginTop: RFPercentage(1),
                     }}
                   >
-                    {notification.createdAt}
+                    {formattedDate}
                   </Text>
                 </Card>
               );
-            })}
+            })
+          ) : (
+            <Text
+              style={{
+                fontFamily: "Dongle-Regular",
+                fontSize: RFPercentage(3),
+                textAlign: "center",
+                marginTop: RFPercentage(5),
+                color: "black",
+              }}
+            >
+              No Notifications
+            </Text>
+          )}
         </View>
       </ScrollView>
     </View>

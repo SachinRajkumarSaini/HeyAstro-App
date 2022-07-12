@@ -45,7 +45,6 @@ const ForgotPassword = ({ navigation }) => {
             }
         `,
         });
-        console.log(fetchProfile.data.usersPermissionsUsers.data);
         if (fetchProfile.data.usersPermissionsUsers.data.length === 1) {
           setUserId(fetchProfile.data.usersPermissionsUsers.data[0].id);
           try {

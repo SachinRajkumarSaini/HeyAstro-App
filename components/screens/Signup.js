@@ -65,6 +65,36 @@ const Signup = ({ navigation }) => {
     }
   };
 
+  const isNumberRegistered = async () => {
+    try {
+      setIsLoading(true);
+      const isNumberRegistered = await FetchAPI({
+        query: `
+          query{
+            usersPermissionsUsers(filters:{Phone:{eq:${phone}}}){
+              data{
+                id
+              }
+            }
+          }
+      `,
+      });
+      if (isNumberRegistered.data.usersPermissionsUsers.data.length === 1) {
+        setIsLoading(false);
+        ToastAndroid.show("Number is already registered", ToastAndroid.SHORT);
+        return true;
+      } else {
+        setIsLoading(false);
+        return false;
+      }
+    } catch (error) {
+      // console.log(error);
+      ToastAndroid.show("Phone number is not valid", ToastAndroid.SHORT);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   const createUser = async () => {
     try {
       const userName = email.split("@")[0].toLowerCase();
@@ -224,6 +254,43 @@ const Signup = ({ navigation }) => {
       setIsLoading(false);
     }
   };
+
+  const sendOTP = async () => {
+    try {
+      setIsLoading(true);
+      const confirmation = await auth().signInWithPhoneNumber(`+91 ${phone}`);
+      ToastAndroid.show("OTP Sent Successfully", ToastAndroid.SHORT);
+      SetConfirm(confirmation);
+      setIsLoading(false);
+      setOtpModal(true);
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.show("OTP Not Sent", ToastAndroid.LONG);
+      if (
+        error.message ===
+        "[auth/invalid-phone-number] The format of the phone number provided is incorrect. Please enter the phone number in a format that can be parsed into E.164 format. E.164 phone numbers are written in the format [+][country code][subscriber number including area code]. [ TOO_SHORT ]"
+      ) {
+        ToastAndroid.show("Invalid Number", ToastAndroid.SHORT);
+        setIsLoading(false);
+      } else if (
+        error.message ===
+        "[auth/network-request-failed] A network error (such as timeout, interrupted connection or unreachable host) has occurred."
+      ) {
+        setIsLoading(false);
+        ToastAndroid.show(
+          "Network Error,  Please try again later",
+          ToastAndroid.SHORT
+        );
+      } else {
+        setIsLoading(false);
+        ToastAndroid.show(
+          "Usage limit exceeded, Please try again later",
+          ToastAndroid.SHORT
+        );
+      }
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={{ flex: 1 }}>
       <StatusBar
@@ -299,43 +366,9 @@ const Signup = ({ navigation }) => {
                     password.length >= 6 &&
                     phone.length === 10
                   ) {
-                    try {
-                      setIsLoading(true);
-                      const confirmation = await auth().signInWithPhoneNumber(
-                        `+91 ${phone}`
-                      );
-                      ToastAndroid.show(
-                        "OTP Sent Successfully",
-                        ToastAndroid.SHORT
-                      );
-                      SetConfirm(confirmation);
-                      setIsLoading(false);
-                      setOtpModal(true);
-                    } catch (error) {
-                      console.log(error);
-                      ToastAndroid.show("OTP Not Sent", ToastAndroid.LONG);
-                      if (
-                        error.message ===
-                        "[auth/invalid-phone-number] The format of the phone number provided is incorrect. Please enter the phone number in a format that can be parsed into E.164 format. E.164 phone numbers are written in the format [+][country code][subscriber number including area code]. [ TOO_SHORT ]"
-                      ) {
-                        ToastAndroid.show("Invalid Number", ToastAndroid.SHORT);
-                        setIsLoading(false);
-                      } else if (
-                        error.message ===
-                        "[auth/network-request-failed] A network error (such as timeout, interrupted connection or unreachable host) has occurred."
-                      ) {
-                        setIsLoading(false);
-                        ToastAndroid.show(
-                          "Network Error,  Please try again later",
-                          ToastAndroid.SHORT
-                        );
-                      } else {
-                        setIsLoading(false);
-                        ToastAndroid.show(
-                          "Usage limit exceeded, Please try again later",
-                          ToastAndroid.SHORT
-                        );
-                      }
+                    const numberRegistered = await isNumberRegistered();
+                    if (!numberRegistered) {
+                      sendOTP();
                     }
                   }
                   if (!email.includes("@")) {

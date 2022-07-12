@@ -243,7 +243,7 @@ const Settings = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
 
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 onPress={() => navigation.navigate("Notifications")}
               >
                 <View
@@ -279,7 +279,7 @@ const Settings = ({ navigation }) => {
                     />
                   </View>
                 </View>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
             </View>
           </View>
 
