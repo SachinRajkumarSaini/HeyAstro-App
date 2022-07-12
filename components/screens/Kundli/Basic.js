@@ -163,7 +163,7 @@ const Basic = (props) => {
         <Text
           style={{
             fontFamily: "Dongle-Regular",
-            fontSize: RFPercentage(3),
+            fontSize: RFPercentage(4),
             color: "black",
             textAlign: "center",
           }}
@@ -207,17 +207,17 @@ const Basic = (props) => {
               style={{
                 fontFamily: "Dongle-Regular",
                 color: "black",
-                fontSize: RFPercentage(2),
+                fontSize: RFPercentage(4),
               }}
             >
               {props.userData.Name}
             </Text>
             <Text
               style={{
-                fontFamily: "Dongle-Regular",
+                fontFamily: "Dongle-Light",
                 color: "black",
-                fontSize: RFPercentage(1.8),
-                lineHeight: 15,
+                fontSize: RFPercentage(3),
+                lineHeight: RFPercentage(3),
               }}
             >
               {props.mangal_dasha.description}
@@ -247,7 +247,7 @@ const Basic = (props) => {
                 <Text
                   style={{
                     fontFamily: "Dongle-Bold",
-                    fontSize: RFPercentage(2.5),
+                    fontSize: RFPercentage(4),
                     color: "black",
                     textAlign: "center",
                   }}
@@ -258,14 +258,21 @@ const Basic = (props) => {
                   style={{
                     fontFamily: "Dongle-Regular",
                     color: "black",
-                    fontSize: RFPercentage(1.8),
-                    lineHeight: 15,
+                    fontSize: RFPercentage(3),
+                    lineHeight: RFPercentage(3),
                     marginTop: RFPercentage(1),
                   }}
                 >
                   {props.mangal_dasha.exceptions.map((item, index) => {
                     return (
-                      <Text style={{ color: "black" }} key={index}>
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: RFPercentage(3),
+                          lineHeight: RFPercentage(3),
+                        }}
+                        key={index}
+                      >
                         {index + 1}
                         {". "}
                         {item}
@@ -294,7 +301,7 @@ const Basic = (props) => {
                 <Text
                   style={{
                     fontFamily: "Dongle-Bold",
-                    fontSize: RFPercentage(2.5),
+                    fontSize: RFPercentage(4),
                     color: "black",
                     textAlign: "center",
                   }}
@@ -305,14 +312,21 @@ const Basic = (props) => {
                   style={{
                     fontFamily: "Dongle-Regular",
                     color: "black",
-                    fontSize: RFPercentage(1.8),
-                    lineHeight: 15,
+                    fontSize: RFPercentage(3),
+                    lineHeight: RFPercentage(3),
                     marginTop: RFPercentage(1),
                   }}
                 >
                   {props.mangal_dasha.remedies.map((item, index) => {
                     return (
-                      <Text style={{ color: "black" }} key={index}>
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: RFPercentage(3),
+                          lineHeight: RFPercentage(3),
+                        }}
+                        key={index}
+                      >
                         {index + 1}
                         {". "}
                         {item}

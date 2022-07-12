@@ -269,8 +269,9 @@ const Home = ({ navigation }) => {
                   >
                     <Image
                       style={{
-                        height: RFPercentage(7),
-                        width: RFPercentage(7),
+                        height: RFPercentage(8),
+                        width: RFPercentage(8),
+                        borderRadius: RFPercentage(4),
                       }}
                       source={{ uri: FileBase64.dailyHoroscope }}
                     />
@@ -302,8 +303,9 @@ const Home = ({ navigation }) => {
                   >
                     <Image
                       style={{
-                        height: RFPercentage(7),
-                        width: RFPercentage(7),
+                        height: RFPercentage(8),
+                        width: RFPercentage(8),
+                        borderRadius: RFPercentage(4),
                       }}
                       source={{ uri: FileBase64.freeKundli }}
                     />
@@ -337,8 +339,9 @@ const Home = ({ navigation }) => {
                   >
                     <Image
                       style={{
-                        height: RFPercentage(6.8),
-                        width: RFPercentage(6.8),
+                        height: RFPercentage(8),
+                        width: RFPercentage(8),
+                        borderRadius: RFPercentage(4),
                       }}
                       source={{ uri: FileBase64.matchMaking }}
                     />
@@ -370,8 +373,9 @@ const Home = ({ navigation }) => {
                   >
                     <Image
                       style={{
-                        height: RFPercentage(5.8),
-                        width: RFPercentage(5.8),
+                        height: RFPercentage(8),
+                        width: RFPercentage(8),
+                        borderRadius: RFPercentage(4),
                       }}
                       source={{ uri: FileBase64.astrologyBlog }}
                     />
