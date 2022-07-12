@@ -774,7 +774,10 @@ const ChatsAndCall = (props) => {
                         const astrologerName =
                           JSON.parse(selectedAstrologer).Name;
                         navigation.navigate("VideoCall", {
-                          videoCallUrl: `https://heyastro.vercel.app/user/${userName}/${userId}/chatwith/${astrologerId}/${astrologerName}`,
+                          videoCallUrl: `https://heyastro.vercel.app/user/${userName}/chatwith/${astrologerId}`,
+                          astrologerId: astrologerId,
+                          userId: userId,
+                          astrologerName: astrologerName,
                         });
                         setShowContactDialog(false);
                       } else {

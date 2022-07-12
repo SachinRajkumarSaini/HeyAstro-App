@@ -188,7 +188,7 @@ export default class CometChatMessageComposer extends React.PureComponent {
     // Calculate User Usage Time
     console.log('balance', Balance);
     console.log('ChargePerMinute', ChargePerMinute);
-    let maximumTime = Math.floor((Balance / ChargePerMinute) * 60);
+    let maximumTime = Math.floor(Balance / ChargePerMinute) * 60;
     let usageTime = 0;
     console.log('maximumTime', maximumTime);
     this.increaseUsageTime = setInterval(() => {
