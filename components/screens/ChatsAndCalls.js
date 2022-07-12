@@ -541,23 +541,35 @@ const ChatsAndCall = (props) => {
                           <TouchableOpacity
                             activeOpacity={0.9}
                             onPress={async () => {
-                              setStatusLoading(true);
-                              const authCometChat = await CometChatAuth();
-                              if (authCometChat) {
-                                const astrologerStatus =
-                                  await CometChat.getUser(astrologer.Username);
-                                astrologer.status = astrologerStatus.status;
-                                setSelectedAstrologer(
-                                  JSON.stringify(astrologer)
-                                );
-                                setShowContactDialog(true);
-                              } else {
-                                ToastAndroid.show(
-                                  "Something went wrong, Please try again later!",
-                                  ToastAndroid.SHORT
-                                );
+                              try {
+                                setStatusLoading(true);
+                                const authCometChat = await CometChatAuth();
+                                if (authCometChat) {
+                                  const astrologerStatus =
+                                    await CometChat.getUser(
+                                      astrologer.Username
+                                    );
+                                  astrologer.status = astrologerStatus.status;
+                                  setSelectedAstrologer(
+                                    JSON.stringify(astrologer)
+                                  );
+                                  setShowContactDialog(true);
+                                } else {
+                                  ToastAndroid.show(
+                                    "Something went wrong, Please try again later!",
+                                    ToastAndroid.SHORT
+                                  );
+                                }
+                                setStatusLoading(false);
+                              } catch (error) {
+                                if (error.code === "ERR_UID_NOT_FOUND") {
+                                  setStatusLoading(false);
+                                  ToastAndroid.show(
+                                    "Astrologer not found, Please try again later!",
+                                    ToastAndroid.SHORT
+                                  );
+                                }
                               }
-                              setStatusLoading(false);
                             }}
                           >
                             <Card
