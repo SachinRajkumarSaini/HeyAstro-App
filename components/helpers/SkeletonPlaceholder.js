@@ -32,7 +32,7 @@ export const HomeCarouselPlaceholder = () => {
       <View
         style={{
           borderRadius: RFPercentage(1),
-          height: RFPercentage(15),
+          height: RFPercentage(20),
           margin: RFPercentage(2),
           width: RFPercentage(40),
         }}

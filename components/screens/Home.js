@@ -8,6 +8,8 @@ import {
   BackHandler,
   Alert,
   ToastAndroid,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -18,6 +20,9 @@ import { FlatListSlider } from "react-native-flatlist-slider";
 import { FetchAPI } from "../helpers/FetchInstance";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CometChat } from "@cometchat-pro/react-native-chat";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { CometChatAuth } from "../helpers/CometChatAuth";
 import {
   HomeLatestPlaceholder,
   HomeCarouselPlaceholder,
@@ -28,9 +33,13 @@ const Home = ({ navigation }) => {
 
   const [carousels, setCarousels] = useState([]);
   const [blogs, setBlogs] = useState([]);
+  const [astrologers, setAstrologers] = useState([]);
   const [videos, setVideos] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
+  const [showContactDialog, setShowContactDialog] = useState(false);
+  const [selectedAstrologer, setSelectedAstrologer] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -85,11 +94,34 @@ const Home = ({ navigation }) => {
         )
       );
 
+      //   Get Astrologers
+      const getAstrologers = await FetchAPI({
+        query: `query {
+                    astrologers(sort: "createdAt:desc") {
+                        data {
+                            attributes {
+                                Name
+                                Languages
+                                Experience
+                                Username
+                                ProfileImage
+                                ChargePerMinute
+                            }
+                        }
+                    }
+                  }
+                                  
+              `,
+      });
+      setAstrologers(
+        getAstrologers.data.astrologers.data.map((item) => item.attributes)
+      );
+
       //   Get Blogs
       const getBlogs = await FetchAPI({
         query: `
                 query{
-                    blogs{
+                    blogs(sort: "createdAt:desc"){
                         data{
                             id,
                             attributes{
@@ -114,7 +146,7 @@ const Home = ({ navigation }) => {
       const getVideos = await FetchAPI({
         query: `
               query{
-                videos{
+                videos(sort: "createdAt:desc"){
                     data{
                         attributes{
                             Title
@@ -139,7 +171,7 @@ const Home = ({ navigation }) => {
       const getTestimonails = await FetchAPI({
         query: `
               query {
-                testimonials {
+                testimonials(sort: "createdAt:desc") {
                   data {
                     attributes {
                       Username
@@ -176,7 +208,7 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={{ backgroundColor: "#ffffff", flex: 1 }}>
+    <View style={{ backgroundColor: "#dce4f5", flex: 1 }}>
       <StatusBar
         translucent={true}
         barStyle="light-content"
@@ -199,6 +231,25 @@ const Home = ({ navigation }) => {
             marginTop: RFPercentage(0.5),
           },
         }}
+        leftComponent={
+          <View
+            style={{
+              height: RFPercentage(5),
+              width: RFPercentage(5),
+              margin: RFPercentage(1),
+              borderRadius: RFPercentage(2.5),
+            }}
+          >
+            <Image
+              style={{
+                height: RFPercentage(5),
+                width: RFPercentage(5),
+                borderRadius: RFPercentage(2.5),
+              }}
+              source={{ uri: FileBase64.heyAstro }}
+            />
+          </View>
+        }
         rightComponent={{
           icon: "account-balance-wallet",
           color: "#fff",
@@ -278,12 +329,13 @@ const Home = ({ navigation }) => {
                   </Card>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "black",
                       fontFamily: "Dongle-Bold",
                       textAlign: "center",
                       position: "absolute",
+                      fontSize: RFPercentage(2.2),
                       top: RFPercentage(10),
-                      left: RFPercentage(1.2),
+                      left: RFPercentage(0.5),
                     }}
                   >
                     Daily Horoscope
@@ -312,12 +364,13 @@ const Home = ({ navigation }) => {
                   </Card>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "black",
                       fontFamily: "Dongle-Bold",
                       textAlign: "center",
                       position: "absolute",
+                      fontSize: RFPercentage(2.2),
                       top: RFPercentage(10),
-                      left: RFPercentage(2.5),
+                      left: RFPercentage(1.8),
                     }}
                   >
                     Free Kundli
@@ -348,12 +401,12 @@ const Home = ({ navigation }) => {
                   </Card>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "black",
                       fontFamily: "Dongle-Bold",
                       textAlign: "center",
                       position: "absolute",
+                      fontSize: RFPercentage(2.2),
                       top: RFPercentage(10),
-                      left: RFPercentage(1.2),
                     }}
                   >
                     Kundli Matching
@@ -382,12 +435,13 @@ const Home = ({ navigation }) => {
                   </Card>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "black",
                       fontFamily: "Dongle-Bold",
                       textAlign: "center",
                       position: "absolute",
+                      fontSize: RFPercentage(2.2),
                       top: RFPercentage(10),
-                      left: RFPercentage(1.2),
+                      left: RFPercentage(1),
                     }}
                   >
                     Astrology Blog
@@ -407,7 +461,7 @@ const Home = ({ navigation }) => {
               <FlatListSlider
                 data={carousels}
                 imageKey={"url"}
-                height={RFPercentage(15)}
+                height={RFPercentage(20)}
                 onPress={(item) => null}
                 timer={2000}
                 indicatorContainerStyle={{ position: "absolute", bottom: 20 }}
@@ -419,29 +473,178 @@ const Home = ({ navigation }) => {
             ) : null}
           </View>
 
-          {/* Astrologer Talk */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ChatsAndCalls")}
-            activeOpacity={0.9}
-            style={{ margin: RFPercentage(2) }}
-          >
-            <Image
-              style={{ height: RFPercentage(12.5), width: "100%" }}
-              source={{ uri: FileBase64.astroTalk }}
-            />
-          </TouchableOpacity>
+          {/* Our Astrologers */}
+          <View>
+            <View
+              style={{
+                paddingHorizontal: RFPercentage(2),
+                marginTop: RFPercentage(1),
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
+                Our Astrologers
+              </Text>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => navigation.navigate("ChatsAndCalls")}
+              >
+                <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
+                  View All
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {isLoading ? (
+                <HomeLatestPlaceholder />
+              ) : (
+                astrologers.map((astrologer, index) => {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        height: RFPercentage(23),
+                        width: RFPercentage(15),
+                        borderRadius: RFPercentage(1),
+                        backgroundColor: "white",
+                        margin: RFPercentage(1.8),
+                        flex: 1,
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Image
+                        source={{
+                          uri: astrologer.ProfileImage
+                            ? astrologer.ProfileImage
+                            : FileBase64.profile_Placeholder,
+                        }}
+                        style={{
+                          height: RFPercentage(8),
+                          width: RFPercentage(8),
+                          borderRadius: RFPercentage(4),
+                          resizeMode: "contain",
+                          alignSelf: "center",
+                          borderWidth: 1,
+                          borderColor: "black",
+                        }}
+                      />
+                      <Text
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                        style={{
+                          fontFamily: "Ubuntu-Regular",
+                          color: "black",
+                          marginTop: RFPercentage(1),
+                          fontSize: RFPercentage(1.7),
+                        }}
+                      >
+                        {astrologer.Name}
+                      </Text>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          fontFamily: "Ubuntu-Regular",
+                          color: "black",
+                          fontSize: RFPercentage(1.5),
+                          maxWidth: RFPercentage(19),
+                          marginVertical: RFPercentage(1),
+                          marginHorizontal: RFPercentage(1),
+                        }}
+                      >
+                        <FontAwesome name="inr" color="green" size={11} />
+                        {astrologer.ChargePerMinute}
+                        /Min
+                      </Text>
+                      <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={async () => {
+                          try {
+                            setStatusLoading(true);
+                            const authCometChat = await CometChatAuth();
+                            if (authCometChat) {
+                              const astrologerStatus = await CometChat.getUser(
+                                astrologer.Username
+                              );
+                              astrologer.status = astrologerStatus.status;
+                              setSelectedAstrologer(JSON.stringify(astrologer));
+                              setShowContactDialog(true);
+                            } else {
+                              ToastAndroid.show(
+                                "Something went wrong, Please try again later!",
+                                ToastAndroid.SHORT
+                              );
+                            }
+                            setStatusLoading(false);
+                          } catch (error) {
+                            if (error.code === "ERR_UID_NOT_FOUND") {
+                              setStatusLoading(false);
+                              ToastAndroid.show(
+                                "Astrologer not found, Please try again later!",
+                                ToastAndroid.SHORT
+                              );
+                            }
+                          }
+                        }}
+                      >
+                        <View
+                          style={{
+                            borderRadius: RFPercentage(1),
+                            borderColor: "green",
+                            borderWidth: 1,
+                            width: RFPercentage(10),
+                            paddingVertical: RFPercentage(1),
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "green",
+                              fontFamily: "Ubuntu-Regular",
+                              fontSize: RFPercentage(1.5),
+                              textAlign: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            Connect
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })
+              )}
+            </ScrollView>
+          </View>
 
           {/* Astrologer Blogs */}
           <View>
             <View
               style={{
                 paddingHorizontal: RFPercentage(2),
-                marginTop: RFPercentage(1),
+                marginTop: RFPercentage(2),
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "space-between",
               }}
             >
               <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
                 Latest from the Blog
               </Text>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => navigation.navigate("Blogs")}
+              >
+                <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
+                  View All
+                </Text>
+              </TouchableOpacity>
             </View>
             <ScrollView
               horizontal={true}
@@ -460,45 +663,58 @@ const Home = ({ navigation }) => {
                         navigation.navigate("Blog", { blogId: blog.id });
                       }}
                     >
-                      <Card
-                        containerStyle={{
+                      <View
+                        style={{
+                          backgroundColor: "white",
+                          margin: RFPercentage(1.8),
+                          height: RFPercentage(25),
                           borderRadius: RFPercentage(1),
-                          height: RFPercentage(21.5),
                           width: RFPercentage(30),
                         }}
                       >
                         <Image
                           style={{
-                            height: RFPercentage(10),
+                            height: RFPercentage(15),
                             width: "100%",
-                            borderRadius: RFPercentage(1),
+                            borderTopLeftRadius: RFPercentage(1),
+                            borderTopRightRadius: RFPercentage(1),
                           }}
                           source={{
                             uri: blog.attributes.CoverImage.data.attributes.url,
                           }}
                         />
-                        <Text
-                          numberOfLines={2}
-                          ellipsizeMode="tail"
+                        <View
                           style={{
-                            fontFamily: "Ubuntu-Regular",
-                            color: "black",
-                            marginTop: RFPercentage(1),
+                            padding: RFPercentage(1),
+                            height: RFPercentage(10),
                           }}
                         >
-                          {blog.attributes.Title}
-                        </Text>
-                        <Text
-                          style={{
-                            color: "#818181",
-                            fontFamily: "Ubuntu-Regular",
-                            textAlign: "right",
-                            marginTop: RFPercentage(0.5),
-                          }}
-                        >
-                          {date.toDateString()}
-                        </Text>
-                      </Card>
+                          <Text
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                            style={{
+                              fontFamily: "Ubuntu-Regular",
+                              color: "black",
+                              marginTop: RFPercentage(1),
+                            }}
+                          >
+                            {blog.attributes.Title}
+                          </Text>
+                          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                            <Text
+                              style={{
+                                color: "#818181",
+                                fontFamily: "Ubuntu-Regular",
+                                textAlign: "right",
+                                fontSize: RFPercentage(1.4),
+                                marginTop: RFPercentage(0.5),
+                              }}
+                            >
+                              {date.toDateString()}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
                     </TouchableOpacity>
                   );
                 })
@@ -537,43 +753,56 @@ const Home = ({ navigation }) => {
                         })
                       }
                     >
-                      <Card
-                        containerStyle={{
+                      <View
+                        style={{
+                          backgroundColor: "white",
+                          margin: RFPercentage(1.8),
+                          height: RFPercentage(25),
                           borderRadius: RFPercentage(1),
-                          height: RFPercentage(21.5),
                           width: RFPercentage(30),
                         }}
                       >
                         <Image
                           style={{
-                            height: RFPercentage(10),
+                            height: RFPercentage(15),
                             width: "100%",
-                            borderRadius: RFPercentage(1),
+                            borderTopLeftRadius: RFPercentage(1),
+                            borderTopRightRadius: RFPercentage(1),
                           }}
                           source={{ uri: video.CoverImage.data.attributes.url }}
                         />
-                        <Text
-                          numberOfLines={2}
-                          ellipsizeMode="tail"
+                        <View
                           style={{
-                            fontFamily: "Ubuntu-Regular",
-                            color: "black",
-                            marginTop: RFPercentage(1),
+                            padding: RFPercentage(1),
+                            height: RFPercentage(10),
                           }}
                         >
-                          {video.Title}
-                        </Text>
-                        <Text
-                          style={{
-                            color: "#818181",
-                            fontFamily: "Ubuntu-Regular",
-                            textAlign: "right",
-                            marginTop: RFPercentage(0.5),
-                          }}
-                        >
-                          {date.toDateString()}
-                        </Text>
-                      </Card>
+                          <Text
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                            style={{
+                              fontFamily: "Ubuntu-Regular",
+                              color: "black",
+                              marginTop: RFPercentage(1),
+                            }}
+                          >
+                            {video.Title}
+                          </Text>
+                          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                            <Text
+                              style={{
+                                color: "#818181",
+                                fontFamily: "Ubuntu-Regular",
+                                textAlign: "right",
+                                fontSize: RFPercentage(1.4),
+                                marginTop: RFPercentage(0.5),
+                              }}
+                            >
+                              {date.toDateString()}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
                     </TouchableOpacity>
                   );
                 })
@@ -645,7 +874,9 @@ const Home = ({ navigation }) => {
                           <View style={{ justifyContent: "center" }}>
                             <Image
                               source={{
-                                uri: testimonial.UserImage.data.attributes.url,
+                                uri: testimonial.UserImage.data.attributes.url
+                                  ? testimonial.UserImage.data.attributes.url
+                                  : FileBase64.profile_Placeholder,
                               }}
                               style={{
                                 height: RFPercentage(7),
@@ -731,6 +962,7 @@ const Home = ({ navigation }) => {
                   marginTop: RFPercentage(1),
                   marginStart: RFPercentage(1),
                   textAlign: "center",
+                  color: "black",
                 }}
               >
                 Privacy & {"\n"}Confidential
@@ -769,6 +1001,7 @@ const Home = ({ navigation }) => {
                   marginTop: RFPercentage(1),
                   marginStart: RFPercentage(1),
                   textAlign: "center",
+                  color: "black",
                 }}
               >
                 Verified {"\n"}Astrologers
@@ -807,6 +1040,7 @@ const Home = ({ navigation }) => {
                   marginTop: RFPercentage(1),
                   marginStart: RFPercentage(1),
                   textAlign: "center",
+                  color: "black",
                 }}
               >
                 Secure {"\n"}Payments
@@ -823,6 +1057,222 @@ const Home = ({ navigation }) => {
         placement="right"
         color="#1F4693"
       />
+      {selectedAstrologer && (
+        <Modal
+          onRequestClose={() => setShowContactDialog(false)}
+          transparent={true}
+          visible={showContactDialog}
+        >
+          <View style={{ backgroundColor: "#000000aa", flex: 1 }}>
+            <View style={{ flex: 1.9 }} />
+            <View
+              style={{
+                backgroundColor: "white",
+                flex: 1,
+              }}
+            >
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: RFPercentage(4),
+                }}
+              >
+                <Image
+                  source={{
+                    uri: JSON.parse(selectedAstrologer).ProfileImage
+                      ? JSON.parse(selectedAstrologer).ProfileImage
+                      : FileBase64.profile_Placeholder,
+                  }}
+                  style={{
+                    height: 85,
+                    width: 85,
+                    borderRadius: 42,
+                    borderWidth: 1,
+                    borderColor: "black",
+                    marginBottom: RFPercentage(1.5),
+                  }}
+                />
+                <View>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      fontFamily: "Ubuntu-Bold",
+                      color: "black",
+                      fontSize: RFPercentage(1.8),
+                      maxWidth: RFPercentage(19),
+                    }}
+                  >
+                    {JSON.parse(selectedAstrologer).Name}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      fontFamily: "Ubuntu-Regular",
+                      color: "black",
+                      fontSize: RFPercentage(1.5),
+                      maxWidth: RFPercentage(19),
+                      marginTop: RFPercentage(0.5),
+                    }}
+                  >
+                    Rate:- {JSON.parse(selectedAstrologer).ChargePerMinute}{" "}
+                    <FontAwesome name="inr" color="green" size={10} />
+                    /Min
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      fontFamily: "Ubuntu-Regular",
+                      color: "black",
+                      fontSize: RFPercentage(1.5),
+                      maxWidth: RFPercentage(19),
+                      marginTop: RFPercentage(0.5),
+                    }}
+                  >
+                    Status :-{" "}
+                    {JSON.parse(selectedAstrologer).status === "online" ? (
+                      <Text style={{ color: "green" }}>Online</Text>
+                    ) : (
+                      <Text style={{ color: "red" }}> Offline</Text>
+                    )}
+                  </Text>
+                </View>
+                <View />
+              </View>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  marginTop: RFPercentage(2),
+                }}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    if (JSON.parse(selectedAstrologer).status === "online") {
+                      if (
+                        JSON.parse(selectedAstrologer).ChargePerMinute <=
+                        userBalance
+                      ) {
+                        navigation.navigate("ChatUI", {
+                          userName: JSON.parse(selectedAstrologer).Username,
+                        });
+                        setShowContactDialog(false);
+                      } else {
+                        ToastAndroid.show(
+                          "Insufficient Balance, Please recharge your wallet",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    } else {
+                      ToastAndroid.show(
+                        "Astrologer is offline, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                  }}
+                >
+                  <Card
+                    containerStyle={{
+                      borderRadius: RFPercentage(1),
+                      borderColor: "#1F4693",
+                      borderWidth: 1,
+                      height: RFPercentage(6),
+                      width: RFPercentage(18),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#1F4693",
+                        fontFamily: "Dongle-Regular",
+                        fontSize: RFPercentage(2),
+                        textAlign: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      Chat
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={async () => {
+                    if (JSON.parse(selectedAstrologer).status === "online") {
+                      if (
+                        JSON.parse(selectedAstrologer).ChargePerMinute <=
+                        userBalance
+                      ) {
+                        const userName = await AsyncStorage.getItem("userName");
+                        const userId = await AsyncStorage.getItem("userId");
+                        const astrologerId =
+                          JSON.parse(selectedAstrologer).Username;
+                        const astrologerName =
+                          JSON.parse(selectedAstrologer).Name;
+                        navigation.navigate("VideoCall", {
+                          videoCallUrl: `https://heyastro.vercel.app/user/${userName}/chatwith/${astrologerId}`,
+                          astrologerId: astrologerId,
+                          userId: userId,
+                          astrologerName: astrologerName,
+                        });
+                        setShowContactDialog(false);
+                      } else {
+                        ToastAndroid.show(
+                          "Insufficient Balance, Please recharge your wallet",
+                          ToastAndroid.SHORT
+                        );
+                      }
+                    } else {
+                      ToastAndroid.show(
+                        "Astrologer is offline, Please try again later!",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                  }}
+                >
+                  <Card
+                    containerStyle={{
+                      borderRadius: RFPercentage(1),
+                      borderColor: "#1F4693",
+                      borderWidth: 1,
+                      width: RFPercentage(18),
+                      height: RFPercentage(6),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#1F4693",
+                        fontFamily: "Dongle-Regular",
+                        fontSize: RFPercentage(2),
+                        textAlign: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      Call
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+      {/* Loading Model */}
+      <Modal transparent={true} visible={statusLoading}>
+        <View
+          style={{
+            backgroundColor: "#000000aa",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      </Modal>
     </View>
   );
 };

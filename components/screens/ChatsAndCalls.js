@@ -178,7 +178,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "All" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -192,7 +193,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -203,7 +204,6 @@ const ChatsAndCall = (props) => {
               style={{
                 height: RFPercentage(7),
                 width: RFPercentage(7),
-                marginStart: RFPercentage(1),
               }}
             />
           </Card>
@@ -215,7 +215,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "Love" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -229,7 +230,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -240,7 +241,6 @@ const ChatsAndCall = (props) => {
               style={{
                 height: RFPercentage(7),
                 width: RFPercentage(7),
-                marginStart: RFPercentage(1),
               }}
             />
           </Card>
@@ -252,7 +252,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "Career" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -266,7 +267,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -277,7 +278,6 @@ const ChatsAndCall = (props) => {
               style={{
                 height: RFPercentage(7),
                 width: RFPercentage(7),
-                marginStart: RFPercentage(1),
               }}
             />
           </Card>
@@ -289,7 +289,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "Marriage" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -303,7 +304,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -315,7 +316,6 @@ const ChatsAndCall = (props) => {
                 height: RFPercentage(7),
                 width: RFPercentage(7),
                 marginTop: RFPercentage(0.5),
-                marginStart: RFPercentage(1),
               }}
             />
           </Card>
@@ -327,7 +327,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "Health" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -341,7 +342,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -353,7 +354,6 @@ const ChatsAndCall = (props) => {
                 height: RFPercentage(7),
                 marginTop: RFPercentage(0.7),
                 width: RFPercentage(7),
-                marginStart: RFPercentage(1),
               }}
             />
           </Card>
@@ -365,7 +365,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "Wealth" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -379,7 +380,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -390,7 +391,6 @@ const ChatsAndCall = (props) => {
               style={{
                 height: RFPercentage(7),
                 width: RFPercentage(7),
-                marginStart: RFPercentage(1),
               }}
             />
           </Card>
@@ -402,7 +402,8 @@ const ChatsAndCall = (props) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              width: RFPercentage(12.5),
+              width: RFPercentage(14),
+              alignItems: "center",
               height: RFPercentage(10.5),
               borderColor: category === "Family" ? "#1F4693" : "#e8e6ff",
               ...style.shadow,
@@ -416,7 +417,7 @@ const ChatsAndCall = (props) => {
                 fontSize: RFPercentage(1),
                 alignItems: "center",
                 position: "absolute",
-                left: -7,
+                left: -15,
                 top: -7,
               }}
             >
@@ -427,7 +428,6 @@ const ChatsAndCall = (props) => {
               style={{
                 height: RFPercentage(7),
                 width: RFPercentage(7),
-                marginStart: RFPercentage(1),
                 marginTop: RFPercentage(0.5),
               }}
             />
@@ -461,7 +461,9 @@ const ChatsAndCall = (props) => {
                         <View style={{ justifyContent: "center" }}>
                           <Image
                             source={{
-                              uri: astrologer.ProfileImage,
+                              uri: astrologer.ProfileImage
+                                ? astrologer.ProfileImage
+                                : FileBase64.profile_Placeholder,
                             }}
                             style={{
                               height: 80,
@@ -643,7 +645,9 @@ const ChatsAndCall = (props) => {
               >
                 <Image
                   source={{
-                    uri: JSON.parse(selectedAstrologer).ProfileImage,
+                    uri: JSON.parse(selectedAstrologer).ProfileImage
+                      ? JSON.parse(selectedAstrologer).ProfileImage
+                      : FileBase64.profile_Placeholder,
                   }}
                   style={{
                     height: 85,
