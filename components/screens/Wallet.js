@@ -111,7 +111,7 @@ const Wallet = ({ route, navigation }) => {
             >
               <Text
                 style={{
-                  color: "#818181",
+                  color: "#181A18",
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
                 }}
@@ -238,7 +238,7 @@ const Wallet = ({ route, navigation }) => {
                         <Text
                           style={{
                             fontFamily: "Ubuntu-Regular",
-                            color: "#818181",
+                            color: "#181A18",
                             fontSize: RFPercentage(1.3),
                           }}
                         >
@@ -247,7 +247,7 @@ const Wallet = ({ route, navigation }) => {
                         <Text
                           style={{
                             fontFamily: "Ubuntu-Regular",
-                            color: "#818181",
+                            color: "#181A18",
                             fontSize: RFPercentage(1.3),
                           }}
                         >
@@ -271,7 +271,7 @@ const Wallet = ({ route, navigation }) => {
                         <Text
                           style={{
                             fontFamily: "Ubuntu-Regular",
-                            color: "#818181",
+                            color: "#181A18",
                             fontSize: RFPercentage(1.3),
                           }}
                         >
@@ -295,7 +295,7 @@ const Wallet = ({ route, navigation }) => {
                         <Text
                           style={{
                             fontFamily: "Ubuntu-Regular",
-                            color: "#818181",
+                            color: "#181A18",
                             fontSize: RFPercentage(1.3),
                           }}
                         >

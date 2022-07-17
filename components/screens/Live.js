@@ -32,7 +32,7 @@ const Live = () => {
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text
           style={{
-            color: "#818181",
+            color: "#181A18",
             fontFamily: "Dongle-Regular",
             fontSize: RFPercentage(5),
           }}

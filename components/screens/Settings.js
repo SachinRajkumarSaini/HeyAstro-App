@@ -158,7 +158,7 @@ const Settings = ({ navigation }) => {
               <Text
                 style={{
                   marginTop: RFPercentage(0.5),
-                  color: "#818181",
+                  color: "#181A18",
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.5),
                 }}
@@ -224,7 +224,7 @@ const Settings = ({ navigation }) => {
                     <Text
                       style={{
                         marginStart: RFPercentage(2),
-                        color: "#818181",
+                        color: "#181A18",
                         fontFamily: "Ubuntu-Regular",
                         fontSize: RFPercentage(1.4),
                         marginTop: RFPercentage(0.4),
@@ -262,7 +262,7 @@ const Settings = ({ navigation }) => {
                     <Text
                       style={{
                         marginStart: RFPercentage(2),
-                        color: "#818181",
+                        color: "#181A18",
                         fontFamily: "Ubuntu-Regular",
                         fontSize: RFPercentage(1.4),
                         marginTop: RFPercentage(0.4),
@@ -298,7 +298,7 @@ const Settings = ({ navigation }) => {
               <Text
                 style={{
                   marginTop: RFPercentage(0.5),
-                  color: "#818181",
+                  color: "#181A18",
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.5),
                 }}
@@ -329,7 +329,7 @@ const Settings = ({ navigation }) => {
                     <Text
                       style={{
                         marginStart: RFPercentage(2),
-                        color: "#818181",
+                        color: "#181A18",
                         fontFamily: "Ubuntu-Regular",
                         fontSize: RFPercentage(1.4),
                         marginTop: RFPercentage(0.4),
@@ -362,7 +362,7 @@ const Settings = ({ navigation }) => {
                       style={{
                         marginStart: RFPercentage(2),
                         fontFamily: "Ubuntu-Regular",
-                        color: "#818181",
+                        color: "#181A18",
                         fontSize: RFPercentage(1.4),
                         marginTop: RFPercentage(0.4),
                       }}
@@ -384,7 +384,7 @@ const Settings = ({ navigation }) => {
                         fontFamily: "Ubuntu-Regular",
                         fontSize: RFPercentage(1.4),
                         marginTop: RFPercentage(0.4),
-                        color: "#818181",
+                        color: "#181A18",
                       }}
                     >
                       {balance}
@@ -427,7 +427,7 @@ const Settings = ({ navigation }) => {
               <Text
                 style={{
                   fontFamily: "Ubuntu-Regular",
-                  color: "#818181",
+                  color: "#181A18",
                   fontSize: RFPercentage(1.3),
                   marginTop: RFPercentage(0.4),
                 }}

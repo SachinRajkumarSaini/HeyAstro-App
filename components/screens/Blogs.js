@@ -223,7 +223,7 @@ const Blogs = ({ navigation }) => {
                       </Text>
                       <Text
                         style={{
-                          color: "#818181",
+                          color: "#181A18",
                           fontFamily: "Ubuntu-Regular",
                           textAlign: "right",
                           marginTop: RFPercentage(0.5),

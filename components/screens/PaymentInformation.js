@@ -253,7 +253,7 @@ const PaymentInformation = ({ route, navigation }) => {
       <View style={{ flex: 1 }}>
         {/* Payment Details */}
         <Card containerStyle={{ borderRadius: RFPercentage(1) }}>
-          <Text style={{ color: "#818181", fontFamily: "Ubuntu-Bold" }}>
+          <Text style={{ color: "#181A18", fontFamily: "Ubuntu-Bold" }}>
             Payment Details
           </Text>
           <View
@@ -263,7 +263,7 @@ const PaymentInformation = ({ route, navigation }) => {
               marginTop: RFPercentage(0.8),
             }}
           >
-            <Text style={{ color: "#818181", fontFamily: "Ubuntu-Regular" }}>
+            <Text style={{ color: "#181A18", fontFamily: "Ubuntu-Regular" }}>
               Total Amount
             </Text>
             <View style={{ flexDirection: "row" }}>
@@ -274,7 +274,7 @@ const PaymentInformation = ({ route, navigation }) => {
               />
               <Text
                 style={{
-                  color: "#818181",
+                  color: "#181A18",
                   marginStart: RFPercentage(0.5),
                   fontFamily: "Ubuntu-Regular",
                 }}
@@ -290,7 +290,7 @@ const PaymentInformation = ({ route, navigation }) => {
               marginTop: RFPercentage(0.8),
             }}
           >
-            <Text style={{ color: "#818181", fontFamily: "Ubuntu-Regular" }}>
+            <Text style={{ color: "#181A18", fontFamily: "Ubuntu-Regular" }}>
               GST (18%)
             </Text>
             <View style={{ flexDirection: "row" }}>
@@ -301,7 +301,7 @@ const PaymentInformation = ({ route, navigation }) => {
               />
               <Text
                 style={{
-                  color: "#818181",
+                  color: "#181A18",
                   marginStart: RFPercentage(0.5),
                   fontFamily: "Ubuntu-Regular",
                 }}
@@ -317,7 +317,7 @@ const PaymentInformation = ({ route, navigation }) => {
               marginTop: RFPercentage(0.8),
             }}
           >
-            <Text style={{ fontFamily: "Ubuntu-Bold", color: "#818181" }}>
+            <Text style={{ fontFamily: "Ubuntu-Bold", color: "#181A18" }}>
               Total Payable Amount
             </Text>
             <View style={{ flexDirection: "row" }}>

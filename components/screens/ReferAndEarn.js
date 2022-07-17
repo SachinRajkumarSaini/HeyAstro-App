@@ -148,7 +148,7 @@ const ReferAndEarn = ({ navigation }) => {
           </Text>
           <Text
             style={{
-              color: "#818181",
+              color: "#181A18",
               fontFamily: "Ubuntu-Bold",
               textAlign: "center",
               marginTop: RFPercentage(0.5),

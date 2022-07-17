@@ -13,7 +13,14 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
-import { Header, Card, Image, SearchBar, FAB } from "react-native-elements";
+import {
+  Header,
+  Card,
+  Image,
+  SearchBar,
+  FAB,
+  Divider,
+} from "react-native-elements";
 import FileBase64 from "../helpers/FileBase64";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { FlatListSlider } from "react-native-flatlist-slider";
@@ -97,7 +104,7 @@ const Home = ({ navigation }) => {
       //   Get Astrologers
       const getAstrologers = await FetchAPI({
         query: `query {
-                    astrologers(sort: "createdAt:desc") {
+                    astrologers(sort: "createdAt:desc",pagination: { limit: 20 }) {
                         data {
                             attributes {
                                 Name
@@ -121,7 +128,7 @@ const Home = ({ navigation }) => {
       const getBlogs = await FetchAPI({
         query: `
                 query{
-                    blogs(sort: "createdAt:desc"){
+                    blogs(sort: "createdAt:desc",pagination: { limit: 20 }){
                         data{
                             id,
                             attributes{
@@ -234,17 +241,16 @@ const Home = ({ navigation }) => {
         leftComponent={
           <View
             style={{
-              height: RFPercentage(5),
-              width: RFPercentage(5),
+              height: RFPercentage(4.5),
+              width: RFPercentage(4.5),
               margin: RFPercentage(1),
               borderRadius: RFPercentage(2.5),
             }}
           >
             <Image
               style={{
-                height: RFPercentage(5),
-                width: RFPercentage(5),
-                borderRadius: RFPercentage(2.5),
+                height: RFPercentage(4.5),
+                width: RFPercentage(4.5),
               }}
               source={{ uri: FileBase64.heyAstro }}
             />
@@ -298,24 +304,28 @@ const Home = ({ navigation }) => {
           {/* Top Categoires */}
           <ScrollView
             style={{ height: RFPercentage(13) }}
+            contentContainerStyle={{ flex: 1 }}
             showsHorizontalScrollIndicator={false}
             horizontal={true}
           >
             <View
               style={{
+                flex: 1,
                 flexDirection: "row",
-                paddingHorizontal: RFPercentage(1.5),
+                justifyContent: "space-around",
+                margin: RFPercentage(0.8),
               }}
             >
               <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                <View>
-                  <Card
-                    containerStyle={{
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
+                  <View
+                    style={{
                       height: RFPercentage(8),
                       width: RFPercentage(8),
                       borderRadius: RFPercentage(4),
-                      alignItems: "center",
-                      justifyContent: "center",
+                      elevation: RFPercentage(0.8),
                     }}
                   >
                     <Image
@@ -326,16 +336,14 @@ const Home = ({ navigation }) => {
                       }}
                       source={{ uri: FileBase64.dailyHoroscope }}
                     />
-                  </Card>
+                  </View>
                   <Text
                     style={{
                       color: "black",
-                      fontFamily: "Dongle-Bold",
+                      fontFamily: "Ubuntu-Bold",
                       textAlign: "center",
-                      position: "absolute",
-                      fontSize: RFPercentage(2.2),
-                      top: RFPercentage(10),
-                      left: RFPercentage(0.5),
+                      fontSize: RFPercentage(1.5),
+                      width: RFPercentage(10),
                     }}
                   >
                     Daily Horoscope
@@ -343,14 +351,15 @@ const Home = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate("Kundli")}>
-                <View>
-                  <Card
-                    containerStyle={{
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
+                  <View
+                    style={{
                       height: RFPercentage(8),
                       width: RFPercentage(8),
                       borderRadius: RFPercentage(4),
-                      alignItems: "center",
-                      justifyContent: "center",
+                      elevation: RFPercentage(0.8),
                     }}
                   >
                     <Image
@@ -361,16 +370,14 @@ const Home = ({ navigation }) => {
                       }}
                       source={{ uri: FileBase64.freeKundli }}
                     />
-                  </Card>
+                  </View>
                   <Text
                     style={{
                       color: "black",
-                      fontFamily: "Dongle-Bold",
+                      fontFamily: "Ubuntu-Bold",
                       textAlign: "center",
-                      position: "absolute",
-                      fontSize: RFPercentage(2.2),
-                      top: RFPercentage(10),
-                      left: RFPercentage(1.8),
+                      fontSize: RFPercentage(1.5),
+                      width: RFPercentage(10),
                     }}
                   >
                     Free Kundli
@@ -380,14 +387,15 @@ const Home = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => navigation.navigate("KundliMatching")}
               >
-                <View>
-                  <Card
-                    containerStyle={{
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
+                  <View
+                    style={{
                       height: RFPercentage(8),
                       width: RFPercentage(8),
                       borderRadius: RFPercentage(4),
-                      alignItems: "center",
-                      justifyContent: "center",
+                      elevation: RFPercentage(0.8),
                     }}
                   >
                     <Image
@@ -398,15 +406,14 @@ const Home = ({ navigation }) => {
                       }}
                       source={{ uri: FileBase64.matchMaking }}
                     />
-                  </Card>
+                  </View>
                   <Text
                     style={{
                       color: "black",
-                      fontFamily: "Dongle-Bold",
+                      fontFamily: "Ubuntu-Bold",
                       textAlign: "center",
-                      position: "absolute",
-                      fontSize: RFPercentage(2.2),
-                      top: RFPercentage(10),
+                      fontSize: RFPercentage(1.5),
+                      width: RFPercentage(10),
                     }}
                   >
                     Kundli Matching
@@ -414,14 +421,15 @@ const Home = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate("Blogs")}>
-                <View>
-                  <Card
-                    containerStyle={{
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
+                  <View
+                    style={{
                       height: RFPercentage(8),
                       width: RFPercentage(8),
                       borderRadius: RFPercentage(4),
-                      alignItems: "center",
-                      justifyContent: "center",
+                      elevation: RFPercentage(0.8),
                     }}
                   >
                     <Image
@@ -432,16 +440,14 @@ const Home = ({ navigation }) => {
                       }}
                       source={{ uri: FileBase64.astrologyBlog }}
                     />
-                  </Card>
+                  </View>
                   <Text
                     style={{
                       color: "black",
-                      fontFamily: "Dongle-Bold",
+                      fontFamily: "Ubuntu-Bold",
                       textAlign: "center",
-                      position: "absolute",
-                      fontSize: RFPercentage(2.2),
-                      top: RFPercentage(10),
-                      left: RFPercentage(1),
+                      fontSize: RFPercentage(1.5),
+                      width: RFPercentage(10),
                     }}
                   >
                     Astrology Blog
@@ -462,7 +468,7 @@ const Home = ({ navigation }) => {
                 data={carousels}
                 imageKey={"url"}
                 height={RFPercentage(20)}
-                onPress={(item) => null}
+                onPress={(item) => navigation.navigate("ChatsAndCalls")}
                 timer={2000}
                 indicatorContainerStyle={{ position: "absolute", bottom: 20 }}
                 indicatorActiveColor={"#1F4693"}
@@ -478,7 +484,7 @@ const Home = ({ navigation }) => {
             <View
               style={{
                 paddingHorizontal: RFPercentage(2),
-                marginTop: RFPercentage(1),
+                marginTop: RFPercentage(2.5),
                 flex: 1,
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -517,6 +523,7 @@ const Home = ({ navigation }) => {
                         flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
+                        elevation: RFPercentage(1),
                       }}
                     >
                       <Image
@@ -541,8 +548,8 @@ const Home = ({ navigation }) => {
                         style={{
                           fontFamily: "Ubuntu-Regular",
                           color: "black",
-                          marginTop: RFPercentage(1),
-                          fontSize: RFPercentage(1.7),
+                          marginTop: RFPercentage(1.2),
+                          fontSize: RFPercentage(1.8),
                         }}
                       >
                         {astrologer.Name}
@@ -551,7 +558,7 @@ const Home = ({ navigation }) => {
                         numberOfLines={1}
                         ellipsizeMode="tail"
                         style={{
-                          fontFamily: "Ubuntu-Regular",
+                          fontFamily: "Ubuntu-Bold",
                           color: "black",
                           fontSize: RFPercentage(1.5),
                           maxWidth: RFPercentage(19),
@@ -623,6 +630,15 @@ const Home = ({ navigation }) => {
             </ScrollView>
           </View>
 
+          <Divider
+            width={RFPercentage(0.1)}
+            style={{
+              marginVertical: RFPercentage(3),
+              marginHorizontal: RFPercentage(2),
+            }}
+            orientation="horizontal"
+          />
+
           {/* Astrologer Blogs */}
           <View>
             <View
@@ -670,6 +686,7 @@ const Home = ({ navigation }) => {
                           height: RFPercentage(25),
                           borderRadius: RFPercentage(1),
                           width: RFPercentage(30),
+                          elevation: RFPercentage(1),
                         }}
                       >
                         <Image
@@ -703,7 +720,7 @@ const Home = ({ navigation }) => {
                           <View style={{ flex: 1, justifyContent: "flex-end" }}>
                             <Text
                               style={{
-                                color: "#818181",
+                                color: "#181A18",
                                 fontFamily: "Ubuntu-Regular",
                                 textAlign: "right",
                                 fontSize: RFPercentage(1.4),
@@ -721,6 +738,15 @@ const Home = ({ navigation }) => {
               )}
             </ScrollView>
           </View>
+
+          <Divider
+            width={RFPercentage(0.1)}
+            style={{
+              marginVertical: RFPercentage(3),
+              marginHorizontal: RFPercentage(2),
+            }}
+            orientation="horizontal"
+          />
 
           {/* Astrologer Videos */}
           <View style={{ marginTop: RFPercentage(2) }}>
@@ -760,6 +786,7 @@ const Home = ({ navigation }) => {
                           height: RFPercentage(25),
                           borderRadius: RFPercentage(1),
                           width: RFPercentage(30),
+                          elevation: RFPercentage(1),
                         }}
                       >
                         <Image
@@ -791,7 +818,7 @@ const Home = ({ navigation }) => {
                           <View style={{ flex: 1, justifyContent: "flex-end" }}>
                             <Text
                               style={{
-                                color: "#818181",
+                                color: "#181A18",
                                 fontFamily: "Ubuntu-Regular",
                                 textAlign: "right",
                                 fontSize: RFPercentage(1.4),
@@ -810,8 +837,17 @@ const Home = ({ navigation }) => {
             </ScrollView>
           </View>
 
+          <Divider
+            width={RFPercentage(0.1)}
+            style={{
+              marginVertical: RFPercentage(4),
+              marginHorizontal: RFPercentage(2),
+            }}
+            orientation="horizontal"
+          />
+
           {/* Testimonials */}
-          <View style={{ marginTop: RFPercentage(2) }}>
+          <View style={{ marginTop: RFPercentage(1) }}>
             <View
               style={{
                 paddingHorizontal: RFPercentage(2),
@@ -839,6 +875,7 @@ const Home = ({ navigation }) => {
                         justifyContent: "center",
                         alignItems: "center",
                         width: width,
+                        elevation: RFPercentage(1),
                       }}
                     >
                       <Card
@@ -852,7 +889,7 @@ const Home = ({ navigation }) => {
                           ellipsizeMode="tail"
                           style={{
                             fontFamily: "Ubuntu-Regular",
-                            color: "#818181",
+                            color: "#181A18",
                             marginTop: RFPercentage(1),
                           }}
                         >
@@ -905,7 +942,7 @@ const Home = ({ navigation }) => {
                             <Text
                               style={{
                                 fontFamily: "Ubuntu-Regular",
-                                color: "#818181",
+                                color: "#181A18",
                                 fontSize: RFPercentage(1.5),
                               }}
                             >
@@ -1064,7 +1101,7 @@ const Home = ({ navigation }) => {
           visible={showContactDialog}
         >
           <View style={{ backgroundColor: "#000000aa", flex: 1 }}>
-            <View style={{ flex: 1.9 }} />
+            <View style={{ flex: 1.6 }} />
             <View
               style={{
                 backgroundColor: "white",
@@ -1085,9 +1122,9 @@ const Home = ({ navigation }) => {
                       : FileBase64.profile_Placeholder,
                   }}
                   style={{
-                    height: 85,
-                    width: 85,
-                    borderRadius: 42,
+                    height: RFPercentage(12),
+                    width: RFPercentage(12),
+                    borderRadius: RFPercentage(6),
                     borderWidth: 1,
                     borderColor: "black",
                     marginBottom: RFPercentage(1.5),
@@ -1100,7 +1137,7 @@ const Home = ({ navigation }) => {
                     style={{
                       fontFamily: "Ubuntu-Bold",
                       color: "black",
-                      fontSize: RFPercentage(1.8),
+                      fontSize: RFPercentage(2),
                       maxWidth: RFPercentage(19),
                     }}
                   >
@@ -1112,14 +1149,15 @@ const Home = ({ navigation }) => {
                     style={{
                       fontFamily: "Ubuntu-Regular",
                       color: "black",
-                      fontSize: RFPercentage(1.5),
+                      fontSize: RFPercentage(1.8),
                       maxWidth: RFPercentage(19),
                       marginTop: RFPercentage(0.5),
                     }}
                   >
-                    Rate:- {JSON.parse(selectedAstrologer).ChargePerMinute}{" "}
-                    <FontAwesome name="inr" color="green" size={10} />
-                    /Min
+                    Rate:- <FontAwesome name="inr" color="green" size={14} />
+                    <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
+                      {JSON.parse(selectedAstrologer).ChargePerMinute} /Min
+                    </Text>
                   </Text>
                   <Text
                     numberOfLines={1}
@@ -1127,7 +1165,7 @@ const Home = ({ navigation }) => {
                     style={{
                       fontFamily: "Ubuntu-Regular",
                       color: "black",
-                      fontSize: RFPercentage(1.5),
+                      fontSize: RFPercentage(1.8),
                       maxWidth: RFPercentage(19),
                       marginTop: RFPercentage(0.5),
                     }}
@@ -1181,7 +1219,7 @@ const Home = ({ navigation }) => {
                       borderRadius: RFPercentage(1),
                       borderColor: "#1F4693",
                       borderWidth: 1,
-                      height: RFPercentage(6),
+                      height: RFPercentage(7),
                       width: RFPercentage(18),
                     }}
                   >
@@ -1189,7 +1227,7 @@ const Home = ({ navigation }) => {
                       style={{
                         color: "#1F4693",
                         fontFamily: "Dongle-Regular",
-                        fontSize: RFPercentage(2),
+                        fontSize: RFPercentage(3),
                         textAlign: "center",
                         alignItems: "center",
                       }}
@@ -1239,14 +1277,14 @@ const Home = ({ navigation }) => {
                       borderColor: "#1F4693",
                       borderWidth: 1,
                       width: RFPercentage(18),
-                      height: RFPercentage(6),
+                      height: RFPercentage(7),
                     }}
                   >
                     <Text
                       style={{
                         color: "#1F4693",
                         fontFamily: "Dongle-Regular",
-                        fontSize: RFPercentage(2),
+                        fontSize: RFPercentage(3),
                         textAlign: "center",
                         alignItems: "center",
                       }}

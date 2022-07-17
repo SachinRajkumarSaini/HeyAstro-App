@@ -98,7 +98,7 @@ const Feedback = ({ navigation }) => {
               <Text
                 style={{
                   fontFamily: "Ubuntu-Regular",
-                  color: "#818181",
+                  color: "#181A18",
                   marginTop: RFPercentage(0.8),
                 }}
               >
@@ -113,10 +113,11 @@ const Feedback = ({ navigation }) => {
                 textAlignVertical="top"
                 style={{
                   borderWidth: 1,
-                  borderColor: "#818181",
+                  bordercolor: "#181A18",
                   borderRadius: RFPercentage(1),
                   padding: RFPercentage(1),
                   marginTop: RFPercentage(2),
+                  color: "black",
                 }}
                 placeholder="Your feedback"
               />

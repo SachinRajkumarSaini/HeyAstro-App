@@ -215,7 +215,7 @@ export default class VideoCall extends React.Component {
         {
           text: "Leave",
           onPress: () => {
-            if (this.state.userUsageTime > 10) {
+            if (this.state.userUsageTime > 20) {
               console.log("usage", this.state.userUsageTime);
               const { userUsageTime, astrologerChargesPerMinute } = this.state;
               let amount =

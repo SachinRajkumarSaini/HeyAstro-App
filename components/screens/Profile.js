@@ -171,7 +171,7 @@ const Profile = ({ navigation }) => {
                 </View>
                 <Text
                   style={{
-                    color: "#818181",
+                    color: "#181A18",
                     fontFamily: "Ubuntu-Regular",
                     fontSize: RFPercentage(1.8),
                     margin: RFPercentage(0.5),
@@ -181,7 +181,7 @@ const Profile = ({ navigation }) => {
                 </Text>
                 <Text
                   style={{
-                    color: "#818181",
+                    color: "#181A18",
                     fontFamily: "Ubuntu-Regular",
                     fontSize: RFPercentage(1.8),
                     margin: RFPercentage(0.5),
@@ -238,7 +238,7 @@ const Profile = ({ navigation }) => {
             ) : (
               <Text
                 style={{
-                  color: "#818181",
+                  color: "#181A18",
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
                   margin: RFPercentage(0.5),
@@ -283,7 +283,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.3),
                       margin: RFPercentage(0.5),
@@ -316,7 +316,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -356,7 +356,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -389,7 +389,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -422,7 +422,7 @@ const Profile = ({ navigation }) => {
             ) : (
               <Text
                 style={{
-                  color: "#818181",
+                  color: "#181A18",
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
                   margin: RFPercentage(0.5),
@@ -466,7 +466,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.3),
                       margin: RFPercentage(0.5),
@@ -499,7 +499,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -539,7 +539,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -572,7 +572,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -605,7 +605,7 @@ const Profile = ({ navigation }) => {
             ) : (
               <Text
                 style={{
-                  color: "#818181",
+                  color: "#181A18",
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
                   margin: RFPercentage(0.5),
@@ -650,7 +650,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.3),
                       margin: RFPercentage(0.5),
@@ -683,7 +683,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -723,7 +723,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),
@@ -756,7 +756,7 @@ const Profile = ({ navigation }) => {
                   </Text>
                   <Text
                     style={{
-                      color: "#818181",
+                      color: "#181A18",
                       fontFamily: "Ubuntu-Regular",
                       fontSize: RFPercentage(1.5),
                       margin: RFPercentage(0.5),

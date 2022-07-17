@@ -23,7 +23,7 @@ const Notifications = ({ navigation }) => {
       const getNotifications = await FetchAPI({
         query: `
                     query{
-                        notifications(sort: "createdAt:desc"){
+                        notifications(sort: "createdAt:desc",pagination: { limit: 100 }){
                             data{
                                 attributes{
                                     Title
@@ -155,9 +155,6 @@ const Notifications = ({ navigation }) => {
                       >
                         {notification.attributes.Description}
                       </Text>
-                    </View>
-                    <View style={{ justifyContent: "center" }}>
-                      <AntDesign name="delete" color={"red"} size={20} />
                     </View>
                   </View>
                   <Text
