@@ -585,7 +585,10 @@ const ChatsAndCall = (props) => {
                             onPress={async () => {
                               try {
                                 setStatusLoading(true);
-                                const authCometChat = await CometChatAuth();
+                                const authCometChat = await CometChatAuth(
+                                  astrologer.Username,
+                                  astrologer.Name
+                                );
                                 if (authCometChat) {
                                   const astrologerStatus =
                                     await CometChat.getUser(
@@ -868,7 +871,14 @@ const ChatsAndCall = (props) => {
         </Modal>
       )}
       {/* Loading Model */}
-      <Modal transparent={true} visible={statusLoading}>
+      <Modal
+        onRequestClose={() => {
+          setStatusLoading(false);
+          setShowContactDialog(false);
+        }}
+        transparent={true}
+        visible={statusLoading}
+      >
         <View
           style={{
             backgroundColor: "#000000aa",

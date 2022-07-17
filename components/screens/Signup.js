@@ -106,7 +106,9 @@ const Signup = ({ navigation }) => {
                 mutation {
                   createUsersPermissionsUser(
                     data: {
-                      username: ${JSON.stringify(userName)},
+                      username: ${JSON.stringify(
+                        userName.replace(/[.,\s]/g, "")
+                      )},
                       email: ${JSON.stringify(email)},
                       password: ${JSON.stringify(password)},
                       confirmed: true

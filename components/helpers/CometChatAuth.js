@@ -1,12 +1,9 @@
 import { CometChat } from "@cometchat-pro/react-native-chat";
 import { ToastAndroid } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COMETCHAT_AUTH_KEY } from "@env";
 
-export const CometChatAuth = async (props) => {
+export const CometChatAuth = async (userName, userFullName) => {
   try {
-    const userName = await AsyncStorage.getItem("userName");
-    const userFullName = await AsyncStorage.getItem("userFullName");
     const login = await CometChat.login(userName, COMETCHAT_AUTH_KEY);
     if (login.authToken) {
       console.log("login Success");
