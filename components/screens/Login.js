@@ -129,7 +129,7 @@ const Login = ({ navigation }) => {
         </Text>
         <TextInput
           textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
-          placeholder="Email or Username"
+          placeholder="Email"
           onChangeText={(identifier) =>
             setIdentifier(identifier.replace(/^\s+|\s+$/gm, ""))
           }

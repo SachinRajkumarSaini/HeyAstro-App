@@ -59,13 +59,20 @@ const ChatsAndCall = (props) => {
         setAstrologers(
           await Promise.all(
             getAstrologers.data.astrologers.data.map(async (item) => {
-              const { status } = await CometChat.getUser(
-                item.attributes.Username
-              );
-              return {
-                ...item.attributes,
-                status: status,
-              };
+              try {
+                const { status } = await CometChat.getUser(
+                  item.attributes.Username
+                );
+                return {
+                  ...item.attributes,
+                  status: status,
+                };
+              } catch (error) {
+                return {
+                  ...item.attributes,
+                  status: "offline",
+                };
+              }
             })
           ),
           setIsLoading(false)
@@ -104,20 +111,27 @@ const ChatsAndCall = (props) => {
         setAstrologers(
           await Promise.all(
             getAstrologers.data.astrologers.data.map(async (item) => {
-              const { status } = await CometChat.getUser(
-                item.attributes.Username
-              );
-              return {
-                ...item.attributes,
-                status: status,
-              };
+              try {
+                const { status } = await CometChat.getUser(
+                  item.attributes.Username
+                );
+                return {
+                  ...item.attributes,
+                  status: status,
+                };
+              } catch (error) {
+                return {
+                  ...item.attributes,
+                  status: "offline",
+                };
+              }
             })
           ),
           setIsLoading(false)
         );
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       setIsLoading(false);
     }
   };
