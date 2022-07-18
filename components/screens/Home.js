@@ -47,6 +47,7 @@ const Home = ({ navigation }) => {
   const [selectedAstrologer, setSelectedAstrologer] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [userBalance, setUserBalance] = useState(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -202,16 +203,78 @@ const Home = ({ navigation }) => {
       );
       setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
         ToastAndroid.SHORT
       );
-      // console.log(error);
+    }
+  };
+
+  const fetchUserBalance = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const getBalance = await FetchAPI({
+        query: `
+            query {
+              usersPermissionsUser(id: ${userId}) {
+                data {
+                  attributes {
+                    Balance
+                  }
+                }
+              }
+            }
+          `,
+      });
+      setUserBalance(
+        getBalance.data.usersPermissionsUser.data.attributes.Balance
+      );
+    } catch (error) {
+      ToastAndroid.show(
+        "Some error occured, Please try again later",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
+  const loginCometChat = async () => {
+    try {
+      setIsLoading(true);
+      // Fetching Profile
+      const userId = await AsyncStorage.getItem("userId");
+      const fetchProfile = await FetchAPI({
+        query: `
+              query{
+                usersPermissionsUser(id:${userId}){
+                  data{
+                    attributes{
+                      FullName
+                      username                     
+                    }
+                  }
+                }
+              }
+        `,
+      });
+      const authCometChat = await CometChatAuth(
+        fetchProfile.data.usersPermissionsUser.data.attributes.username,
+        fetchProfile.data.usersPermissionsUser.data.attributes.FullName
+      );
+      if (authCometChat) {
+        fetchData();
+      }
+    } catch (error) {
+      ToastAndroid.show(
+        "Some error occured, Please try again later",
+        ToastAndroid.SHORT
+      );
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchUserBalance();
+    loginCometChat();
   }, []);
 
   return (
@@ -377,7 +440,7 @@ const Home = ({ navigation }) => {
                       fontFamily: "Ubuntu-Bold",
                       textAlign: "center",
                       fontSize: RFPercentage(1.5),
-                      width: RFPercentage(10),
+                      width: RFPercentage(8),
                     }}
                   >
                     Free Kundli
@@ -575,24 +638,13 @@ const Home = ({ navigation }) => {
                         onPress={async () => {
                           try {
                             setStatusLoading(true);
-                            const authCometChat = await CometChatAuth(
-                              astrologer.Username,
-                              astrologer.Name
+                            const astrologerStatus = await CometChat.getUser(
+                              astrologer.Username
                             );
-                            if (authCometChat) {
-                              const astrologerStatus = await CometChat.getUser(
-                                astrologer.Username
-                              );
-                              astrologer.status = astrologerStatus.status;
-                              setSelectedAstrologer(JSON.stringify(astrologer));
-                              setShowContactDialog(true);
-                            } else {
-                              ToastAndroid.show(
-                                "Something went wrong, Please try again later!",
-                                ToastAndroid.SHORT
-                              );
-                            }
+                            astrologer.status = astrologerStatus.status;
+                            setSelectedAstrologer(JSON.stringify(astrologer));
                             setStatusLoading(false);
+                            setShowContactDialog(true);
                           } catch (error) {
                             if (error.code === "ERR_UID_NOT_FOUND") {
                               setStatusLoading(false);
@@ -858,7 +910,7 @@ const Home = ({ navigation }) => {
               }}
             >
               <Text style={{ fontFamily: "Ubuntu-Bold", color: "black" }}>
-                Client Testimonials
+                Client Reviews
               </Text>
             </View>
             <ScrollView
@@ -1204,6 +1256,7 @@ const Home = ({ navigation }) => {
                         });
                         setShowContactDialog(false);
                       } else {
+                        navigation.navigate("Wallet");
                         ToastAndroid.show(
                           "Insufficient Balance, Please recharge your wallet",
                           ToastAndroid.SHORT
@@ -1254,13 +1307,14 @@ const Home = ({ navigation }) => {
                         const astrologerName =
                           JSON.parse(selectedAstrologer).Name;
                         navigation.navigate("VideoCall", {
-                          videoCallUrl: `https://heyastro.vercel.app/user/${userName}/chatwith/${astrologerId}`,
+                          videoCallUrl: `https://heyastro.site/user/${userName}/chatwith/${astrologerId}`,
                           astrologerId: astrologerId,
                           userId: userId,
                           astrologerName: astrologerName,
                         });
                         setShowContactDialog(false);
                       } else {
+                        navigation.navigate("Wallet");
                         ToastAndroid.show(
                           "Insufficient Balance, Please recharge your wallet",
                           ToastAndroid.SHORT
@@ -1302,14 +1356,7 @@ const Home = ({ navigation }) => {
         </Modal>
       )}
       {/* Loading Model */}
-      <Modal
-        onRequestClose={() => {
-          setStatusLoading(false);
-          setShowContactDialog(false);
-        }}
-        transparent={true}
-        visible={statusLoading}
-      >
+      <Modal transparent={true} visible={statusLoading}>
         <View
           style={{
             backgroundColor: "#000000aa",

@@ -5,6 +5,7 @@ import { COMETCHAT_AUTH_KEY } from "@env";
 export const CometChatAuth = async (userName, userFullName) => {
   try {
     const login = await CometChat.login(userName, COMETCHAT_AUTH_KEY);
+    console.log("Login Successful:", login);
     if (login.authToken) {
       console.log("login Success");
       return true;

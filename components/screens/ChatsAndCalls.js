@@ -32,7 +32,6 @@ const ChatsAndCall = (props) => {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedAstrologer, setSelectedAstrologer] = useState();
   const [userBalance, setUserBalance] = useState(null);
-  const [statusLoading, setStatusLoading] = useState(false);
 
   const fetchAstrologers = async () => {
     try {
@@ -58,7 +57,17 @@ const ChatsAndCall = (props) => {
             `,
         });
         setAstrologers(
-          getAstrologers.data.astrologers.data.map((item) => item.attributes),
+          await Promise.all(
+            getAstrologers.data.astrologers.data.map(async (item) => {
+              const { status } = await CometChat.getUser(
+                item.attributes.Username
+              );
+              return {
+                ...item.attributes,
+                status: status,
+              };
+            })
+          ),
           setIsLoading(false)
         );
       } else {
@@ -91,18 +100,62 @@ const ChatsAndCall = (props) => {
                 }                        
             `,
         });
+
         setAstrologers(
-          getAstrologers.data.astrologers.data.map((item) => item.attributes),
+          await Promise.all(
+            getAstrologers.data.astrologers.data.map(async (item) => {
+              const { status } = await CometChat.getUser(
+                item.attributes.Username
+              );
+              return {
+                ...item.attributes,
+                status: status,
+              };
+            })
+          ),
           setIsLoading(false)
         );
       }
     } catch (error) {
       // console.log(error);
+      setIsLoading(false);
+    }
+  };
+
+  const loginCometChat = async () => {
+    try {
+      setIsLoading(true);
+      setAstrologers([]);
+      // Fetching Profile
+      const userId = await AsyncStorage.getItem("userId");
+      const fetchProfile = await FetchAPI({
+        query: `
+              query{
+                usersPermissionsUser(id:${userId}){
+                  data{
+                    attributes{
+                      FullName
+                      username                     
+                    }
+                  }
+                }
+              }
+        `,
+      });
+      const authCometChat = await CometChatAuth(
+        fetchProfile.data.usersPermissionsUser.data.attributes.username,
+        fetchProfile.data.usersPermissionsUser.data.attributes.FullName
+      );
+      if (authCometChat) {
+        setIsLoading(false);
+        fetchAstrologers();
+      }
+    } catch (error) {
+      setIsLoading(false);
       ToastAndroid.show(
         "Some error occured, Please try again later",
         ToastAndroid.SHORT
       );
-      setIsLoading(false);
     }
   };
 
@@ -134,12 +187,9 @@ const ChatsAndCall = (props) => {
   };
 
   useEffect(() => {
-    fetchAstrologers();
-  }, [category]);
-
-  useEffect(() => {
+    loginCometChat();
     fetchUserBalance();
-  }, [isFocused]);
+  }, [isFocused, category]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -191,276 +241,288 @@ const ChatsAndCall = (props) => {
           </View>
         }
       />
-      <ScrollView
-        style={{ backgroundColor: "#e4e9f5", flex: 1 }}
-        automaticallyAdjustContentInsets={true}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-      >
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("All")}
+      <View style={{ backgroundColor: "#e4e9f5", flex: 1.1 }}>
+        <ScrollView
+          automaticallyAdjustContentInsets={true}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
         >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "All" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("All")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "All" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              All
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryAll }}
-              style={{
-                height: RFPercentage(7),
-                width: RFPercentage(7),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("Love")}
-        >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "Love" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                All
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryAll }}
+                style={{
+                  height: RFPercentage(7),
+                  width: RFPercentage(7),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("Love")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "Love" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              Love
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryLove }}
-              style={{
-                height: RFPercentage(7),
-                width: RFPercentage(7),
-                marginTop: RFPercentage(0.5),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("Career")}
-        >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "Career" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                Love
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryLove }}
+                style={{
+                  height: RFPercentage(7),
+                  width: RFPercentage(7),
+                  marginTop: RFPercentage(0.5),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("Career")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "Career" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              Career
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryCarrer }}
-              style={{
-                height: RFPercentage(7),
-                width: RFPercentage(7),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("Marriage")}
-        >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "Marriage" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                Career
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryCarrer }}
+                style={{
+                  height: RFPercentage(7),
+                  width: RFPercentage(7),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("Marriage")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "Marriage" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              Marriage
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryMarriage }}
-              style={{
-                height: RFPercentage(7),
-                width: RFPercentage(7),
-                marginTop: RFPercentage(0.8),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("Health")}
-        >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "Health" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                Marriage
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryMarriage }}
+                style={{
+                  height: RFPercentage(7),
+                  width: RFPercentage(7),
+                  marginTop: RFPercentage(0.8),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("Health")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "Health" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              Health
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryHealth }}
-              style={{
-                height: RFPercentage(7),
-                marginTop: RFPercentage(0.9),
-                width: RFPercentage(7),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("Wealth")}
-        >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "Wealth" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                Health
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryHealth }}
+                style={{
+                  height: RFPercentage(7),
+                  marginTop: RFPercentage(0.9),
+                  width: RFPercentage(7),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("Wealth")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "Wealth" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              Wealth
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryWealth }}
-              style={{
-                height: RFPercentage(7),
-                width: RFPercentage(7),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setCategory("Family")}
-        >
-          <Card
-            containerStyle={{
-              borderRadius: RFPercentage(1),
-              width: RFPercentage(14),
-              alignItems: "center",
-              height: RFPercentage(10.5),
-              borderColor: category === "Family" ? "#1F4693" : "#e8e6ff",
-              ...style.shadow,
-            }}
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                Wealth
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryWealth }}
+                style={{
+                  height: RFPercentage(7),
+                  width: RFPercentage(7),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setCategory("Family")}
           >
-            <Text
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "Ubuntu-Regular",
-                fontSize: RFPercentage(1.2),
+            <Card
+              containerStyle={{
+                borderRadius: RFPercentage(1),
+                width: RFPercentage(14),
                 alignItems: "center",
-                position: "absolute",
-                left: -15,
-                top: -7,
+                height: RFPercentage(10.5),
+                borderColor: category === "Family" ? "#1F4693" : "#e8e6ff",
+                ...style.shadow,
               }}
             >
-              Family
-            </Text>
-            <Image
-              source={{ uri: FileBase64.categoryFamily }}
-              style={{
-                height: RFPercentage(7),
-                width: RFPercentage(7),
-                marginTop: RFPercentage(0.7),
-              }}
-            />
-          </Card>
-        </TouchableOpacity>
-      </ScrollView>
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: RFPercentage(1.2),
+                  alignItems: "center",
+                  position: "absolute",
+                  left: -15,
+                  top: -7,
+                }}
+              >
+                Family
+              </Text>
+              <Image
+                source={{ uri: FileBase64.categoryFamily }}
+                style={{
+                  height: RFPercentage(7),
+                  width: RFPercentage(7),
+                  marginTop: RFPercentage(0.7),
+                }}
+              />
+            </Card>
+          </TouchableOpacity>
+        </ScrollView>
+        <Text
+          style={{
+            color: "black",
+            fontFamily: "Dongle-Bold",
+            fontSize: RFPercentage(2),
+            textAlign: "right",
+            marginEnd: RFPercentage(1),
+          }}
+        >
+          Swipe >>
+        </Text>
+      </View>
 
       <View style={{ flex: 5.3, backgroundColor: "#dce4f5" }}>
         {isLoading && (
@@ -565,6 +627,24 @@ const ChatsAndCall = (props) => {
                               color: "black",
                               fontSize: RFPercentage(1.8),
                               maxWidth: RFPercentage(19),
+                              marginTop: RFPercentage(0.1),
+                            }}
+                          >
+                            Status:-{" "}
+                            {astrologer.status === "online" ? (
+                              <Text style={{ color: "green" }}>Online</Text>
+                            ) : (
+                              <Text style={{ color: "red" }}>Offline</Text>
+                            )}
+                          </Text>
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={{
+                              fontFamily: "Ubuntu-Regular",
+                              color: "black",
+                              fontSize: RFPercentage(1.8),
+                              maxWidth: RFPercentage(19),
                               marginTop: RFPercentage(0.5),
                             }}
                           >
@@ -579,42 +659,12 @@ const ChatsAndCall = (props) => {
                             </Text>
                           </Text>
                         </View>
-                        <View>
+                        <View style={{ justifyContent: "center" }}>
                           <TouchableOpacity
                             activeOpacity={0.9}
-                            onPress={async () => {
-                              try {
-                                setStatusLoading(true);
-                                const authCometChat = await CometChatAuth(
-                                  astrologer.Username,
-                                  astrologer.Name
-                                );
-                                if (authCometChat) {
-                                  const astrologerStatus =
-                                    await CometChat.getUser(
-                                      astrologer.Username
-                                    );
-                                  astrologer.status = astrologerStatus.status;
-                                  setSelectedAstrologer(
-                                    JSON.stringify(astrologer)
-                                  );
-                                  setShowContactDialog(true);
-                                } else {
-                                  ToastAndroid.show(
-                                    "Something went wrong, Please try again later!",
-                                    ToastAndroid.SHORT
-                                  );
-                                }
-                                setStatusLoading(false);
-                              } catch (error) {
-                                if (error.code === "ERR_UID_NOT_FOUND") {
-                                  setStatusLoading(false);
-                                  ToastAndroid.show(
-                                    "Astrologer not found, Please try again later!",
-                                    ToastAndroid.SHORT
-                                  );
-                                }
-                              }
+                            onPress={() => {
+                              setSelectedAstrologer(JSON.stringify(astrologer));
+                              setShowContactDialog(true);
                             }}
                           >
                             <Card
@@ -773,6 +823,7 @@ const ChatsAndCall = (props) => {
                         });
                         setShowContactDialog(false);
                       } else {
+                        navigation.navigate("Wallet");
                         ToastAndroid.show(
                           "Insufficient Balance, Please recharge your wallet",
                           ToastAndroid.SHORT
@@ -823,13 +874,14 @@ const ChatsAndCall = (props) => {
                         const astrologerName =
                           JSON.parse(selectedAstrologer).Name;
                         navigation.navigate("VideoCall", {
-                          videoCallUrl: `https://heyastro.vercel.app/user/${userName}/chatwith/${astrologerId}`,
+                          videoCallUrl: `https://heyastro.site/user/${userName}/chatwith/${astrologerId}`,
                           astrologerId: astrologerId,
                           userId: userId,
                           astrologerName: astrologerName,
                         });
                         setShowContactDialog(false);
                       } else {
+                        navigation.navigate("Wallet");
                         ToastAndroid.show(
                           "Insufficient Balance, Please recharge your wallet",
                           ToastAndroid.SHORT
@@ -870,26 +922,6 @@ const ChatsAndCall = (props) => {
           </View>
         </Modal>
       )}
-      {/* Loading Model */}
-      <Modal
-        onRequestClose={() => {
-          setStatusLoading(false);
-          setShowContactDialog(false);
-        }}
-        transparent={true}
-        visible={statusLoading}
-      >
-        <View
-          style={{
-            backgroundColor: "#000000aa",
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color="white" />
-        </View>
-      </Modal>
     </View>
   );
 };

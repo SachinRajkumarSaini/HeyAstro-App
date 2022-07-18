@@ -116,7 +116,7 @@ const Signup = ({ navigation }) => {
                       Phone: ${phone},
                       DOB: ${JSON.stringify(DOB.toISOString())}
                       BirthPlacePincode: ${pincode},
-                      Balance: ${parseFloat(0)},
+                      Balance: ${parseFloat(25)},
                       BirthPlace: {
                         Country: ${JSON.stringify(location.Country)},
                         City: ${JSON.stringify(location.City)},
