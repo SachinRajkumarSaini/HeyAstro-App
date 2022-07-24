@@ -156,7 +156,6 @@ const Wallet = ({ route, navigation }) => {
                 containerStyle={{
                   backgroundColor: "#1F4693",
                   borderRadius: RFPercentage(1),
-                  height: RFPercentage(5.5),
                   alignItems: "center",
                 }}
               >
@@ -178,7 +177,6 @@ const Wallet = ({ route, navigation }) => {
               backgroundColor: "#f4f4f4",
               borderRadius: RFPercentage(2.2),
               borderColor: "#1F4693",
-              height: RFPercentage(5.5),
               alignItems: "center",
               justifyContent: "center",
             }}
