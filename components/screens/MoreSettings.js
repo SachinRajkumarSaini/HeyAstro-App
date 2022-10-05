@@ -20,7 +20,7 @@ const MoreSettings = ({ navigation }) => {
         containerStyle={{
           backgroundColor: "#1F4693",
           paddingVertical: 6,
-          borderBottomWidth: 0,
+          borderBottomWidth: 0
         }}
         centerComponent={{
           text: "Settings",
@@ -28,17 +28,17 @@ const MoreSettings = ({ navigation }) => {
             color: "#fff",
             fontSize: RFPercentage(3.5),
             fontFamily: "Dongle-Regular",
-            marginTop: RFPercentage(0.5),
-          },
+            marginTop: RFPercentage(0.5)
+          }
         }}
         leftComponent={{
           icon: "arrow-back",
           color: "#fff",
           iconStyle: {
             marginLeft: RFPercentage(1),
-            marginTop: RFPercentage(0.8),
+            marginTop: RFPercentage(0.8)
           },
-          onPress: () => navigation.goBack(),
+          onPress: () => navigation.goBack()
         }}
       />
 
@@ -50,7 +50,7 @@ const MoreSettings = ({ navigation }) => {
           <Card
             containerStyle={{
               margin: RFPercentage(2),
-              borderRadius: RFPercentage(1),
+              borderRadius: RFPercentage(1)
             }}
           >
             <Text
@@ -58,7 +58,7 @@ const MoreSettings = ({ navigation }) => {
                 color: "black",
                 fontFamily: "Ubuntu-Regular",
                 fontSize: RFPercentage(1.8),
-                color: "green",
+                color: "green"
               }}
             >
               Terms and Conditions
@@ -72,7 +72,7 @@ const MoreSettings = ({ navigation }) => {
           <Card
             containerStyle={{
               margin: RFPercentage(2),
-              borderRadius: RFPercentage(1),
+              borderRadius: RFPercentage(1)
             }}
           >
             <Text
@@ -80,7 +80,7 @@ const MoreSettings = ({ navigation }) => {
                 color: "black",
                 fontFamily: "Ubuntu-Regular",
                 fontSize: RFPercentage(1.8),
-                color: "green",
+                color: "green"
               }}
             >
               Privacy Policy
@@ -97,7 +97,7 @@ const MoreSettings = ({ navigation }) => {
                 {
                   text: "Cancel",
                   onPress: () => console.log("Cancel Pressed"),
-                  style: "cancel",
+                  style: "cancel"
                 },
                 {
                   text: "OK",
@@ -106,17 +106,16 @@ const MoreSettings = ({ navigation }) => {
                       () => {
                         console.log("Logout completed successfully");
                       },
-                      (error) => {
+                      error => {
                         console.log("Logout failed with exception:", { error });
                       }
                     );
                     navigation.navigate("Login");
-                    await AsyncStorage.setItem("jwtToken", "");
                     await AsyncStorage.setItem("userId", "");
                     await AsyncStorage.setItem("userFullName", "");
                     await AsyncStorage.setItem("userName", "");
-                  },
-                },
+                  }
+                }
               ],
               { cancelable: true }
             );
@@ -125,7 +124,7 @@ const MoreSettings = ({ navigation }) => {
           <Card
             containerStyle={{
               margin: RFPercentage(2),
-              borderRadius: RFPercentage(1),
+              borderRadius: RFPercentage(1)
             }}
           >
             <View
@@ -138,7 +137,7 @@ const MoreSettings = ({ navigation }) => {
                   fontFamily: "Ubuntu-Regular",
                   fontSize: RFPercentage(1.8),
                   color: "black",
-                  marginStart: RFPercentage(1.5),
+                  marginStart: RFPercentage(1.5)
                 }}
               >
                 Logout my account

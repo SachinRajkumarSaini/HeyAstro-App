@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ToastAndroid,
-  Modal,
+  Modal
 } from "react-native";
 import React, { useState, Fragment, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -41,20 +41,23 @@ const Signup = ({ navigation }) => {
   const [Confirm, SetConfirm] = useState();
   const [Code, SetCode] = useState();
 
-  useEffect(() => {
-    setOtpErrorText("");
-  }, [isFocused]);
+  useEffect(
+    () => {
+      setOtpErrorText("");
+    },
+    [isFocused]
+  );
 
   const getLocation = async () => {
     try {
       const gettingLocation = await Fetch_API(
         `${process.env.HEYASTRO_API_URL}/getLocation`,
         {
-          pincode: pincode,
+          pincode: pincode
         },
         "POST",
         {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         }
       );
       return gettingLocation;
@@ -77,7 +80,7 @@ const Signup = ({ navigation }) => {
               }
             }
           }
-      `,
+      `
       });
       if (isNumberRegistered.data.usersPermissionsUsers.data.length === 1) {
         setIsLoading(false);
@@ -133,7 +136,7 @@ const Signup = ({ navigation }) => {
                     }
                   }
                 }
-        `,
+        `
       });
       if (createUser.errors) {
         if (createUser.errors[0].message === "Email already taken") {
@@ -230,12 +233,11 @@ const Signup = ({ navigation }) => {
                       }
                     }
                   }                    
-                `,
+                `
           });
           if (login.data) {
             if (login.data.login.jwt) {
               const { jwt, user } = login.data.login;
-              await AsyncStorage.setItem("jwtToken", jwt);
               await AsyncStorage.setItem("userId", user.id);
               await AsyncStorage.setItem("userFullName", fullName);
               await AsyncStorage.setItem("userName", user.username);
@@ -303,7 +305,7 @@ const Signup = ({ navigation }) => {
       <View
         style={{
           flex: 1,
-          justifyContent: "center",
+          justifyContent: "center"
         }}
       >
         <View style={{ alignItems: "center" }}>
@@ -311,7 +313,7 @@ const Signup = ({ navigation }) => {
             source={{ uri: FileBase64.heyAstro }}
             containerStyle={{
               height: RFPercentage(20),
-              width: RFPercentage(20),
+              width: RFPercentage(20)
             }}
           />
           <Text
@@ -319,222 +321,217 @@ const Signup = ({ navigation }) => {
               fontFamily: "Dongle-Bold",
               color: "#4d148c",
               fontSize: RFPercentage(4),
-              marginTop: RFPercentage(1),
+              marginTop: RFPercentage(1)
             }}
           >
             Sign Up
           </Text>
         </View>
-        {firstScreen ? (
-          <View style={{ alignItems: "center" }}>
-            <TextInput
-              textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
-              placeholder="Mobile Number"
-              keyboardType="numeric"
-              maxLength={10}
-              onChangeText={(number) =>
-                setPhone(number.replace(/^\s+|\s+$/gm, ""))
-              }
-            />
-            <TextInput
-              textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
-              placeholder="Email"
-              onChangeText={(email) =>
-                setEmail(email.replace(/^\s+|\s+$/gm, ""))
-              }
-            />
-            <TextInput
-              textInputStyle={{ marginTop: RFPercentage(2), color: "black" }}
-              placeholder="Password"
-              secureTextEntry={true}
-              onChangeText={(password) =>
-                setPassword(password.replace(/^\s+|\s+$/gm, ""))
-              }
-            />
-            <Button
-              containerStyle={{
-                marginTop: RFPercentage(2),
-                width: "90%",
-              }}
-              buttonStyle={{ backgroundColor: "#1F4693" }}
-              titleStyle={{
-                fontFamily: "Dongle-Regular",
-                fontSize: RFPercentage(2.5),
-              }}
-              onPress={async () => {
-                if (email && password && phone) {
-                  if (
-                    email.includes("@") &&
-                    password.length >= 6 &&
-                    phone.length === 10
-                  ) {
-                    const numberRegistered = await isNumberRegistered();
-                    if (!numberRegistered) {
-                      sendOTP();
-                    }
-                  }
-                  if (!email.includes("@")) {
-                    ToastAndroid.show(
-                      "Please enter valid email",
-                      ToastAndroid.SHORT
-                    );
-                  }
-                  if (password.length < 6) {
-                    ToastAndroid.show(
-                      "Password must be at least 6 characters",
-                      ToastAndroid.SHORT
-                    );
-                  }
-                  if (!phone.length === 10) {
-                    ToastAndroid.show(
-                      "Please enter valid phone number",
-                      ToastAndroid.SHORT
-                    );
-                  }
-                } else {
-                  ToastAndroid.show(
-                    "Please fill all the fields",
-                    ToastAndroid.SHORT
-                  );
-                }
-              }}
-              title="Next"
-              loading={isLoading}
-              type="solid"
-            />
-          </View>
-        ) : (
-          <Fragment>
-            <Text
-              style={{
-                fontFamily: "Dongle-Bold",
-                color: "black",
-                fontSize: RFPercentage(2),
-                marginTop: RFPercentage(1),
-                marginStart: RFPercentage(3),
-              }}
-            >
-              Name
-            </Text>
-            <View style={{ alignItems: "center" }}>
+        {firstScreen
+          ? <View style={{ alignItems: "center" }}>
               <TextInput
-                textInputStyle={{ color: "black" }}
-                placeholder="Full Name"
-                onChangeText={(fullName) => setFullName(fullName)}
-              />
-            </View>
-            <Text
-              style={{
-                fontFamily: "Dongle-Bold",
-                color: "black",
-                fontSize: RFPercentage(2),
-                marginTop: RFPercentage(1.5),
-                marginStart: RFPercentage(3),
-              }}
-            >
-              Date of Birth
-            </Text>
-            <View style={{ alignItems: "center" }}>
-              <TextInput
-                textInputStyle={{ color: "black" }}
-                placeholder="Date of Birth"
-                value={DOB.toDateString()}
-                onFocus={() => setOpenDate(true)}
-                onPressIn={() => setOpenDate(true)}
-              />
-              <DatePicker
-                modal
-                mode="date"
-                open={openDate}
-                date={DOB}
-                onConfirm={(date) => {
-                  setOpenDate(false);
-                  setDOB(date);
-                }}
-                onCancel={() => {
-                  setOpenDate(false);
-                }}
-              />
-            </View>
-            <Text
-              style={{
-                fontFamily: "Dongle-Bold",
-                color: "black",
-                fontSize: RFPercentage(2),
-                marginTop: RFPercentage(1.5),
-                marginStart: RFPercentage(3),
-              }}
-            >
-              Time of Birth
-            </Text>
-            <View style={{ alignItems: "center" }}>
-              <TextInput
-                textInputStyle={{ color: "black" }}
-                placeholder="Time of Birth"
-                value={moment(DOB).format("hh:mm a")}
-                onFocus={() => setOpenTime(true)}
-                onPressIn={() => setOpenTime(true)}
-              />
-              <DateTimePickerModal
-                isVisible={openTime}
-                mode="time"
-                date={DOB}
-                onConfirm={(time) => {
-                  DOB.setTime(time);
-                  setOpenTime(false);
-                }}
-                onCancel={() => {
-                  setOpenTime(false);
-                }}
-              />
-            </View>
-            <Text
-              style={{
-                fontFamily: "Dongle-Regular",
-                textAlign: "left",
-                color: "black",
-                marginStart: RFPercentage(3),
-              }}
-            >
-              If you don't know time, then select 12:00 AM
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Dongle-Bold",
-                color: "black",
-                fontSize: RFPercentage(2),
-                marginTop: RFPercentage(1.5),
-                marginStart: RFPercentage(3),
-              }}
-            >
-              Pincode
-            </Text>
-            <View style={{ alignItems: "center" }}>
-              <TextInput
-                textInputStyle={{ color: "black" }}
-                placeholder="Birth Place Pincode"
-                maxLength={6}
+                textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
+                placeholder="Mobile Number"
                 keyboardType="numeric"
-                onChangeText={(pincode) => setPincode(pincode)}
+                maxLength={10}
+                onChangeText={number =>
+                  setPhone(number.replace(/^\s+|\s+$/gm, ""))}
+              />
+              <TextInput
+                textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
+                placeholder="Email"
+                onChangeText={email =>
+                  setEmail(email.replace(/^\s+|\s+$/gm, ""))}
+              />
+              <TextInput
+                textInputStyle={{ marginTop: RFPercentage(2), color: "black" }}
+                placeholder="Password"
+                secureTextEntry={true}
+                onChangeText={password =>
+                  setPassword(password.replace(/^\s+|\s+$/gm, ""))}
               />
               <Button
                 containerStyle={{
                   marginTop: RFPercentage(2),
-                  width: "90%",
+                  width: "90%"
                 }}
                 buttonStyle={{ backgroundColor: "#1F4693" }}
                 titleStyle={{
                   fontFamily: "Dongle-Regular",
-                  fontSize: RFPercentage(2.5),
+                  fontSize: RFPercentage(2.5)
                 }}
-                onPress={signup}
-                title="Signup"
+                onPress={async () => {
+                  if (email && password && phone) {
+                    if (
+                      email.includes("@") &&
+                      password.length >= 6 &&
+                      phone.length === 10
+                    ) {
+                      const numberRegistered = await isNumberRegistered();
+                      if (!numberRegistered) {
+                        sendOTP();
+                      }
+                    }
+                    if (!email.includes("@")) {
+                      ToastAndroid.show(
+                        "Please enter valid email",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                    if (password.length < 6) {
+                      ToastAndroid.show(
+                        "Password must be at least 6 characters",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                    if (!phone.length === 10) {
+                      ToastAndroid.show(
+                        "Please enter valid phone number",
+                        ToastAndroid.SHORT
+                      );
+                    }
+                  } else {
+                    ToastAndroid.show(
+                      "Please fill all the fields",
+                      ToastAndroid.SHORT
+                    );
+                  }
+                }}
+                title="Next"
                 loading={isLoading}
                 type="solid"
               />
             </View>
-          </Fragment>
-        )}
+          : <Fragment>
+              <Text
+                style={{
+                  fontFamily: "Dongle-Bold",
+                  color: "black",
+                  fontSize: RFPercentage(2),
+                  marginTop: RFPercentage(1),
+                  marginStart: RFPercentage(3)
+                }}
+              >
+                Name
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <TextInput
+                  textInputStyle={{ color: "black" }}
+                  placeholder="Full Name"
+                  onChangeText={fullName => setFullName(fullName)}
+                />
+              </View>
+              <Text
+                style={{
+                  fontFamily: "Dongle-Bold",
+                  color: "black",
+                  fontSize: RFPercentage(2),
+                  marginTop: RFPercentage(1.5),
+                  marginStart: RFPercentage(3)
+                }}
+              >
+                Date of Birth
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <TextInput
+                  textInputStyle={{ color: "black" }}
+                  placeholder="Date of Birth"
+                  value={DOB.toDateString()}
+                  onFocus={() => setOpenDate(true)}
+                  onPressIn={() => setOpenDate(true)}
+                />
+                <DatePicker
+                  modal
+                  mode="date"
+                  open={openDate}
+                  date={DOB}
+                  onConfirm={date => {
+                    setOpenDate(false);
+                    setDOB(date);
+                  }}
+                  onCancel={() => {
+                    setOpenDate(false);
+                  }}
+                />
+              </View>
+              <Text
+                style={{
+                  fontFamily: "Dongle-Bold",
+                  color: "black",
+                  fontSize: RFPercentage(2),
+                  marginTop: RFPercentage(1.5),
+                  marginStart: RFPercentage(3)
+                }}
+              >
+                Time of Birth
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <TextInput
+                  textInputStyle={{ color: "black" }}
+                  placeholder="Time of Birth"
+                  value={moment(DOB).format("hh:mm a")}
+                  onFocus={() => setOpenTime(true)}
+                  onPressIn={() => setOpenTime(true)}
+                />
+                <DateTimePickerModal
+                  isVisible={openTime}
+                  mode="time"
+                  date={DOB}
+                  onConfirm={time => {
+                    DOB.setTime(time);
+                    setOpenTime(false);
+                  }}
+                  onCancel={() => {
+                    setOpenTime(false);
+                  }}
+                />
+              </View>
+              <Text
+                style={{
+                  fontFamily: "Dongle-Regular",
+                  textAlign: "left",
+                  color: "black",
+                  marginStart: RFPercentage(3)
+                }}
+              >
+                If you don't know time, then select 12:00 AM
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "Dongle-Bold",
+                  color: "black",
+                  fontSize: RFPercentage(2),
+                  marginTop: RFPercentage(1.5),
+                  marginStart: RFPercentage(3)
+                }}
+              >
+                Pincode
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <TextInput
+                  textInputStyle={{ color: "black" }}
+                  placeholder="Birth Place Pincode"
+                  maxLength={6}
+                  keyboardType="numeric"
+                  onChangeText={pincode => setPincode(pincode)}
+                />
+                <Button
+                  containerStyle={{
+                    marginTop: RFPercentage(2),
+                    width: "90%"
+                  }}
+                  buttonStyle={{ backgroundColor: "#1F4693" }}
+                  titleStyle={{
+                    fontFamily: "Dongle-Regular",
+                    fontSize: RFPercentage(2.5)
+                  }}
+                  onPress={signup}
+                  title="Signup"
+                  loading={isLoading}
+                  type="solid"
+                />
+              </View>
+            </Fragment>}
         <View style={{ alignItems: "center" }}>
           <TouchableOpacity
             activeOpacity={0.5}
@@ -547,7 +544,7 @@ const Signup = ({ navigation }) => {
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(3),
                 marginTop: RFPercentage(2),
-                color: "black",
+                color: "black"
               }}
             >
               Already have an account?
@@ -569,14 +566,14 @@ const Signup = ({ navigation }) => {
             style={{
               flex: 1,
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Image
               source={{ uri: FileBase64.heyAstro }}
               containerStyle={{
                 height: RFPercentage(20),
-                width: RFPercentage(20),
+                width: RFPercentage(20)
               }}
             />
             <Text
@@ -584,7 +581,7 @@ const Signup = ({ navigation }) => {
                 fontFamily: "Dongle-Bold",
                 color: "#4d148c",
                 fontSize: RFPercentage(4),
-                marginTop: RFPercentage(1),
+                marginTop: RFPercentage(1)
               }}
             >
               Verify Number
@@ -593,7 +590,7 @@ const Signup = ({ navigation }) => {
               style={{
                 color: "#696969",
                 fontSize: 12,
-                fontFamily: "Ubuntu-Regular",
+                fontFamily: "Ubuntu-Regular"
               }}
             >
               We Have Sent an OTP to
@@ -603,7 +600,7 @@ const Signup = ({ navigation }) => {
                 style={{
                   color: "#696969",
                   fontSize: 12,
-                  fontFamily: "Ubuntu-Bold",
+                  fontFamily: "Ubuntu-Bold"
                 }}
               >
                 {phone}
@@ -621,11 +618,11 @@ const Signup = ({ navigation }) => {
               textInputStyle={{
                 marginTop: RFPercentage(2),
                 color: "black",
-                fontFamily: "Ubuntu-Regular",
+                fontFamily: "Ubuntu-Regular"
               }}
               keyboardType="numeric"
               placeholder="OTP"
-              onChangeText={(code) => SetCode(code.replace(/^\s+|\s+$/gm, ""))}
+              onChangeText={code => SetCode(code.replace(/^\s+|\s+$/gm, ""))}
             />
             <Text
               style={{
@@ -634,7 +631,7 @@ const Signup = ({ navigation }) => {
                 fontFamily: "Ubuntu-Regular",
                 marginHorizontal: RFPercentage(4),
                 textAlign: "center",
-                marginTop: RFPercentage(0.5),
+                marginTop: RFPercentage(0.5)
               }}
             >
               {otpErrorText}
@@ -642,12 +639,12 @@ const Signup = ({ navigation }) => {
             <Button
               containerStyle={{
                 marginTop: RFPercentage(2),
-                width: "80%",
+                width: "80%"
               }}
               buttonStyle={{ backgroundColor: "#1F4693" }}
               titleStyle={{
                 fontFamily: "Dongle-Regular",
-                fontSize: RFPercentage(2.5),
+                fontSize: RFPercentage(2.5)
               }}
               onPress={verifyNumber}
               title="Submit"
@@ -657,17 +654,17 @@ const Signup = ({ navigation }) => {
             <Button
               containerStyle={{
                 marginTop: RFPercentage(2),
-                width: "80%",
+                width: "80%"
               }}
               buttonStyle={{
                 backgroundColor: "white",
                 borderWidth: 1,
-                borderColor: "#1F4693",
+                borderColor: "#1F4693"
               }}
               titleStyle={{
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(2.5),
-                color: "#1F4693",
+                color: "#1F4693"
               }}
               onPress={() => {
                 setOtpModal(false);

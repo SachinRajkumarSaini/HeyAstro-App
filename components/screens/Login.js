@@ -2,11 +2,12 @@ import {
   View,
   Text,
   StatusBar,
+  Modal,
   TouchableOpacity,
   ToastAndroid,
   ScrollView,
   BackHandler,
-  Alert,
+  Alert
 } from "react-native";
 import React, { useState } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -16,59 +17,146 @@ import FileBase64 from "../helpers/FileBase64";
 import { FetchAPI } from "../helpers/FetchInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import Feather from "react-native-vector-icons/Feather";
+import auth from "@react-native-firebase/auth";
 
 const Login = ({ navigation }) => {
-  const [identifier, setIdentifier] = useState();
-  const [password, setPassword] = useState();
+  const [number, setNumber] = useState();
+  const [otpModal, setOtpModal] = useState(false);
+  const [isOTPLoading, setisOTPLoading] = useState(false);
+  const [otpErrorText, setOtpErrorText] = useState("");
+  const [Confirm, SetConfirm] = useState();
+  const [Code, SetCode] = useState();
   const [isLoading, setIsLoading] = useState(false);
+
   const login = async () => {
-    if (identifier && password) {
-      try {
-        setIsLoading(true);
-        const getLogin = await FetchAPI({
-          query: `
-            mutation{
-              login(input:{identifier: ${JSON.stringify(
-                identifier.toLowerCase()
-              )}, password: ${JSON.stringify(password)},provider:"local"}){
-                jwt
-                user{
-                  id
+    try {
+      setIsLoading(true);
+      const getLogin = await FetchAPI({
+        query: `
+          query {
+            usersPermissionsUsers(filters: { Phone: { eq: ${parseInt(
+              number
+            )} } }) {
+              data {
+                id
+                attributes {
                   username
+                  FullName
                 }
               }
             }
-        `,
-        });
-        if (getLogin.data) {
-          if (getLogin.data.login.jwt) {
-            const { jwt, user } = getLogin.data.login;
-            // Main App Login Logic
-            setIsLoading(false);
-            await AsyncStorage.setItem("jwtToken", jwt);
-            await AsyncStorage.setItem("userId", user.id);
-            await AsyncStorage.setItem("userFullName", user.username);
-            await AsyncStorage.setItem("userName", user.username);
-            navigation.navigate("Home");
-          }
-        }
-        if (getLogin.errors) {
-          if (getLogin.errors[0].message === "Invalid identifier or password") {
-            // Invalid identifier or password
-            ToastAndroid.show("Invalid email or password", ToastAndroid.SHORT);
-            setIsLoading(false);
-          }
-        }
-      } catch (error) {
+          }        
+        `
+      });
+      if (getLogin.data.usersPermissionsUsers.data.length === 0) {
         setIsLoading(false);
-        ToastAndroid.show(
-          "Something went wrong, Please try again later!",
-          ToastAndroid.SHORT
-        );
-        // console.log(error);
+        ToastAndroid.show("User not found", ToastAndroid.SHORT);
+      } else {
+        if (getLogin.data.usersPermissionsUsers.data[0]) {
+          const {
+            username,
+            FullName
+          } = getLogin.data.usersPermissionsUsers.data[0].attributes;
+          const { id } = getLogin.data.usersPermissionsUsers.data[0];
+          // Main App Login Logic
+          setIsLoading(false);
+          await AsyncStorage.setItem("userId", id);
+          await AsyncStorage.setItem("userFullName", FullName);
+          await AsyncStorage.setItem("userName", username);
+          navigation.navigate("Home");
+        }
+      }
+      if (getLogin.errors) {
+        if (getLogin.errors[0].message === "Invalid identifier or password") {
+          // Invalid identifier or password
+          ToastAndroid.show("Invalid email or password", ToastAndroid.SHORT);
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      ToastAndroid.show(
+        "Something went wrong, Please try again later!",
+        ToastAndroid.SHORT
+      );
+      // console.log(error);
+    }
+  };
+
+  const verifyNumber = async () => {
+    setisOTPLoading(true);
+    setOtpErrorText("");
+    if (Code) {
+      try {
+        await Confirm.confirm(Code);
+        setOtpModal(false);
+        setisOTPLoading(false);
+        console.warn("Success");
+        login();
+      } catch (error) {
+        if (
+          error.message ===
+          "[auth/invalid-verification-code] The sms verification code used to create the phone auth credential is invalid. Please resend the verification code sms and be sure use the verification code provided by the user."
+        ) {
+          setOtpErrorText("Invalid OTP");
+          setisOTPLoading(false);
+        }
+        if (
+          error.message ===
+          "[auth/session-expired] The sms code has expired. Please re-send the verification code to try again."
+        ) {
+          setOtpErrorText("OTP Session Expired!");
+          setisOTPLoading(false);
+        }
+        setOtpErrorText("Invalid OTP");
+        setisOTPLoading(false);
       }
     } else {
-      ToastAndroid.show("Please fill all the fields", ToastAndroid.SHORT);
+      otpErrorText("Invalid OTP");
+      setisOTPLoading(false);
+    }
+  };
+
+  const sendOTP = async () => {
+    if (number && number.length === 10) {
+      try {
+        setIsLoading(true);
+        const confirmation = await auth().signInWithPhoneNumber(
+          `+91 ${number}`
+        );
+        ToastAndroid.show("OTP Sent Successfully", ToastAndroid.SHORT);
+        SetConfirm(confirmation);
+        setIsLoading(false);
+        setOtpModal(true);
+      } catch (error) {
+        console.log(error);
+        ToastAndroid.show("OTP Not Sent", ToastAndroid.LONG);
+        if (
+          error.message ===
+          "[auth/invalid-phone-number] The format of the phone number provided is incorrect. Please enter the phone number in a format that can be parsed into E.164 format. E.164 phone numbers are written in the format [+][country code][subscriber number including area code]. [ TOO_SHORT ]"
+        ) {
+          ToastAndroid.show("Invalid Number", ToastAndroid.SHORT);
+          setIsLoading(false);
+        } else if (
+          error.message ===
+          "[auth/network-request-failed] A network error (such as timeout, interrupted connection or unreachable host) has occurred."
+        ) {
+          setIsLoading(false);
+          ToastAndroid.show(
+            "Network Error,  Please try again later",
+            ToastAndroid.SHORT
+          );
+        } else {
+          setIsLoading(false);
+          ToastAndroid.show(
+            "Usage limit exceeded, Please try again later",
+            ToastAndroid.SHORT
+          );
+        }
+      }
+    } else {
+      ToastAndroid.show("Please enter your mobile number.", ToastAndroid.SHORT);
     }
   };
 
@@ -80,9 +168,9 @@ const Login = ({ navigation }) => {
           {
             text: "Cancel",
             onPress: () => null,
-            style: "cancel",
+            style: "cancel"
           },
-          { text: "YES", onPress: () => BackHandler.exitApp() },
+          { text: "YES", onPress: () => BackHandler.exitApp() }
         ]);
         return true;
       };
@@ -107,14 +195,14 @@ const Login = ({ navigation }) => {
         style={{
           flex: 1,
           justifyContent: "center",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <Image
           source={{ uri: FileBase64.heyAstro }}
           containerStyle={{
             height: RFPercentage(20),
-            width: RFPercentage(20),
+            width: RFPercentage(20)
           }}
         />
         <Text
@@ -122,25 +210,17 @@ const Login = ({ navigation }) => {
             fontFamily: "Dongle-Bold",
             color: "#4d148c",
             fontSize: RFPercentage(4),
-            marginTop: RFPercentage(1),
+            marginTop: RFPercentage(1)
           }}
         >
           Login
         </Text>
         <TextInput
           textInputStyle={{ marginTop: RFPercentage(1), color: "black" }}
-          placeholder="Email"
-          onChangeText={(identifier) =>
-            setIdentifier(identifier.replace(/^\s+|\s+$/gm, ""))
-          }
-        />
-        <TextInput
-          textInputStyle={{ marginTop: RFPercentage(2), color: "black" }}
-          placeholder="Password"
-          secureTextEntry={true}
-          onChangeText={(password) =>
-            setPassword(password.replace(/^\s+|\s+$/gm, ""))
-          }
+          placeholder="Mobile Number"
+          keyboardType="numeric"
+          maxLength={10}
+          onChangeText={number => setNumber(number.replace(/^\s+|\s+$/gm, ""))}
         />
         <View
           style={{
@@ -148,7 +228,7 @@ const Login = ({ navigation }) => {
             justifyContent: "flex-start",
             alignItems: "flex-start",
             textAlign: "left",
-            width: "100%",
+            width: "100%"
           }}
         >
           <TouchableOpacity
@@ -163,7 +243,7 @@ const Login = ({ navigation }) => {
                 fontSize: RFPercentage(2.5),
                 marginTop: RFPercentage(1.5),
                 marginStart: RFPercentage(4),
-                color: "#1F4693",
+                color: "#1F4693"
               }}
             >
               Forgot password?
@@ -173,15 +253,15 @@ const Login = ({ navigation }) => {
         <Button
           containerStyle={{
             marginTop: RFPercentage(2),
-            width: "90%",
+            width: "90%"
           }}
           buttonStyle={{ backgroundColor: "#1F4693" }}
           titleStyle={{
             fontFamily: "Dongle-Regular",
-            fontSize: RFPercentage(2.5),
+            fontSize: RFPercentage(2.5)
           }}
-          onPress={login}
-          title="Login"
+          onPress={sendOTP}
+          title="Send OTP"
           loading={isLoading}
           type="solid"
         />
@@ -196,13 +276,137 @@ const Login = ({ navigation }) => {
               fontFamily: "Dongle-Regular",
               fontSize: RFPercentage(3),
               marginTop: RFPercentage(2),
-              color: "black",
+              color: "black"
             }}
           >
             Don't have an account?
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modal View of OTP Screen For Changing Mobile Number */}
+      <Modal
+        visible={otpModal}
+        onRequestClose={() => setOtpModal(false)}
+        transparent={true}
+      >
+        <ScrollView
+          contentContainerStyle={{ flex: 1, backgroundColor: "white" }}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Image
+              source={{ uri: FileBase64.heyAstro }}
+              containerStyle={{
+                height: RFPercentage(20),
+                width: RFPercentage(20)
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: "Dongle-Bold",
+                color: "#4d148c",
+                fontSize: RFPercentage(4),
+                marginTop: RFPercentage(1)
+              }}
+            >
+              Verify Number
+            </Text>
+            <Text
+              style={{
+                color: "#696969",
+                fontSize: 12,
+                fontFamily: "Ubuntu-Regular"
+              }}
+            >
+              We Have Sent an OTP to
+            </Text>
+            <View style={{ flexDirection: "row", paddingTop: 10 }}>
+              <Text
+                style={{
+                  color: "#696969",
+                  fontSize: 12,
+                  fontFamily: "Ubuntu-Bold"
+                }}
+              >
+                {number}
+              </Text>
+              <Feather
+                style={{ paddingStart: 5, color: "#1F4693" }}
+                onPress={() => {
+                  setOtpModal(false);
+                }}
+                size={12}
+                name="edit"
+              />
+            </View>
+            <TextInput
+              textInputStyle={{
+                marginTop: RFPercentage(2),
+                color: "black",
+                fontFamily: "Ubuntu-Regular"
+              }}
+              keyboardType="numeric"
+              placeholder="OTP"
+              onChangeText={code => SetCode(code.replace(/^\s+|\s+$/gm, ""))}
+            />
+            <Text
+              style={{
+                color: "#b00020",
+                fontSize: RFPercentage(1.5),
+                fontFamily: "Ubuntu-Regular",
+                marginHorizontal: RFPercentage(4),
+                textAlign: "center",
+                marginTop: RFPercentage(0.5)
+              }}
+            >
+              {otpErrorText}
+            </Text>
+            <Button
+              containerStyle={{
+                marginTop: RFPercentage(2),
+                width: "80%"
+              }}
+              buttonStyle={{ backgroundColor: "#1F4693" }}
+              titleStyle={{
+                fontFamily: "Dongle-Regular",
+                fontSize: RFPercentage(2.5)
+              }}
+              onPress={verifyNumber}
+              title="Submit"
+              loading={isOTPLoading}
+              type="solid"
+            />
+            <Button
+              containerStyle={{
+                marginTop: RFPercentage(2),
+                width: "80%"
+              }}
+              buttonStyle={{
+                backgroundColor: "white",
+                borderWidth: 1,
+                borderColor: "#1F4693"
+              }}
+              titleStyle={{
+                fontFamily: "Dongle-Regular",
+                fontSize: RFPercentage(2.5),
+                color: "#1F4693"
+              }}
+              onPress={() => {
+                setOtpModal(false);
+                setOtpErrorText("");
+              }}
+              title="Cancel"
+              type="solid"
+            />
+          </View>
+        </ScrollView>
+      </Modal>
     </ScrollView>
   );
 };
