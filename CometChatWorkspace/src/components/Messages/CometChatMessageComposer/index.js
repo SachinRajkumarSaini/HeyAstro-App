@@ -10,33 +10,29 @@ import {
   Text,
   Keyboard,
   Platform,
-  ToastAndroid,
-  BackHandler,
-  Alert,
-  Modal,
-  ActivityIndicator,
+  Vibration
 } from 'react-native';
+import * as consts from '../../../utils/consts';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDIcon from 'react-native-vector-icons/AntDesign';
 import { CometChat } from '@cometchat-pro/react-native-chat';
 import Sound from 'react-native-sound';
+
 import style from './styles';
-import { CometChatCreatePoll, CometChatSmartReplyPreview } from '../Extensions';
+
+import {
+  CometChatCreatePoll,
+  CometChatSmartReplyPreview,
+} from '../../Messages/Extensions';
 import CometChatStickerKeyboard from '../CometChatStickerKeyboard';
 import ComposerActions from './composerActions';
+
 import { outgoingMessageAlert } from '../../../resources/audio';
 import * as enums from '../../../utils/enums';
 import * as actions from '../../../utils/actions';
 import { heightRatio } from '../../../utils/consts';
 import { logger } from '../../../utils/common';
 import { CometChatContext } from '../../../utils/CometChatContext';
-import {
-  FetchAPI,
-  Fetch_API,
-} from '../../../../../components/helpers/FetchInstance';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import uuid from 'react-native-uuid';
-import { STRAPI_API_URL } from '@env';
 
 export default class CometChatMessageComposer extends React.PureComponent {
   static contextType = CometChatContext;
@@ -48,7 +44,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
     this.audioUploaderRef = React.createRef();
     this.videoUploaderRef = React.createRef();
     this.messageInputRef = React.createRef();
-    this.messageSending = false;
 
     this.node = React.createRef();
     this.isTyping = false;
@@ -66,10 +61,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
       user: null,
       keyboardActivity: false,
       restrictions: null,
-      userUsageTime: 0,
-      userBalance: null,
-      astrologerChargesPerMinute: null,
-      showLoader: false,
     };
     Sound.setCategory('Ambient', true);
     this.audio = new Sound(outgoingMessageAlert);
@@ -79,133 +70,7 @@ export default class CometChatMessageComposer extends React.PureComponent {
         const errorCode = error?.message || 'ERROR';
         this.props?.showMessage('error', errorCode);
       });
-    // Back Button Clicked
-    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
-
-  increaseUsageTime = 0;
-
-  deductBalance = async (Amount) => {
-    try {
-      clearInterval(this.increaseUsageTime);
-      this.setState({
-        userBalance: this.state.userBalance - Amount,
-        showLoader: true,
-      });
-      const userId = await AsyncStorage.getItem('userId');
-      const removeBalance = await FetchAPI({
-        query: `
-            mutation {
-              updateUsersPermissionsUser(id: ${userId}, data: { Balance: ${this.state.userBalance} }) {
-                data {
-                  attributes {
-                    Balance
-                  }
-                }
-              }
-            }
-        `,
-      });
-      this.setState({
-        userBalance:
-          removeBalance.data.updateUsersPermissionsUser.data.attributes.Balance,
-      });
-      const date = new Date();
-      const addOrderHistory = await Fetch_API(
-        `${STRAPI_API_URL}/api/users/orderhistory/${userId}`,
-        {
-          OrderHistory: {
-            OrderId: uuid.v4(),
-            AstrologerName: JSON.stringify(this.props.item.name),
-            DateAndTime: JSON.stringify(date.toISOString()),
-            CallRate: JSON.stringify(this.state.astrologerChargesPerMinute),
-            Duration: JSON.stringify(Math.ceil(this.state.userUsageTime / 60)),
-            Deduction: JSON.stringify(
-              Math.ceil(this.state.userUsageTime / 60) *
-                this.state.astrologerChargesPerMinute,
-            ),
-            OrderType: JSON.stringify('Chat'),
-          },
-        },
-        'PUT',
-        {
-          'Content-Type': 'application/json',
-        },
-      );
-      console.log('addOrderHistory', addOrderHistory);
-      console.log(
-        'Final Balance',
-        removeBalance.data.updateUsersPermissionsUser.data.attributes
-          .updatedOrderHistory,
-      );
-      // Exit the Screen
-      console.log('Exit the Screen');
-      this.setState({ showLoader: false });
-      this.props.actionGenerated(actions.GO_BACK);
-    } catch (error) {
-      ToastAndroid.show('Something went wrong', ToastAndroid.SHORT);
-      this.setState({ showLoader: false });
-    }
-  };
-
-  calculateTime = async () => {
-    // Astrologer Charge Per Minute
-    const getCharges = await FetchAPI({
-      query: `
-        query {
-          astrologers(filters: { Username: { eq: ${JSON.stringify(
-            this.props.item.uid,
-          )} } }) {
-            data {
-              attributes {
-                ChargePerMinute
-              }
-            }
-          }
-        }      
-      `,
-    });
-    const { ChargePerMinute } = getCharges.data.astrologers.data[0].attributes;
-    this.setState({ astrologerChargesPerMinute: ChargePerMinute });
-    // User Balance
-    const userId = await AsyncStorage.getItem('userId');
-    const getBalance = await FetchAPI({
-      query: `
-        query {
-          usersPermissionsUser(id: ${userId}) {
-            data {
-              attributes {
-                Balance
-              }
-            }
-          }
-        }
-      `,
-    });
-    const { Balance } = getBalance.data.usersPermissionsUser.data.attributes;
-    this.setState({ userBalance: Balance });
-
-    // Calculate User Usage Time
-    console.log('balance', Balance);
-    console.log('ChargePerMinute', ChargePerMinute);
-    let maximumTime = Math.floor(Balance / ChargePerMinute) * 60;
-    let usageTime = 0;
-    console.log('maximumTime', maximumTime);
-    this.increaseUsageTime = setInterval(() => {
-      if (usageTime < maximumTime) {
-        this.setState({ userUsageTime: usageTime++ });
-        console.log('userTime', this.state.userUsageTime);
-      } else {
-        this.deductBalance(Balance);
-        setTimeout(() => {
-          ToastAndroid.show(
-            'Out of Balance, Please recharge your account',
-            ToastAndroid.LONG,
-          );
-        }, 2000);
-      }
-    }, 1000);
-  };
 
   componentDidMount() {
     this.keyboardDidShowListener = Keyboard.addListener(
@@ -217,11 +82,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
       this._keyboardDidHide,
     );
     this.checkRestrictions();
-    this.calculateTime();
-    BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
   }
 
   checkRestrictions = async () => {
@@ -243,44 +103,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
   componentWillUnmount() {
     this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
-    clearInterval(this.increaseUsageTime);
-  }
-
-  handleBackButtonClick() {
-    Alert.alert(
-      'Leave',
-      'Are you sure you want to leave?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        {
-          text: 'Leave',
-          onPress: () => {
-            if (this.state.userUsageTime > 10) {
-              console.log('usage', this.state.userUsageTime);
-              const { userUsageTime, astrologerChargesPerMinute } = this.state;
-              let amount =
-                Math.ceil(userUsageTime / 60) * astrologerChargesPerMinute;
-              console.log('amount', amount);
-              this.deductBalance(amount);
-            } else {
-              // Exit the Screen
-              this.props.actionGenerated(actions.GO_BACK);
-              clearInterval(this.increaseUsageTime);
-            }
-          },
-        },
-      ],
-      { cancelable: true },
-    );
-    return true;
   }
 
   _keyboardDidShow = () => {
@@ -328,7 +150,7 @@ export default class CometChatMessageComposer extends React.PureComponent {
    */
   playAudio = () => {
     this.audio.setCurrentTime(0);
-    this.audio.play();
+    this.audio.play(()=>{});
   };
 
   /**
@@ -369,11 +191,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
 
   sendMediaMessage = (messageInput, messageType) => {
     try {
-      if (this.messageSending) {
-        return false;
-      }
-
-      this.messageSending = true;
 
       const { receiverId, receiverType } = this.getReceiverDetails();
       const conversationId = this.props.getConversationId();
@@ -392,8 +209,9 @@ export default class CometChatMessageComposer extends React.PureComponent {
       mediaMessage.setReceiver(receiverType);
       mediaMessage.setConversationId(conversationId);
       mediaMessage.setType(messageType);
-      mediaMessage._composedAt = Math.round(+new Date() / 1000);
+      mediaMessage._composedAt = Date.now();
       mediaMessage._id = '_' + Math.random().toString(36).substr(2, 9);
+      mediaMessage.setId(mediaMessage._id)
       mediaMessage.setData({
         type: messageType,
         category: CometChat.CATEGORY_MESSAGE,
@@ -405,7 +223,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
       this.props.actionGenerated(actions.MESSAGE_COMPOSED, [mediaMessage]);
       CometChat.sendMessage(mediaMessage)
         .then(async (response) => {
-          this.messageSending = false;
           this.playAudio();
 
           const newMessageObj = {
@@ -424,7 +241,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
           );
 
           this.props?.showMessage('error', errorCode);
-          this.messageSending = false;
           logger('Message sending failed with error: ', error);
         });
     } catch (error) {
@@ -446,12 +262,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
       if (!this.state.messageInput.trim().length) {
         return false;
       }
-
-      if (this.messageSending) {
-        return false;
-      }
-
-      this.messageSending = true;
 
       if (this.state.messageToBeEdited) {
         this.editMessage();
@@ -477,6 +287,7 @@ export default class CometChatMessageComposer extends React.PureComponent {
       textMessage.setConversationId(conversationId);
       textMessage._composedAt = Date.now();
       textMessage._id = '_' + Math.random().toString(36).substr(2, 9);
+      textMessage.setId(textMessage._id)
       this.props.actionGenerated(actions.MESSAGE_COMPOSED, [textMessage]);
       this.setState({ messageInput: '', replyPreview: false });
 
@@ -486,7 +297,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
         .then((message) => {
           const newMessageObj = { ...message, _id: textMessage._id };
           this.setState({ messageInput: '' });
-          this.messageSending = false;
           this.messageInputRef.current.textContent = '';
           // this.playAudio();
           this.props.actionGenerated(actions.MESSAGE_SENT, newMessageObj);
@@ -500,7 +310,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
           logger('Message sending failed with error:', error);
           const errorCode = error?.message || 'ERROR';
           this.props?.showMessage('error', errorCode);
-          this.messageSending = false;
         });
     } catch (error) {
       logger(error);
@@ -531,7 +340,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
       CometChat.editMessage(textMessage)
         .then((message) => {
           this.setState({ messageInput: '' });
-          this.messageSending = false;
           this.messageInputRef.current.textContent = '';
           this.playAudio();
 
@@ -539,7 +347,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
           this.props.actionGenerated(actions.MESSAGE_EDITED, message);
         })
         .catch((error) => {
-          this.messageSending = false;
           const errorCode = error?.message || 'ERROR';
           this.props?.showMessage('error', errorCode);
           logger('Message editing failed with error:', error);
@@ -677,7 +484,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
    * @param stickerMessage: object stickerMessage
    */
   sendSticker = (stickerMessage) => {
-    this.messageSending = true;
 
     const { receiverId, receiverType } = this.getReceiverDetails();
 
@@ -705,7 +511,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
     this.props.actionGenerated(actions.MESSAGE_COMPOSED, [customMessage]);
     CometChat.sendCustomMessage(customMessage)
       .then((message) => {
-        this.messageSending = false;
         this.playAudio();
         const newMessageObj = { ...message, _id: customMessage._id };
 
@@ -720,7 +525,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
         const errorCode = error?.message || 'ERROR';
 
         this.props?.showMessage('error', errorCode);
-        this.messageSending = false;
         logger('custom message sending failed with error', error);
       });
   };
@@ -984,6 +788,7 @@ export default class CometChatMessageComposer extends React.PureComponent {
         style={
           Platform.OS === 'android' && this.state.keyboardActivity
             ? {
+                marginBottom: 21 * heightRatio,
                 elevation: 5,
                 backgroundColor: '#fff',
               }
@@ -1026,17 +831,6 @@ export default class CometChatMessageComposer extends React.PureComponent {
           </View>
           {liveReactionBtn}
         </View>
-        <Modal transparent={true} visible={this.state.showLoader}>
-          <View
-            style={{
-              backgroundColor: '#000000aa',
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <ActivityIndicator size="large" color="white" />
-          </View>
-        </Modal>
       </View>
     );
   }

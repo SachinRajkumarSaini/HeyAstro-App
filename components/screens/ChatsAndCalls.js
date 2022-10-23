@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TouchableHighlight,
-  Modal,
+  Modal
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -23,7 +23,7 @@ import { CometChat } from "@cometchat-pro/react-native-chat";
 import { useIsFocused } from "@react-navigation/native";
 import { CometChatAuth } from "../helpers/CometChatAuth";
 
-const ChatsAndCall = (props) => {
+const ChatsAndCall = props => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const [astrologers, setAstrologers] = useState([]);
@@ -41,7 +41,7 @@ const ChatsAndCall = (props) => {
         const getAstrologers = await FetchAPI({
           query: `
                     query {
-                        astrologers {
+                        astrologers(pagination: { limit: 10000 }){
                             data {
                                 attributes {
                                     Name
@@ -49,31 +49,17 @@ const ChatsAndCall = (props) => {
                                     Experience
                                     Username
                                     ProfileImage
+                                    Status
                                     ChargePerMinute
                                 }
                             }
                         }
                     }              
-            `,
+            `
         });
         setAstrologers(
-          await Promise.all(
-            getAstrologers.data.astrologers.data.map(async (item) => {
-              try {
-                const { status } = await CometChat.getUser(
-                  item.attributes.Username
-                );
-                return {
-                  ...item.attributes,
-                  status: status,
-                };
-              } catch (error) {
-                return {
-                  ...item.attributes,
-                  status: "offline",
-                };
-              }
-            })
+          getAstrologers.data.astrologers.data.map(
+            astrologer => astrologer.attributes
           ),
           setIsLoading(false)
         );
@@ -82,6 +68,7 @@ const ChatsAndCall = (props) => {
           query: `
                 query {
                   astrologers(
+                    pagination: { limit: 10000 },
                     filters: {
                       or: [
                         {
@@ -100,32 +87,17 @@ const ChatsAndCall = (props) => {
                         Experience
                         Username
                         ProfileImage
+                        Status
                         ChargePerMinute           
                       }
                     }
                   }
                 }                        
-            `,
+            `
         });
-
         setAstrologers(
-          await Promise.all(
-            getAstrologers.data.astrologers.data.map(async (item) => {
-              try {
-                const { status } = await CometChat.getUser(
-                  item.attributes.Username
-                );
-                return {
-                  ...item.attributes,
-                  status: status,
-                };
-              } catch (error) {
-                return {
-                  ...item.attributes,
-                  status: "offline",
-                };
-              }
-            })
+          getAstrologers.data.astrologers.data.map(
+            astrologer => astrologer.attributes
           ),
           setIsLoading(false)
         );
@@ -154,7 +126,7 @@ const ChatsAndCall = (props) => {
                   }
                 }
               }
-        `,
+        `
       });
       const authCometChat = await CometChatAuth(
         fetchProfile.data.usersPermissionsUser.data.attributes.username,
@@ -187,7 +159,7 @@ const ChatsAndCall = (props) => {
                 }
               }
             }
-          `,
+          `
       });
       setUserBalance(
         getBalance.data.usersPermissionsUser.data.attributes.Balance
@@ -200,10 +172,13 @@ const ChatsAndCall = (props) => {
     }
   };
 
-  useEffect(() => {
-    loginCometChat();
-    fetchUserBalance();
-  }, [isFocused, category]);
+  useEffect(
+    () => {
+      loginCometChat();
+      fetchUserBalance();
+    },
+    [isFocused, category]
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -218,7 +193,7 @@ const ChatsAndCall = (props) => {
         containerStyle={{
           backgroundColor: "#1F4693",
           paddingVertical: 6,
-          borderBottomWidth: 0,
+          borderBottomWidth: 0
         }}
         centerComponent={{
           text: "Astrologers",
@@ -226,8 +201,8 @@ const ChatsAndCall = (props) => {
             color: "#fff",
             fontSize: RFPercentage(3.5),
             fontFamily: "Dongle-Regular",
-            marginTop: RFPercentage(0.5),
-          },
+            marginTop: RFPercentage(0.5)
+          }
         }}
         rightComponent={
           <View
@@ -235,7 +210,7 @@ const ChatsAndCall = (props) => {
               flex: 1,
               flexDirection: "row",
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <TouchableOpacity
@@ -272,7 +247,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "All" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -284,7 +259,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 All
@@ -293,7 +268,7 @@ const ChatsAndCall = (props) => {
                 source={{ uri: FileBase64.categoryAll }}
                 style={{
                   height: RFPercentage(7),
-                  width: RFPercentage(7),
+                  width: RFPercentage(7)
                 }}
               />
             </Card>
@@ -309,7 +284,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "Love" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -321,7 +296,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 Love
@@ -331,7 +306,7 @@ const ChatsAndCall = (props) => {
                 style={{
                   height: RFPercentage(7),
                   width: RFPercentage(7),
-                  marginTop: RFPercentage(0.5),
+                  marginTop: RFPercentage(0.5)
                 }}
               />
             </Card>
@@ -347,7 +322,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "Career" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -359,7 +334,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 Career
@@ -368,7 +343,7 @@ const ChatsAndCall = (props) => {
                 source={{ uri: FileBase64.categoryCarrer }}
                 style={{
                   height: RFPercentage(7),
-                  width: RFPercentage(7),
+                  width: RFPercentage(7)
                 }}
               />
             </Card>
@@ -384,7 +359,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "Marriage" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -396,7 +371,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 Marriage
@@ -406,7 +381,7 @@ const ChatsAndCall = (props) => {
                 style={{
                   height: RFPercentage(7),
                   width: RFPercentage(7),
-                  marginTop: RFPercentage(0.8),
+                  marginTop: RFPercentage(0.8)
                 }}
               />
             </Card>
@@ -422,7 +397,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "Health" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -434,7 +409,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 Health
@@ -444,7 +419,7 @@ const ChatsAndCall = (props) => {
                 style={{
                   height: RFPercentage(7),
                   marginTop: RFPercentage(0.9),
-                  width: RFPercentage(7),
+                  width: RFPercentage(7)
                 }}
               />
             </Card>
@@ -460,7 +435,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "Wealth" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -472,7 +447,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 Wealth
@@ -481,7 +456,7 @@ const ChatsAndCall = (props) => {
                 source={{ uri: FileBase64.categoryWealth }}
                 style={{
                   height: RFPercentage(7),
-                  width: RFPercentage(7),
+                  width: RFPercentage(7)
                 }}
               />
             </Card>
@@ -497,7 +472,7 @@ const ChatsAndCall = (props) => {
                 alignItems: "center",
                 height: RFPercentage(10.5),
                 borderColor: category === "Family" ? "#1F4693" : "#e8e6ff",
-                ...style.shadow,
+                ...style.shadow
               }}
             >
               <Text
@@ -509,7 +484,7 @@ const ChatsAndCall = (props) => {
                   alignItems: "center",
                   position: "absolute",
                   left: -15,
-                  top: -7,
+                  top: -7
                 }}
               >
                 Family
@@ -519,7 +494,7 @@ const ChatsAndCall = (props) => {
                 style={{
                   height: RFPercentage(7),
                   width: RFPercentage(7),
-                  marginTop: RFPercentage(0.7),
+                  marginTop: RFPercentage(0.7)
                 }}
               />
             </Card>
@@ -531,7 +506,7 @@ const ChatsAndCall = (props) => {
             fontFamily: "Dongle-Bold",
             fontSize: RFPercentage(2),
             textAlign: "right",
-            marginEnd: RFPercentage(1),
+            marginEnd: RFPercentage(1)
           }}
         >
           Swipe >>
@@ -539,13 +514,12 @@ const ChatsAndCall = (props) => {
       </View>
 
       <View style={{ flex: 5.3, backgroundColor: "#dce4f5" }}>
-        {isLoading && (
+        {isLoading &&
           <ActivityIndicator
             style={{ marginVertical: RFPercentage(10) }}
             size={RFPercentage(5)}
             color={"#1F4693"}
-          />
-        )}
+          />}
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ paddingBottom: RFPercentage(3) }}>
             {astrologers.length != 0
@@ -555,32 +529,42 @@ const ChatsAndCall = (props) => {
                       key={index}
                       containerStyle={{
                         borderRadius: RFPercentage(1),
-                        ...style.shadow,
+                        ...style.shadow
                       }}
                     >
                       <View
                         style={{
                           flexDirection: "row",
-                          justifyContent: "space-between",
+                          justifyContent: "space-between"
                         }}
                       >
-                        <View style={{ justifyContent: "center" }}>
+                        <View
+                          style={{
+                            justifyContent: "center",
+                            width: RFPercentage(10)
+                          }}
+                        >
                           <Image
                             source={{
                               uri: astrologer.ProfileImage
                                 ? astrologer.ProfileImage
-                                : FileBase64.profile_Placeholder,
+                                : FileBase64.profile_Placeholder
                             }}
                             style={{
-                              height: 80,
-                              width: 80,
-                              borderRadius: 40,
+                              height: 70,
+                              width: 70,
+                              borderRadius: 35,
                               borderWidth: 1,
-                              borderColor: "black",
+                              borderColor: "black"
                             }}
                           />
                         </View>
-                        <View style={{ justifyContent: "space-around" }}>
+                        <View
+                          style={{
+                            justifyContent: "space-around",
+                            width: RFPercentage(18)
+                          }}
+                        >
                           <Text
                             numberOfLines={1}
                             ellipsizeMode="tail"
@@ -588,7 +572,7 @@ const ChatsAndCall = (props) => {
                               fontFamily: "Ubuntu-Bold",
                               color: "black",
                               fontSize: RFPercentage(2),
-                              maxWidth: RFPercentage(19),
+                              maxWidth: RFPercentage(19)
                             }}
                           >
                             {astrologer.Name}
@@ -600,7 +584,7 @@ const ChatsAndCall = (props) => {
                               fontFamily: "Ubuntu-Regular",
                               color: "black",
                               fontSize: RFPercentage(1.8),
-                              maxWidth: RFPercentage(19),
+                              maxWidth: RFPercentage(19)
                             }}
                           >
                             {astrologer.Languages &&
@@ -612,7 +596,7 @@ const ChatsAndCall = (props) => {
                                       color: "black",
                                       fontSize: RFPercentage(1.8),
                                       maxWidth: RFPercentage(19),
-                                      marginTop: RFPercentage(0.5),
+                                      marginTop: RFPercentage(0.5)
                                     }}
                                     key={index}
                                   >
@@ -628,7 +612,7 @@ const ChatsAndCall = (props) => {
                               fontFamily: "Ubuntu-Regular",
                               color: "black",
                               fontSize: RFPercentage(1.8),
-                              maxWidth: RFPercentage(19),
+                              maxWidth: RFPercentage(19)
                             }}
                           >
                             Experience:- {astrologer.Experience}
@@ -641,15 +625,15 @@ const ChatsAndCall = (props) => {
                               color: "black",
                               fontSize: RFPercentage(1.8),
                               maxWidth: RFPercentage(19),
-                              marginTop: RFPercentage(0.1),
+                              marginTop: RFPercentage(0.1)
                             }}
                           >
                             Status:-{" "}
-                            {astrologer.status === "online" ? (
-                              <Text style={{ color: "green" }}>Online</Text>
-                            ) : (
-                              <Text style={{ color: "red" }}>Offline</Text>
-                            )}
+                            {astrologer.Status === "Online"
+                              ? <Text style={{ color: "green" }}>Online</Text>
+                              : astrologer.Status === "Busy"
+                                ? <Text style={{ color: "orange" }}>Busy</Text>
+                                : <Text style={{ color: "red" }}>Offline</Text>}
                           </Text>
                           <Text
                             numberOfLines={1}
@@ -659,21 +643,26 @@ const ChatsAndCall = (props) => {
                               color: "black",
                               fontSize: RFPercentage(1.8),
                               maxWidth: RFPercentage(19),
-                              marginTop: RFPercentage(0.5),
+                              marginTop: RFPercentage(0.5)
                             }}
                           >
                             <FontAwesome name="inr" color="green" size={15} />
                             <Text
                               style={{
                                 fontFamily: "Ubuntu-Bold",
-                                color: "black",
+                                color: "black"
                               }}
                             >
                               {astrologer.ChargePerMinute} /Min
                             </Text>
                           </Text>
                         </View>
-                        <View style={{ justifyContent: "center" }}>
+                        <View
+                          style={{
+                            justifyContent: "center",
+                            width: RFPercentage(15)
+                          }}
+                        >
                           <TouchableOpacity
                             activeOpacity={0.9}
                             onPress={() => {
@@ -686,7 +675,7 @@ const ChatsAndCall = (props) => {
                                 borderRadius: RFPercentage(1),
                                 borderColor: "green",
                                 borderWidth: 1,
-                                ...style.shadow,
+                                ...style.shadow
                               }}
                             >
                               <Text
@@ -695,7 +684,7 @@ const ChatsAndCall = (props) => {
                                   fontFamily: "Ubuntu-Regular",
                                   fontSize: RFPercentage(1.6),
                                   textAlign: "center",
-                                  alignItems: "center",
+                                  alignItems: "center"
                                 }}
                               >
                                 Contact
@@ -707,30 +696,29 @@ const ChatsAndCall = (props) => {
                     </Card>
                   );
                 })
-              : !isLoading && (
-                  <View
+              : !isLoading &&
+                <View
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginVertical: RFPercentage(2)
+                  }}
+                >
+                  <Text
                     style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginVertical: RFPercentage(2),
+                      fontFamily: "Dongle-Regular",
+                      color: "black",
+                      fontSize: RFPercentage(3)
                     }}
                   >
-                    <Text
-                      style={{
-                        fontFamily: "Dongle-Regular",
-                        color: "black",
-                        fontSize: RFPercentage(3),
-                      }}
-                    >
-                      No Astrologers Found
-                    </Text>
-                  </View>
-                )}
+                    No Astrologers Found
+                  </Text>
+                </View>}
           </View>
         </ScrollView>
       </View>
-      {selectedAstrologer && (
+      {selectedAstrologer &&
         <Modal
           onRequestClose={() => setShowContactDialog(false)}
           transparent={true}
@@ -741,21 +729,21 @@ const ChatsAndCall = (props) => {
             <View
               style={{
                 backgroundColor: "white",
-                flex: 1,
+                flex: 1
               }}
             >
               <View
                 style={{
                   alignItems: "center",
                   justifyContent: "center",
-                  marginTop: RFPercentage(4),
+                  marginTop: RFPercentage(4)
                 }}
               >
                 <Image
                   source={{
                     uri: JSON.parse(selectedAstrologer).ProfileImage
                       ? JSON.parse(selectedAstrologer).ProfileImage
-                      : FileBase64.profile_Placeholder,
+                      : FileBase64.profile_Placeholder
                   }}
                   style={{
                     height: RFPercentage(12),
@@ -763,7 +751,7 @@ const ChatsAndCall = (props) => {
                     borderRadius: RFPercentage(6),
                     borderWidth: 1,
                     borderColor: "black",
-                    marginBottom: RFPercentage(1.5),
+                    marginBottom: RFPercentage(1.5)
                   }}
                 />
                 <View>
@@ -774,7 +762,7 @@ const ChatsAndCall = (props) => {
                       fontFamily: "Ubuntu-Bold",
                       color: "black",
                       fontSize: RFPercentage(2),
-                      maxWidth: RFPercentage(19),
+                      maxWidth: RFPercentage(19)
                     }}
                   >
                     {JSON.parse(selectedAstrologer).Name}
@@ -787,7 +775,7 @@ const ChatsAndCall = (props) => {
                       color: "black",
                       fontSize: RFPercentage(1.8),
                       maxWidth: RFPercentage(19),
-                      marginTop: RFPercentage(0.5),
+                      marginTop: RFPercentage(0.5)
                     }}
                   >
                     Rate:- <FontAwesome name="inr" color="green" size={14} />
@@ -803,15 +791,15 @@ const ChatsAndCall = (props) => {
                       color: "black",
                       fontSize: RFPercentage(1.8),
                       maxWidth: RFPercentage(19),
-                      marginTop: RFPercentage(0.5),
+                      marginTop: RFPercentage(0.5)
                     }}
                   >
                     Status :-{" "}
-                    {JSON.parse(selectedAstrologer).status === "online" ? (
-                      <Text style={{ color: "green" }}>Online</Text>
-                    ) : (
-                      <Text style={{ color: "red" }}> Offline</Text>
-                    )}
+                    {JSON.parse(selectedAstrologer).Status === "Online"
+                      ? <Text style={{ color: "green" }}>Online</Text>
+                      : JSON.parse(selectedAstrologer).Status === "Busy"
+                        ? <Text style={{ color: "orange" }}>Busy</Text>
+                        : <Text style={{ color: "red" }}>Offline</Text>}
                   </Text>
                 </View>
                 <View />
@@ -821,77 +809,26 @@ const ChatsAndCall = (props) => {
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-around",
-                  marginTop: RFPercentage(2),
+                  marginTop: RFPercentage(2)
                 }}
               >
                 <TouchableOpacity
                   activeOpacity={0.9}
-                  onPress={() => {
-                    if (JSON.parse(selectedAstrologer).status === "online") {
-                      if (
-                        JSON.parse(selectedAstrologer).ChargePerMinute <=
-                        userBalance
-                      ) {
-                        navigation.navigate("ChatUI", {
-                          userName: JSON.parse(selectedAstrologer).Username,
-                        });
-                        setShowContactDialog(false);
-                      } else {
-                        navigation.navigate("Wallet");
-                        ToastAndroid.show(
-                          "Insufficient Balance, Please recharge your wallet",
-                          ToastAndroid.SHORT
-                        );
-                      }
-                    } else {
-                      ToastAndroid.show(
-                        "Astrologer is offline, Please try again later!",
-                        ToastAndroid.SHORT
-                      );
-                    }
-                  }}
-                >
-                  <Card
-                    containerStyle={{
-                      borderRadius: RFPercentage(1),
-                      borderColor: "#1F4693",
-                      borderWidth: 1,
-                      height: RFPercentage(7),
-                      width: RFPercentage(18),
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#1F4693",
-                        fontFamily: "Dongle-Regular",
-                        fontSize: RFPercentage(3),
-                        textAlign: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      Chat
-                    </Text>
-                  </Card>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={0.9}
                   onPress={async () => {
-                    if (JSON.parse(selectedAstrologer).status === "online") {
+                    if (JSON.parse(selectedAstrologer).Status === "Online") {
                       if (
                         JSON.parse(selectedAstrologer).ChargePerMinute <=
                         userBalance
                       ) {
-                        const userName = await AsyncStorage.getItem("userName");
                         const userId = await AsyncStorage.getItem("userId");
-                        const astrologerId =
-                          JSON.parse(selectedAstrologer).Username;
-                        const astrologerName =
-                          JSON.parse(selectedAstrologer).Name;
-                        navigation.navigate("VideoCall", {
-                          videoCallUrl: `https://heyastro.site/user/${userName}/chatwith/${astrologerId}`,
+                        const astrologerId = JSON.parse(selectedAstrologer)
+                          .Username;
+                        const astrologerName = JSON.parse(selectedAstrologer)
+                          .Name;
+                        navigation.navigate("ChatUI", {
                           astrologerId: astrologerId,
                           userId: userId,
-                          astrologerName: astrologerName,
+                          astrologerName: astrologerName
                         });
                         setShowContactDialog(false);
                       } else {
@@ -903,7 +840,8 @@ const ChatsAndCall = (props) => {
                       }
                     } else {
                       ToastAndroid.show(
-                        "Astrologer is offline, Please try again later!",
+                        `Astrologer is ${JSON.parse(selectedAstrologer)
+                          .Status}, Please try again later!`,
                         ToastAndroid.SHORT
                       );
                     }
@@ -914,8 +852,8 @@ const ChatsAndCall = (props) => {
                       borderRadius: RFPercentage(1),
                       borderColor: "#1F4693",
                       borderWidth: 1,
-                      width: RFPercentage(18),
                       height: RFPercentage(7),
+                      width: RFPercentage(20)
                     }}
                   >
                     <Text
@@ -924,18 +862,17 @@ const ChatsAndCall = (props) => {
                         fontFamily: "Dongle-Regular",
                         fontSize: RFPercentage(3),
                         textAlign: "center",
-                        alignItems: "center",
+                        alignItems: "center"
                       }}
                     >
-                      Call
+                      Connect
                     </Text>
                   </Card>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-        </Modal>
-      )}
+        </Modal>}
     </View>
   );
 };
@@ -946,8 +883,8 @@ const style = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 5,
-  },
+    elevation: 5
+  }
 });
 
 export default ChatsAndCall;

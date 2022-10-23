@@ -13,6 +13,7 @@ import Settings from "../screens/Settings";
 import Profile from "../screens/Profile";
 import Live from "../screens/Live";
 import ChatsAndCalls from "../screens/ChatsAndCalls";
+import CallingScreen from "../screens/CallingScreen";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import Following from "../screens/Following";
 import MoreSettings from "../screens/MoreSettings";
@@ -35,7 +36,6 @@ import Signup from "../screens/Signup";
 import Blog from "../screens/Blog";
 import EmbbedPlayer from "./EmbbedPlayer";
 import UploadImage from "./UploadImage";
-import VideoCall from "../screens/VideoCall";
 import Kundli from "../screens/Kundli/Kundli";
 import CreateKundli from "../screens/Kundli/CreateKundli";
 import DetailedKundli from "../screens/Kundli/DetailedKundli";
@@ -50,7 +50,7 @@ import {
   CometChatMessages,
   CometChatUserList,
   CometChatGroupList,
-  CometChatUserListWithMessages,
+  CometChatUserListWithMessages
 } from "../../CometChatWorkspace/src";
 
 const StackNavigator = () => {
@@ -68,11 +68,11 @@ const StackNavigator = () => {
         <Stack.Screen name="Blogs" component={Blogs} />
         <Stack.Screen name="Blog" component={Blog} />
         <Stack.Screen name="EmbbedPlayer" component={EmbbedPlayer} />
-        <Stack.Screen name="VideoCall" component={VideoCall} />
         <Stack.Screen name="UploadImage" component={UploadImage} />
         <Stack.Screen name="MoreSettings" component={MoreSettings} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="ChatUI" component={CometChatUIView} />
+        <Stack.Screen name="CallingScreen" component={CallingScreen} />
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Notifications" component={Notifications} />
@@ -128,15 +128,15 @@ const TabNavigator = () => {
           height: RFPercentage(7),
           borderTopWidth: 0,
           backgroundColor: "white",
-          paddingBottom: RFPercentage(1),
-        },
+          paddingBottom: RFPercentage(1)
+        }
       }}
     >
       <Tab.Screen
         name="HomeScreen"
         component={Home}
         options={{
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }) =>
             <View
               style={{ alignItems: "center", justifyContent: "center", top: 2 }}
             >
@@ -146,18 +146,17 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "blue" : "black",
+                  tintColor: focused ? "blue" : "black"
                 }}
               />
             </View>
-          ),
         }}
       />
       <Tab.Screen
         name="ChatsAndCalls"
         component={ChatsAndCalls}
         options={{
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }) =>
             <View
               style={{ alignItems: "center", justifyContent: "center", top: 2 }}
             >
@@ -167,18 +166,17 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "blue" : "black",
+                  tintColor: focused ? "blue" : "black"
                 }}
               />
             </View>
-          ),
         }}
       />
       <Tab.Screen
         name="Live"
         component={Live}
         options={{
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }) =>
             <View
               style={{ alignItems: "center", justifyContent: "center", top: 2 }}
             >
@@ -188,18 +186,17 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "blue" : "black",
+                  tintColor: focused ? "blue" : "black"
                 }}
               />
             </View>
-          ),
         }}
       />
       <Tab.Screen
         name="Profile"
         component={Profile}
         options={{
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }) =>
             <View
               style={{ alignItems: "center", justifyContent: "center", top: 2 }}
             >
@@ -209,18 +206,17 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "blue" : "black",
+                  tintColor: focused ? "blue" : "black"
                 }}
               />
             </View>
-          ),
         }}
       />
       <Tab.Screen
         name="Settings"
         component={Settings}
         options={{
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }) =>
             <View
               style={{ alignItems: "center", justifyContent: "center", top: 2 }}
             >
@@ -230,11 +226,10 @@ const TabNavigator = () => {
                 style={{
                   width: 25,
                   height: 25,
-                  tintColor: focused ? "blue" : "black",
+                  tintColor: focused ? "blue" : "black"
                 }}
               />
             </View>
-          ),
         }}
       />
     </Tab.Navigator>

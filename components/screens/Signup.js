@@ -533,23 +533,20 @@ const Signup = ({ navigation }) => {
               </View>
             </Fragment>}
         <View style={{ alignItems: "center" }}>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => {
-              navigation.navigate("Login");
+          <Button
+            containerStyle={{
+              marginTop: RFPercentage(2),
+              width: "90%"
             }}
-          >
-            <Text
-              style={{
-                fontFamily: "Dongle-Regular",
-                fontSize: RFPercentage(3),
-                marginTop: RFPercentage(2),
-                color: "black"
-              }}
-            >
-              Already have an account?
-            </Text>
-          </TouchableOpacity>
+            buttonStyle={{ backgroundColor: "#1F4693" }}
+            titleStyle={{
+              fontFamily: "Dongle-Regular",
+              fontSize: RFPercentage(2.5)
+            }}
+            onPress={() => navigation.navigate("Login")}
+            title="Already have an account? Login"
+            type="solid"
+          />
         </View>
       </View>
 

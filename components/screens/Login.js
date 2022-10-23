@@ -265,23 +265,20 @@ const Login = ({ navigation }) => {
           loading={isLoading}
           type="solid"
         />
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={() => {
-            navigation.navigate("Signup");
+        <Button
+          containerStyle={{
+            marginTop: RFPercentage(2),
+            width: "90%"
           }}
-        >
-          <Text
-            style={{
-              fontFamily: "Dongle-Regular",
-              fontSize: RFPercentage(3),
-              marginTop: RFPercentage(2),
-              color: "black"
-            }}
-          >
-            Don't have an account?
-          </Text>
-        </TouchableOpacity>
+          buttonStyle={{ backgroundColor: "#1F4693" }}
+          titleStyle={{
+            fontFamily: "Dongle-Regular",
+            fontSize: RFPercentage(2.5)
+          }}
+          onPress={() => navigation.navigate("Signup")}
+          title="Don't have an account? Sign Up"
+          type="solid"
+        />
       </View>
 
       {/* Modal View of OTP Screen For Changing Mobile Number */}

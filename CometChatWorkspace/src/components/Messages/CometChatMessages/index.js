@@ -66,8 +66,11 @@ class CometChatMessages extends React.PureComponent {
       user: params.type === 'user' ? params.item : null,
       showProfile: false,
       ongoingDirectCall: false,
-      imageView: null,
-      joinDirectCall: false,
+      imageView:null,
+      joinDirectCall:false,
+      outgoingCall: null,
+      incomingCall: null,
+      ongoingDirectCall: null
     };
 
     this.composerRef = React.createRef();
@@ -85,7 +88,7 @@ class CometChatMessages extends React.PureComponent {
         this.loggedInUser = user;
       })
       .catch(() => {
-        logger('[CometChatMessages] getLoggedInUser error', error);
+         logger('[CometChatMessages] getLoggedInUser error', error);
       });
   }
   checkRestrictions = async () => {
@@ -282,8 +285,7 @@ class CometChatMessages extends React.PureComponent {
         this.appendPollMessage(messages);
         break;
       case actions.VIEW_ACTUAL_IMAGE:
-        params.actionGenerated(actions.VIEW_ACTUAL_IMAGE, messages);
-        this.setState({ imageView: messages });
+        this.setState({ imageView: messages});
         break;
       case actions.VIEW_ACTUAL_VIDEO:
         this.setState({ videoMessage: messages });
@@ -367,6 +369,24 @@ class CometChatMessages extends React.PureComponent {
       case actions.SHOW_PROFILE:
         this.showProfile();
         break;
+      case actions.ACCEPT_INCOMING_CALL:
+        this.setState({ incomingCall: messages});
+        this.appendMessage([messages])
+        break;
+      case actions.CALL_ENDED:
+      case actions.OUTGOING_CALL_REJECTED:
+      case actions.OUTGOING_CALL_CANCELLED:
+        params.actionGenerated(action, messages);
+        break;
+      case actions.REJECTED_INCOMING_CALL:
+        params.actionGenerated(action, messages, key);
+        break;
+      case actions.ACCEPT_DIRECT_CALL:
+        this.setState({joinDirectCall: true}, () => {
+          if (params.type === CometChat.RECEIVER_TYPE.GROUP)
+            this.setState({ongoingDirectCall: true})
+        })
+        break;
       case actions.JOIN_DIRECT_CALL:
         this.setState({ joinDirectCall: true }, () => {
           this.setState({ ongoingDirectCall: true });
@@ -387,7 +407,7 @@ class CometChatMessages extends React.PureComponent {
         break;
     }
   };
-
+  
   sendMessage = (message) => {
     const { route } = this.props;
 
@@ -622,7 +642,7 @@ class CometChatMessages extends React.PureComponent {
         params.actionGenerated('unblockUser');
       })
       .catch((error) => {
-        logger('unblocking user fails with error', error);
+       logger('unblocking user fails with error', error);
       });
   };
 
@@ -635,7 +655,7 @@ class CometChatMessages extends React.PureComponent {
       return false;
     }
 
-    if (
+    if ( reaction.metadata === undefined ||
       !Object.prototype.hasOwnProperty.call(reaction.metadata, 'type') ||
       !Object.prototype.hasOwnProperty.call(reaction.metadata, 'reaction')
     ) {
@@ -833,9 +853,22 @@ class CometChatMessages extends React.PureComponent {
   };
 
   callUpdated = (message) => {
-    const { route } = this.props;
-    const params = route?.params || this.props;
-
+    const {status, callInitiator} = message
+    switch (status) {
+      case CometChat.CALL_STATUS.INITIATED:
+        if (callInitiator.uid === this.loggedInUser.uid) {
+          this.setState({outgoingCall: message})
+        }
+        break;
+      case CometChat.CALL_STATUS.BUSY:
+      case CometChat.CALL_STATUS.CANCELLED:
+      case CometChat.CALL_STATUS.ENDED:
+      case CometChat.CALL_STATUS.REJECTED:
+      case CometChat.CALL_STATUS.UNANSWERED:
+        this.setState({outgoingCall: null, incomingCall: null})
+      default:
+        break;
+    }
     this.appendMessage([message]);
   };
 
@@ -918,7 +951,7 @@ class CometChatMessages extends React.PureComponent {
       imageView = (
         <CometChatImageViewer
           open
-          close={() => this.setState({ imageView: null })}
+          close={() => this.setState({imageView:null})}
           message={this.state.imageView}
         />
       );
@@ -980,9 +1013,6 @@ class CometChatMessages extends React.PureComponent {
       <Modal
         transparent
         animated
-        onRequestClose={() => {
-          this.actionHandler('closeThreadClicked');
-        }}
         animationType="fade"
         visible={this.state.threadMessageView}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }}>
@@ -1028,7 +1058,7 @@ class CometChatMessages extends React.PureComponent {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}>
           <SafeAreaView style={style.chatWrapperStyle}>
-            {imageView}
+                  {imageView}
             {this.state.showProfile ? (
               <CometChatUserProfile
                 open
@@ -1046,7 +1076,6 @@ class CometChatMessages extends React.PureComponent {
             {this.state.userDetailVisible ? (
               <CometChatUserDetails
                 open={this.state.userDetailVisible}
-                close={() => this.setState({ userDetailVisible: false })}
                 theme={this.theme}
                 item={
                   params.type === CometChat.RECEIVER_TYPE.USER
@@ -1139,6 +1168,33 @@ class CometChatMessages extends React.PureComponent {
             />
           </>
         ) : null}
+        {this.state.restrictions?.isCallActionMessagesEnabled ? (
+            <CometChatIncomingCall
+              showMessage={(type, message) => {
+                this.dropDownAlertRef?.showMessage(type, message);
+              }}
+              theme={this.theme}
+              loggedInUser={this.loggedInUser}
+              actionGenerated={this.actionHandler}
+              outgoingCall={this.state.outgoingCall}
+            />
+          ) : null}
+          <CometChatOutgoingCall
+            theme={this.theme}
+            item={this.state.item}
+            type={this.state.type}
+            incomingCall={this.state.incomingCall}
+            outgoingCall={this.state.outgoingCall}
+            loggedInUser={this.loggedInUser}
+            actionGenerated={this.actionHandler}
+          />
+          {this.state.restrictions?.isCallActionMessagesEnabled ? (
+            <CometChatIncomingDirectCall
+              theme={this.props.theme}
+              lang={this.state.lang}
+              actionGenerated={this.actionHandler}
+            />
+          ) : null}
       </CometChatContextProvider>
     );
   }

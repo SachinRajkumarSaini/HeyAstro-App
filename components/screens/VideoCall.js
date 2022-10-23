@@ -7,7 +7,7 @@ import {
   ToastAndroid,
   PermissionsAndroid,
   Modal,
-  Alert,
+  Alert
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { WebView } from "react-native-webview";
@@ -27,7 +27,7 @@ export default class VideoCall extends React.Component {
       userUsageTime: 0,
       userBalance: null,
       astrologerChargesPerMinute: null,
-      showLoader: false,
+      showLoader: false
     };
     // Back Button Clicked
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -41,7 +41,7 @@ export default class VideoCall extends React.Component {
         message: "App needs access to your camera " + "so others can see you.",
         buttonNeutral: "Ask Me Later",
         buttonNegative: "Cancel",
-        buttonPositive: "OK",
+        buttonPositive: "OK"
       }
     );
   };
@@ -54,25 +54,26 @@ export default class VideoCall extends React.Component {
         message: "App needs access to your audio / microphone",
         buttonNeutral: "Ask Me Later",
         buttonNegative: "Cancel",
-        buttonPositive: "OK",
+        buttonPositive: "OK"
       }
     );
   };
 
   increaseUsageTime = 0;
 
-  deductBalance = async (Amount) => {
+  deductBalance = async Amount => {
     try {
       clearInterval(this.increaseUsageTime);
       this.setState({
         userBalance: this.state.userBalance - Amount,
-        showLoader: true,
+        showLoader: true
       });
       const userId = await AsyncStorage.getItem("userId");
       const removeBalance = await FetchAPI({
         query: `
             mutation {
-              updateUsersPermissionsUser(id: ${this.props.route.params.userId}, data: { Balance: ${this.state.userBalance} }) {
+              updateUsersPermissionsUser(id: ${this.props.route.params
+                .userId}, data: { Balance: ${this.state.userBalance} }) {
                 data {
                   attributes {
                     Balance
@@ -80,15 +81,16 @@ export default class VideoCall extends React.Component {
                 }
               }
             }
-        `,
+        `
       });
       this.setState({
         userBalance:
-          removeBalance.data.updateUsersPermissionsUser.data.attributes.Balance,
+          removeBalance.data.updateUsersPermissionsUser.data.attributes.Balance
       });
       const date = new Date();
       const addOrderHistory = await Fetch_API(
-        `${STRAPI_API_URL}/api/users/orderhistory/${this.props.route.params.userId}`,
+        `${STRAPI_API_URL}/api/users/orderhistory/${this.props.route.params
+          .userId}`,
         {
           OrderHistory: {
             OrderId: uuid.v4(),
@@ -102,12 +104,12 @@ export default class VideoCall extends React.Component {
               Math.ceil(this.state.userUsageTime / 60) *
                 this.state.astrologerChargesPerMinute
             ),
-            OrderType: JSON.stringify("Call"),
-          },
+            OrderType: JSON.stringify("Call")
+          }
         },
         "PUT",
         {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         }
       );
       console.log("addOrderHistory", addOrderHistory);
@@ -140,7 +142,7 @@ export default class VideoCall extends React.Component {
             }
           }
         }      
-      `,
+      `
     });
     const { ChargePerMinute } = getCharges.data.astrologers.data[0].attributes;
     this.setState({ astrologerChargesPerMinute: ChargePerMinute });
@@ -157,7 +159,7 @@ export default class VideoCall extends React.Component {
             }
           }
         }
-      `,
+      `
     });
     const { Balance } = getBalance.data.usersPermissionsUser.data.attributes;
     this.setState({ userBalance: Balance });
@@ -210,7 +212,7 @@ export default class VideoCall extends React.Component {
         {
           text: "Cancel",
           onPress: () => null,
-          style: "cancel",
+          style: "cancel"
         },
         {
           text: "Leave",
@@ -227,8 +229,8 @@ export default class VideoCall extends React.Component {
               this.props.navigation.goBack();
               clearInterval(this.increaseUsageTime);
             }
-          },
-        },
+          }
+        }
       ],
       { cancelable: true }
     );
@@ -249,20 +251,22 @@ export default class VideoCall extends React.Component {
           containerStyle={{
             backgroundColor: "#1F4693",
             paddingVertical: 6,
-            borderBottomWidth: 0,
+            borderBottomWidth: 0
           }}
           leftComponent={{
             icon: "arrow-back",
             color: "#fff",
             iconStyle: {
               marginLeft: RFPercentage(1),
-              marginTop: RFPercentage(0.8),
+              marginTop: RFPercentage(0.8)
             },
             onPress: () => {
               if (this.state.userUsageTime > 10) {
                 console.log("usage", this.state.userUsageTime);
-                const { userUsageTime, astrologerChargesPerMinute } =
-                  this.state;
+                const {
+                  userUsageTime,
+                  astrologerChargesPerMinute
+                } = this.state;
                 let amount =
                   Math.ceil(userUsageTime / 60) * astrologerChargesPerMinute;
                 console.log("amount", amount);
@@ -272,7 +276,7 @@ export default class VideoCall extends React.Component {
                 this.props.navigation.goBack();
                 clearInterval(this.increaseUsageTime);
               }
-            },
+            }
           }}
           centerComponent={{
             text: "Call",
@@ -280,8 +284,8 @@ export default class VideoCall extends React.Component {
               color: "#fff",
               fontSize: RFPercentage(3.5),
               fontFamily: "Dongle-Regular",
-              marginTop: RFPercentage(0.5),
-            },
+              marginTop: RFPercentage(0.5)
+            }
           }}
         />
 
@@ -303,7 +307,7 @@ export default class VideoCall extends React.Component {
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               />
             );
@@ -315,7 +319,7 @@ export default class VideoCall extends React.Component {
               backgroundColor: "#000000aa",
               flex: 1,
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <ActivityIndicator size="large" color="white" />
