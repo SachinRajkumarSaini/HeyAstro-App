@@ -22,6 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CometChat } from "@cometchat-pro/react-native-chat";
 import { useIsFocused } from "@react-navigation/native";
 import { CometChatAuth } from "../helpers/CometChatAuth";
+import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 
 const ChatsAndCall = props => {
   const navigation = useNavigation();
@@ -32,6 +33,25 @@ const ChatsAndCall = props => {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedAstrologer, setSelectedAstrologer] = useState();
   const [userBalance, setUserBalance] = useState(null);
+
+  const permissions = async () => {
+    const permissions = await requestMultiple([
+      PERMISSIONS.ANDROID.RECORD_AUDIO,
+      PERMISSIONS.ANDROID.CAMERA
+    ]);
+    if (
+      permissions["android.permission.CAMERA"] === "granted" &&
+      permissions["android.permission.RECORD_AUDIO"] === "granted"
+    ) {
+      console.log("permissions granted");
+    } else {
+      console.log("permissions denied");
+    }
+  };
+
+  useEffect(() => {
+    permissions();
+  }, []);
 
   const fetchAstrologers = async () => {
     try {

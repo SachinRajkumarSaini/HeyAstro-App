@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   BackHandler,
   ToastAndroid,
-  PermissionsAndroid,
   Alert,
   Modal
 } from "react-native";
@@ -33,32 +32,6 @@ export default class CometChatMessagesView extends React.Component {
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.goBack = this.goBack.bind(this);
   }
-
-  cameraPermission = async () => {
-    let granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      {
-        title: "Camera Permission",
-        message: "App needs access to your camera " + "so others can see you.",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
-    );
-  };
-
-  micPermission = async () => {
-    let granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      {
-        title: "Audio Permission",
-        message: "App needs access to your audio / microphone",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
-    );
-  };
 
   increaseUsageTime = 0;
 
@@ -237,8 +210,6 @@ export default class CometChatMessagesView extends React.Component {
   componentDidMount() {
     this.getLoggedinUser();
     this.getAstrologerUser();
-    this.cameraPermission();
-    this.micPermission();
     this.calculateTime();
     BackHandler.addEventListener(
       "hardwareBackPress",
