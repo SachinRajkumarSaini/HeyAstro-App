@@ -254,7 +254,7 @@ export default class CometChatMessagesView extends React.Component {
     let receiverType = CometChat.RECEIVER_TYPE.USER;
     let call = new CometChat.Call(receiverID, callType, receiverType);
     CometChat.initiateCall(call).then(
-      outGoingCall => {
+      async outGoingCall => {
         console.log("Call initiated successfully:", outGoingCall.sessionId);
         this.setState({ sessionId: outGoingCall.sessionId });
         let callListener = new CometChat.OngoingCallListener({
@@ -309,14 +309,28 @@ export default class CometChatMessagesView extends React.Component {
           .showEndCallButton(false)
           .setCallEventListener(callListener)
           .build();
+
+        await AsyncStorage.setItem("sessionId", outGoingCall.sessionId);
         this.props.navigation.navigate("CallingScreen", {
           sessionId: outGoingCall.sessionId,
           callSettings: callSettings
         });
         // perform action on success. Like show your calling screen.
       },
-      error => {
-        console.log("Call initialization failed with exception:", error);
+      async error => {
+        console.log("Call initialization failed with exception:", error.code);
+        const sessionId = await AsyncStorage.getItem("sessionId");
+        if (error.code === "CALL_ALREADY_INITIATED") {
+          CometChat.endCall(sessionId).then(
+            call => {
+              console.log("call ended", call);
+              this.startCall(callingType);
+            },
+            error => {
+              console.log("error", error);
+            }
+          );
+        }
       }
     );
   };

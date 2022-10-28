@@ -5,6 +5,7 @@ import {
   StatusBar,
   ToastAndroid,
   Modal,
+  TouchableOpacity
 } from "react-native";
 import FileBase64 from "../helpers/FileBase64";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -25,10 +26,28 @@ const ForgotPassword = ({ navigation }) => {
   const [Confirm, SetConfirm] = useState();
   const [Code, SetCode] = useState();
   const [userId, setUserId] = useState();
+  const [counter, setCounter] = useState(90);
 
-  useEffect(() => {
-    setOtpErrorText("");
-  }, [isFocused, otpModal]);
+  useEffect(
+    () => {
+      setOtpErrorText("");
+    },
+    [isFocused, otpModal]
+  );
+
+  useEffect(
+    () => {
+      const timer =
+        counter > 0 &&
+        setInterval(() => {
+          if (otpModal) {
+            setCounter(counter - 1);
+          }
+        }, 1000);
+      return () => clearInterval(timer);
+    },
+    [counter, otpModal]
+  );
 
   const onSubmit = async () => {
     if (phone) {
@@ -43,7 +62,7 @@ const ForgotPassword = ({ navigation }) => {
                 }
               }
             }
-        `,
+        `
         });
         if (fetchProfile.data.usersPermissionsUsers.data.length === 1) {
           setUserId(fetchProfile.data.usersPermissionsUsers.data[0].id);
@@ -55,6 +74,7 @@ const ForgotPassword = ({ navigation }) => {
             ToastAndroid.show("OTP Sent Successfully", ToastAndroid.SHORT);
             SetConfirm(confirmation);
             setIsLoading(false);
+            setCounter(90);
             setOtpModal(true);
           } catch (error) {
             setIsLoading(false);
@@ -137,14 +157,14 @@ const ForgotPassword = ({ navigation }) => {
         style={{
           flex: 1,
           justifyContent: "center",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <Image
           source={{ uri: FileBase64.heyAstro }}
           containerStyle={{
             height: RFPercentage(20),
-            width: RFPercentage(20),
+            width: RFPercentage(20)
           }}
         />
         <Text
@@ -152,7 +172,7 @@ const ForgotPassword = ({ navigation }) => {
             fontFamily: "Dongle-Bold",
             color: "#4d148c",
             fontSize: RFPercentage(4),
-            marginTop: RFPercentage(1),
+            marginTop: RFPercentage(1)
           }}
         >
           Forgot Password
@@ -162,19 +182,18 @@ const ForgotPassword = ({ navigation }) => {
           placeholder="Mobile Number"
           keyboardType="numeric"
           maxLength={10}
-          onChangeText={(identifier) =>
-            setPhone(identifier.replace(/^\s+|\s+$/gm, ""))
-          }
+          onChangeText={identifier =>
+            setPhone(identifier.replace(/^\s+|\s+$/gm, ""))}
         />
         <Button
           containerStyle={{
             marginTop: RFPercentage(2),
-            width: "90%",
+            width: "90%"
           }}
           buttonStyle={{ backgroundColor: "#1F4693" }}
           titleStyle={{
             fontFamily: "Dongle-Regular",
-            fontSize: RFPercentage(2.5),
+            fontSize: RFPercentage(2.5)
           }}
           onPress={onSubmit}
           title="Submit"
@@ -195,14 +214,14 @@ const ForgotPassword = ({ navigation }) => {
             style={{
               flex: 1,
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Image
               source={{ uri: FileBase64.heyAstro }}
               containerStyle={{
                 height: RFPercentage(20),
-                width: RFPercentage(20),
+                width: RFPercentage(20)
               }}
             />
             <Text
@@ -210,7 +229,7 @@ const ForgotPassword = ({ navigation }) => {
                 fontFamily: "Dongle-Bold",
                 color: "#4d148c",
                 fontSize: RFPercentage(4),
-                marginTop: RFPercentage(1),
+                marginTop: RFPercentage(1)
               }}
             >
               Verify Number
@@ -219,7 +238,7 @@ const ForgotPassword = ({ navigation }) => {
               style={{
                 color: "#696969",
                 fontSize: 12,
-                fontFamily: "Ubuntu-Regular",
+                fontFamily: "Ubuntu-Regular"
               }}
             >
               We Have Sent an OTP to
@@ -229,7 +248,7 @@ const ForgotPassword = ({ navigation }) => {
                 style={{
                   color: "#696969",
                   fontSize: 12,
-                  fontFamily: "Ubuntu-Bold",
+                  fontFamily: "Ubuntu-Bold"
                 }}
               >
                 {phone}
@@ -247,11 +266,11 @@ const ForgotPassword = ({ navigation }) => {
               textInputStyle={{
                 marginTop: RFPercentage(2),
                 color: "black",
-                fontFamily: "Ubuntu-Regular",
+                fontFamily: "Ubuntu-Regular"
               }}
               keyboardType="numeric"
               placeholder="OTP"
-              onChangeText={(code) => SetCode(code.replace(/^\s+|\s+$/gm, ""))}
+              onChangeText={code => SetCode(code.replace(/^\s+|\s+$/gm, ""))}
             />
             <Text
               style={{
@@ -260,20 +279,58 @@ const ForgotPassword = ({ navigation }) => {
                 fontFamily: "Ubuntu-Regular",
                 marginHorizontal: RFPercentage(4),
                 textAlign: "center",
-                marginTop: RFPercentage(0.5),
+                marginTop: RFPercentage(0.5)
               }}
             >
               {otpErrorText}
             </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                paddingTop: 18,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <TouchableOpacity
+                disabled={counter === 0 ? false : true}
+                color="black"
+                mode="text"
+                uppercase={false}
+                labelStyle={{
+                  color: "#202b58",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: 14.5
+                }}
+                onPress={onSubmit}
+              >
+                {counter === 0
+                  ? <Text
+                      style={{ fontFamily: "Ubuntu-Regular", color: "black" }}
+                    >
+                      Didn't Receive SMS ? Resend
+                    </Text>
+                  : <Text
+                      style={{ fontFamily: "Ubuntu-Regular", color: "black" }}
+                    >
+                      {" "}Resend OTP in{" "}
+                      <Text
+                        style={{ fontFamily: "Ubuntu-Regular", color: "green" }}
+                      >
+                        {counter}s
+                      </Text>
+                    </Text>}
+              </TouchableOpacity>
+            </View>
             <Button
               containerStyle={{
                 marginTop: RFPercentage(2),
-                width: "80%",
+                width: "80%"
               }}
               buttonStyle={{ backgroundColor: "#1F4693" }}
               titleStyle={{
                 fontFamily: "Dongle-Regular",
-                fontSize: RFPercentage(2.5),
+                fontSize: RFPercentage(2.5)
               }}
               onPress={verifyNumber}
               title="Submit"
@@ -283,17 +340,17 @@ const ForgotPassword = ({ navigation }) => {
             <Button
               containerStyle={{
                 marginTop: RFPercentage(2),
-                width: "80%",
+                width: "80%"
               }}
               buttonStyle={{
                 backgroundColor: "white",
                 borderWidth: 1,
-                borderColor: "#1F4693",
+                borderColor: "#1F4693"
               }}
               titleStyle={{
                 fontFamily: "Dongle-Regular",
                 fontSize: RFPercentage(2.5),
-                color: "#1F4693",
+                color: "#1F4693"
               }}
               onPress={() => {
                 setOtpModal(false);

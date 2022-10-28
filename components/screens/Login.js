@@ -9,7 +9,7 @@ import {
   BackHandler,
   Alert
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import TextInput from "react-native-text-input-interactive";
 import { Button, Image } from "@rneui/themed";
@@ -28,6 +28,21 @@ const Login = ({ navigation }) => {
   const [Confirm, SetConfirm] = useState();
   const [Code, SetCode] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [counter, setCounter] = useState(90);
+
+  useEffect(
+    () => {
+      const timer =
+        counter > 0 &&
+        setInterval(() => {
+          if (otpModal) {
+            setCounter(counter - 1);
+          }
+        }, 1000);
+      return () => clearInterval(timer);
+    },
+    [counter, otpModal]
+  );
 
   const login = async () => {
     try {
@@ -121,6 +136,7 @@ const Login = ({ navigation }) => {
   const sendOTP = async () => {
     if (number && number.length === 10) {
       try {
+        setisOTPLoading(true);
         setIsLoading(true);
         const confirmation = await auth().signInWithPhoneNumber(
           `+91 ${number}`
@@ -128,9 +144,12 @@ const Login = ({ navigation }) => {
         ToastAndroid.show("OTP Sent Successfully", ToastAndroid.SHORT);
         SetConfirm(confirmation);
         setIsLoading(false);
+        setisOTPLoading(false);
+        setCounter(90);
         setOtpModal(true);
       } catch (error) {
         console.log(error);
+        setisOTPLoading(false);
         ToastAndroid.show("OTP Not Sent", ToastAndroid.LONG);
         if (
           error.message ===
@@ -364,6 +383,44 @@ const Login = ({ navigation }) => {
             >
               {otpErrorText}
             </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                paddingTop: 18,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <TouchableOpacity
+                disabled={counter === 0 ? false : true}
+                color="black"
+                mode="text"
+                uppercase={false}
+                labelStyle={{
+                  color: "#202b58",
+                  fontFamily: "Ubuntu-Regular",
+                  fontSize: 14.5
+                }}
+                onPress={sendOTP}
+              >
+                {counter === 0
+                  ? <Text
+                      style={{ fontFamily: "Ubuntu-Regular", color: "black" }}
+                    >
+                      Didn't Receive SMS ? Resend
+                    </Text>
+                  : <Text
+                      style={{ fontFamily: "Ubuntu-Regular", color: "black" }}
+                    >
+                      {" "}Resend OTP in{" "}
+                      <Text
+                        style={{ fontFamily: "Ubuntu-Regular", color: "green" }}
+                      >
+                        {counter}s
+                      </Text>
+                    </Text>}
+              </TouchableOpacity>
+            </View>
             <Button
               containerStyle={{
                 marginTop: RFPercentage(2),
@@ -379,6 +436,7 @@ const Login = ({ navigation }) => {
               loading={isOTPLoading}
               type="solid"
             />
+
             <Button
               containerStyle={{
                 marginTop: RFPercentage(2),

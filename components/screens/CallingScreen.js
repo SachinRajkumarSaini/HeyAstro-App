@@ -10,20 +10,47 @@ import { CometChat } from "@cometchat-pro/react-native-chat";
 import { Card } from "react-native-elements";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Button } from "@rneui/themed";
+import { useIsFocused, useFocusEffect } from "@react-navigation/core";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CallingScreen = props => {
+  const isFocused = useIsFocused();
   const [showEnd, setShowEnd] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       setShowEnd(true);
     }, 2000);
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => true
-    );
-    return () => backHandler.remove();
   }, []);
+
+  useEffect(
+    () => {
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => true
+      );
+      return () => backHandler.remove();
+    },
+    [isFocused]
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Screen is Focused");
+      return async () => {
+        const sessionId = await AsyncStorage.getItem("sessionId");
+        console.log("Screen is unfocused");
+        CometChat.endCall(sessionId).then(
+          call => {
+            console.log("call ended", call);
+          },
+          error => {
+            console.log("error", error);
+          }
+        );
+      };
+    }, [])
+  );
 
   return (
     <View style={{ height: "100%", width: "100%" }}>
