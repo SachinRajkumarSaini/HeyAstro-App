@@ -295,7 +295,7 @@ const Login = ({ navigation }) => {
             fontSize: RFPercentage(2.5)
           }}
           onPress={() => navigation.navigate("Signup")}
-          title="Don't have an account? Sign Up"
+          title="New User? Sign Up"
           type="solid"
         />
       </View>

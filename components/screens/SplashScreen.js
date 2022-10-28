@@ -4,7 +4,7 @@ import {
   StatusBar,
   Text,
   ToastAndroid,
-  ImageBackground,
+  ImageBackground
 } from "react-native";
 import React, { useEffect } from "react";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -24,7 +24,7 @@ const SplashScreen = () => {
         if (user) {
           navigation.navigate("Home");
         } else {
-          navigation.navigate("Login");
+          navigation.navigate("Signup");
         }
       } else {
         navigation.navigate("IntroScreen");
@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: RFPercentage(7.5),
     fontWeight: "bold",
-    color: "#482a49",
-  },
+    color: "#482a49"
+  }
 });
 
 export default SplashScreen;

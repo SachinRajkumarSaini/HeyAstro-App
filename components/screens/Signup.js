@@ -397,7 +397,7 @@ const Signup = ({ navigation }) => {
                     );
                   }
                 }}
-                title="Next"
+                title="Next (New User)"
                 loading={isLoading}
                 type="solid"
               />

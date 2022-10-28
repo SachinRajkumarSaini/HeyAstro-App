@@ -15,7 +15,7 @@ const IntroScreen = ({ navigation }) => {
             height: "100%",
             borderBottomEndRadius: RFPercentage(3),
             borderBottomStartRadius: RFPercentage(3),
-            backgroundColor: "#000",
+            backgroundColor: "#000"
           }}
         />
       </View>
@@ -25,7 +25,7 @@ const IntroScreen = ({ navigation }) => {
             textAlign: "center",
             fontSize: RFPercentage(4),
             color: "#1F4693",
-            fontFamily: "Dongle-Regular",
+            fontFamily: "Dongle-Regular"
           }}
         >
           ASTROLOGY APP
@@ -35,7 +35,7 @@ const IntroScreen = ({ navigation }) => {
             textAlign: "center",
             fontSize: RFPercentage(3.4),
             color: "black",
-            fontFamily: "Ubuntu-Bold",
+            fontFamily: "Ubuntu-Bold"
           }}
         >
           Get to know your horoscope by the stars from our specialists.
@@ -45,25 +45,25 @@ const IntroScreen = ({ navigation }) => {
             textAlign: "center",
             fontSize: RFPercentage(2),
             color: "#b4b4b6",
-            fontFamily: "Ubuntu-Regular",
+            fontFamily: "Ubuntu-Regular"
           }}
         >
           Extend your arms in welcome to the future.
         </Text>
         <Button
           title="CONTINUE"
-          onPress={() => navigation.navigate("Login")}
+          onPress={() => navigation.navigate("Signup")}
           titleStyle={{
             fontFamily: "Dongle-Regular",
-            fontSize: RFPercentage(3.5),
+            fontSize: RFPercentage(3.5)
           }}
           buttonStyle={{
             backgroundColor: "#1F4693",
-            borderRadius: RFPercentage(1),
+            borderRadius: RFPercentage(1)
           }}
           containerStyle={{
             marginHorizontal: RFPercentage(2),
-            position: "relative",
+            position: "relative"
           }}
           type="solid"
           iconRight
