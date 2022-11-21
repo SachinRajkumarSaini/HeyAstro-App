@@ -607,7 +607,7 @@ const ChatsAndCall = props => {
                               maxWidth: RFPercentage(19)
                             }}
                           >
-                            {astrologer.Languages &&
+                            {astrologer.Languages.length > 0 &&
                               astrologer.Languages.map((language, index) => {
                                 return (
                                   <Text
