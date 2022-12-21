@@ -1,33 +1,57 @@
 {
     "project_info": {
-        "project_number": "60137023168",
-        "project_id": "heyastro",
-        "storage_bucket": "heyastro.appspot.com"
+        "project_number": "994469111989",
+        "project_id": "heyastro-602e4",
+        "storage_bucket": "heyastro-602e4.appspot.com"
     },
     "client": [
         {
             "client_info": {
-                "mobilesdk_app_id": "1:60137023168:android:085aa1eb00702645f4af25",
+                "mobilesdk_app_id": "1:994469111989:android:9c9dc87305c24ab3e676fc",
                 "android_client_info": {
                     "package_name": "com.heyastro"
                 }
             },
             "oauth_client": [
                 {
-                    "client_id": "60137023168-ipte4a5cgc4vql6i3deko62eh6o8drgv.apps.googleusercontent.com",
+                    "client_id": "994469111989-69gb8719pphge2s9892p5m03danp2oem.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.heyastro",
+                        "certificate_hash": "d5e36915d08d0753c6537fa728a96782c30bc496"
+                    }
+                },
+                {
+                    "client_id": "994469111989-7ivdfed4sikcvee03bb4o4i9t0jt4ghc.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.heyastro",
+                        "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+                    }
+                },
+                {
+                    "client_id": "994469111989-pnqpulgdl7lkpckkqlu17qi0luhtcgod.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.heyastro",
+                        "certificate_hash": "bbd62cd2daffc16c218665cec8fc338d2af713cb"
+                    }
+                },
+                {
+                    "client_id": "994469111989-ai5o24u4nsmu89rhdofc83rvb9kdeh8e.apps.googleusercontent.com",
                     "client_type": 3
                 }
             ],
             "api_key": [
                 {
-                    "current_key": "AIzaSyA90vu0sM6IZJyWIoXHCMHymKowMmAFBBg"
+                    "current_key": "AIzaSyC6InnEIDM3w8MSNFWgkAV4zBBGW0DWS5A"
                 }
             ],
             "services": {
                 "appinvite_service": {
                     "other_platform_oauth_client": [
                         {
-                            "client_id": "60137023168-ipte4a5cgc4vql6i3deko62eh6o8drgv.apps.googleusercontent.com",
+                            "client_id": "994469111989-ai5o24u4nsmu89rhdofc83rvb9kdeh8e.apps.googleusercontent.com",
                             "client_type": 3
                         }
                     ]
