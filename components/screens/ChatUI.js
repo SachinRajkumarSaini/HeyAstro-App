@@ -35,6 +35,17 @@ export default class CometChatMessagesView extends React.Component {
 
   increaseUsageTime = 0;
 
+  secondsToHms = d => {
+    d = Number(d);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    var s = Math.floor(d % 3600 % 60);
+    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    return hDisplay + mDisplay + sDisplay;
+  };
+
   deductBalance = async Amount => {
     try {
       clearInterval(this.increaseUsageTime);
@@ -73,9 +84,9 @@ export default class CometChatMessagesView extends React.Component {
             ),
             DateAndTime: JSON.stringify(date.toISOString()),
             CallRate: JSON.stringify(this.state.astrologerChargesPerMinute),
-            Duration: JSON.stringify(Math.ceil(this.state.userUsageTime / 60)),
+            Duration: this.secondsToHms(this.state.userUsageTime),
             Deduction: JSON.stringify(
-              Math.ceil(this.state.userUsageTime / 60) *
+              (this.state.userUsageTime / 60).toFixed(2) *
                 this.state.astrologerChargesPerMinute
             ),
             OrderType: JSON.stringify("Call")
@@ -141,15 +152,18 @@ export default class CometChatMessagesView extends React.Component {
     // Calculate User Usage Time
     console.log("balance", Balance);
     console.log("ChargePerMinute", ChargePerMinute);
-    let maximumTime = Math.floor(Balance / ChargePerMinute) * 60;
+    let maximumTime = Math.floor(Balance / ChargePerMinute * 60);
     let usageTime = 0;
     console.log("maximumTime", maximumTime);
     this.increaseUsageTime = setInterval(() => {
-      if (usageTime < maximumTime) {
+      if (usageTime <= maximumTime) {
         this.setState({ userUsageTime: usageTime++ });
         console.log("userTime", this.state.userUsageTime);
       } else {
-        this.deductBalance(Balance);
+        const { userUsageTime, astrologerChargesPerMinute } = this.state;
+        let amount =
+          (userUsageTime / 60).toFixed(2) * astrologerChargesPerMinute;
+        this.deductBalance(amount);
         setTimeout(() => {
           ToastAndroid.show(
             "Out of Balance, Please recharge your account",
@@ -197,7 +211,7 @@ export default class CometChatMessagesView extends React.Component {
     if (this.state.userUsageTime > 20) {
       console.log("usage", this.state.userUsageTime);
       const { userUsageTime, astrologerChargesPerMinute } = this.state;
-      let amount = Math.ceil(userUsageTime / 60) * astrologerChargesPerMinute;
+      let amount = (userUsageTime / 60).toFixed(2) * astrologerChargesPerMinute;
       console.log("amount", amount);
       this.deductBalance(amount);
     } else {

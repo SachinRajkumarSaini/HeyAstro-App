@@ -77,12 +77,17 @@ const ChatsAndCall = props => {
                     }              
             `
         });
-        setAstrologers(
-          getAstrologers.data.astrologers.data.map(
-            astrologer => astrologer.attributes
-          ),
-          setIsLoading(false)
+        let Astrologers = getAstrologers.data.astrologers.data.map(
+          astrologer => astrologer.attributes
         );
+        let sortedAstrologers = Astrologers.sort((a, b) => {
+          if (a.Status === "Online") {
+            return -1;
+          } else {
+            return 1;
+          }
+        });
+        setAstrologers(sortedAstrologers, setIsLoading(false));
       } else {
         const getAstrologers = await FetchAPI({
           query: `
@@ -115,12 +120,17 @@ const ChatsAndCall = props => {
                 }                        
             `
         });
-        setAstrologers(
-          getAstrologers.data.astrologers.data.map(
-            astrologer => astrologer.attributes
-          ),
-          setIsLoading(false)
+        let Astrologers = getAstrologers.data.astrologers.data.map(
+          astrologer => astrologer.attributes
         );
+        let sortedAstrologers = Astrologers.sort((a, b) => {
+          if (a.Status === "Online") {
+            return -1;
+          } else {
+            return 1;
+          }
+        });
+        setAstrologers(sortedAstrologers, setIsLoading(false));
       }
     } catch (error) {
       console.log(error);

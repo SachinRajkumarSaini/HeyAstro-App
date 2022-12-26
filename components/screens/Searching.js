@@ -51,12 +51,17 @@ const Searching = ({ navigation }) => {
                 }
               `
       });
-      setAstrologers(
-        getAstrologers.data.astrologers.data.map(
-          astrologer => astrologer.attributes
-        ),
-        setIsLoading(false)
+      let Astrologers = getAstrologers.data.astrologers.data.map(
+        astrologer => astrologer.attributes
       );
+      let sortedAstrologers = Astrologers.sort((a, b) => {
+        if (a.Status === "Online") {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+      setAstrologers(sortedAstrologers, setIsLoading(false));
     } catch (error) {
       ToastAndroid.show(
         "Something went wrong, Please try again later!",
@@ -160,12 +165,17 @@ const Searching = ({ navigation }) => {
                 }    
               `
       });
-      setAstrologers(
-        getAstrologers.data.astrologers.data.map(
-          astrologer => astrologer.attributes
-        ),
-        setIsLoading(false)
+      let Astrologers = getAstrologers.data.astrologers.data.map(
+        astrologer => astrologer.attributes
       );
+      let sortedAstrologers = Astrologers.sort((a, b) => {
+        if (a.Status === "Online") {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+      setAstrologers(sortedAstrologers, setIsLoading(false));
     } catch (error) {
       console.log(error);
       ToastAndroid.show(
