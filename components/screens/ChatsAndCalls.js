@@ -80,14 +80,17 @@ const ChatsAndCall = props => {
         let Astrologers = getAstrologers.data.astrologers.data.map(
           astrologer => astrologer.attributes
         );
-        let sortedAstrologers = Astrologers.sort((a, b) => {
+        let sortByCharge = Astrologers.sort(
+          (a, b) => b.ChargePerMinute - a.ChargePerMinute
+        );
+        let sortByStatus = sortByCharge.sort((a, b) => {
           if (a.Status === "Online") {
             return -1;
           } else {
             return 1;
           }
         });
-        setAstrologers(sortedAstrologers, setIsLoading(false));
+        setAstrologers(sortByStatus, setIsLoading(false));
       } else {
         const getAstrologers = await FetchAPI({
           query: `
@@ -123,14 +126,17 @@ const ChatsAndCall = props => {
         let Astrologers = getAstrologers.data.astrologers.data.map(
           astrologer => astrologer.attributes
         );
-        let sortedAstrologers = Astrologers.sort((a, b) => {
+        let sortByCharge = Astrologers.sort(
+          (a, b) => b.ChargePerMinute - a.ChargePerMinute
+        );
+        let sortByStatus = sortByCharge.sort((a, b) => {
           if (a.Status === "Online") {
             return -1;
           } else {
             return 1;
           }
         });
-        setAstrologers(sortedAstrologers, setIsLoading(false));
+        setAstrologers(sortByStatus, setIsLoading(false));
       }
     } catch (error) {
       console.log(error);
