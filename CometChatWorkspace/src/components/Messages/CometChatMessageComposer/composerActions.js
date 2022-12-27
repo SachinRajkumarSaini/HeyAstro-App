@@ -228,8 +228,8 @@ export default class ComposerActions extends Component {
       <TouchableOpacity
         style={style.actionButtonContainer}
         onPress={() => this.takePhoto()}>
-        <EvilIcon name="camera" size={24} />
-        <Text style={{ fontSize: 18, marginLeft: 10, fontWeight: '500' }}>
+        <EvilIcon name="camera" color="black" size={24} />
+        <Text style={{ fontSize: 18, marginLeft: 10, fontWeight: '500', color:"black" }}>
           Take Photo
         </Text>
       </TouchableOpacity>
@@ -238,12 +238,13 @@ export default class ComposerActions extends Component {
       <TouchableOpacity
         style={style.actionButtonContainer}
         onPress={() => this.takePhoto('video')}>
-        <IonIcon name="videocam-outline" size={24} />
+        <IonIcon name="videocam-outline" color="black" size={24} />
         <Text
           style={{
             fontSize: 18,
             marginLeft: 10,
             fontWeight: '500',
+            color:"black"
           }}>
           Take Video
         </Text>
@@ -253,13 +254,14 @@ export default class ComposerActions extends Component {
       <TouchableOpacity
         style={style.actionButtonContainer}
         onPress={() => this.launchLibrary('photo')}>
-        <IonIcon name="image-outline" size={24} />
+        <IonIcon name="image-outline" color="black" size={24} />
 
         <Text
           style={{
             fontSize: 18,
             marginLeft: 10,
             fontWeight: '500',
+            color:"black"
           }}>
           Photo Library
         </Text>
@@ -269,9 +271,9 @@ export default class ComposerActions extends Component {
       <TouchableOpacity
         style={style.actionButtonContainer}
         onPress={() => this.launchLibrary('video')}>
-        <IonIcon name="videocam-outline" size={24} />
+        <IonIcon name="videocam-outline" color="black" size={24} />
 
-        <Text style={{ fontSize: 18, marginLeft: 10, fontWeight: '500' }}>
+        <Text style={{ fontSize: 18, marginLeft: 10, fontWeight: '500', color:"black" }}>
           Video Library
         </Text>
       </TouchableOpacity>
