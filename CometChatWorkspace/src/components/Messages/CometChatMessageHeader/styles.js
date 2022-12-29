@@ -48,18 +48,26 @@ export default StyleSheet.create({
   },
   callIcon: {
     height: 24,
-    width: 24
+    width: 24,
+    resizeMode: "contain",
+    color: theme.color.blue
   },
-  videoIcon: { width: 34, height: 24, resizeMode: "contain" },
+  videoIcon: {
+    width: 34,
+    height: 24,
+    resizeMode: "contain",
+    color: theme.color.blue
+  },
   itemDetailContainer: {
     flex: 1
   },
   itemNameText: {
-    fontSize: 18,
-    fontWeight: "500"
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#101010"
   },
   statusText: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.color.blue
   },
   avatarContainer: {
