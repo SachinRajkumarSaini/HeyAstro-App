@@ -4,7 +4,7 @@ import {
   StatusBar,
   Modal,
   ActivityIndicator,
-  ToastAndroid,
+  ToastAndroid
 } from "react-native";
 import { Header, Button } from "react-native-elements";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -27,25 +27,25 @@ const CreateKundli = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [geographic, setGeographic] = useState({
     Latitude: null,
-    Longitude: null,
+    Longitude: null
   });
   const [place, setPlace] = useState({
     Country: "",
     State: "",
-    City: "",
+    City: ""
   });
 
-  const getLocation = async (pincode) => {
+  const getLocation = async pincode => {
     try {
       setIsLoading(true);
       const gettingLocation = await Fetch_API(
         `${process.env.HEYASTRO_API_URL}/getLocation`,
         {
-          pincode: parseInt(pincode),
+          pincode: parseInt(pincode)
         },
         "POST",
         {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         }
       );
       setIsLoading(false);
@@ -65,30 +65,26 @@ const CreateKundli = ({ navigation }) => {
         setIsLoading(true);
 
         const kundliData = await fetch(
-          `${process.env.HEYASTRO_API_URL}/kundli/1/${geographic.Latitude},${
-            geographic.Longitude
-          }/${DOB.toISOString()}`
+          `${process.env
+            .HEYASTRO_API_URL}/kundli/1/${geographic.Latitude},${geographic.Longitude}/${DOB.toISOString()}`
         );
         const kundli = await kundliData.json();
 
         const lagnaChart = await fetch(
-          `${process.env.HEYASTRO_API_URL}/kundli/chart/1/${
-            geographic.Latitude
-          },${geographic.Longitude}/${DOB.toISOString()}/lagna/north-indian`
+          `${process.env
+            .HEYASTRO_API_URL}/kundli/chart/1/${geographic.Latitude},${geographic.Longitude}/${DOB.toISOString()}/lagna/north-indian`
         );
         const lagna = await lagnaChart.text();
 
         const navamsaChart = await fetch(
-          `${process.env.HEYASTRO_API_URL}/kundli/chart/1/${
-            geographic.Latitude
-          },${geographic.Longitude}/${DOB.toISOString()}/navamsa/north-indian`
+          `${process.env
+            .HEYASTRO_API_URL}/kundli/chart/1/${geographic.Latitude},${geographic.Longitude}/${DOB.toISOString()}/navamsa/north-indian`
         );
         const navamsa = await navamsaChart.text();
 
         const saptamsaChart = await fetch(
-          `${process.env.HEYASTRO_API_URL}/kundli/chart/1/${
-            geographic.Latitude
-          },${geographic.Longitude}/${DOB.toISOString()}/saptamsa/north-indian`
+          `${process.env
+            .HEYASTRO_API_URL}/kundli/chart/1/${geographic.Latitude},${geographic.Longitude}/${DOB.toISOString()}/saptamsa/north-indian`
         );
         const saptamsa = await saptamsaChart.text();
 
@@ -99,68 +95,74 @@ const CreateKundli = ({ navigation }) => {
         // );
         // const rasi = await rasiChart.text();
 
-        const userId = await AsyncStorage.getItem("userId");
+        if (kundli.data === "Credit Exhausted") {
+          ToastAndroid.show(
+            "Credit Exhausted, Please try again tomorrow",
+            ToastAndroid.SHORT
+          );
+          setIsLoading(false);
+          return;
+        } else {
+          const userId = await AsyncStorage.getItem("userId");
 
-        // console.log(kundli, lagna, navamsa, saptamsa);
-        // console.log("new", fullName, DOB, place);
-
-        const addKundli = await Fetch_API(
-          `${STRAPI_API_URL}/api/users/kundli/${userId}`,
-          {
-            Kundli: {
-              id: uuid.v4(),
+          const addKundli = await Fetch_API(
+            `${STRAPI_API_URL}/api/users/kundli/${userId}`,
+            {
+              Kundli: {
+                id: uuid.v4(),
+                Name: fullName,
+                DOB: DOB.toISOString(),
+                Place: `${place.City}, ${place.State}, ${place.Country}`,
+                Kundli: kundli.kundli,
+                PlanetPosition: kundli.planet_position,
+                Charts: [
+                  {
+                    Name: "Lagna Chart",
+                    SVG_XML: lagna
+                  },
+                  {
+                    Name: "Navamsa Chart",
+                    SVG_XML: navamsa
+                  },
+                  {
+                    Name: "Saptamsa Chart",
+                    SVG_XML: saptamsa
+                  }
+                ]
+              }
+            },
+            "PUT",
+            {
+              "Content-Type": "application/json"
+            }
+          );
+          // console.log(addKundli.updatedKundli);
+          setIsLoading(false);
+          navigation.navigate("DetailedKundli", {
+            Kundli: kundli.kundli,
+            PlanetPosition: kundli.planet_position,
+            userData: {
               Name: fullName,
-              DOB: DOB.toISOString(),
-              Place: `${place.City}, ${place.State}, ${place.Country}`,
-              Kundli: kundli.kundli,
-              PlanetPosition: kundli.planet_position,
-              Charts: [
-                {
-                  Name: "Lagna Chart",
-                  SVG_XML: lagna,
-                },
-                {
-                  Name: "Navamsa Chart",
-                  SVG_XML: navamsa,
-                },
-                {
-                  Name: "Saptamsa Chart",
-                  SVG_XML: saptamsa,
-                },
-              ],
+              Date: DOB.toDateString(),
+              Time: moment(DOB).format("hh:mm a"),
+              Place: `${place.City},${place.State},${place.Country}`
             },
-          },
-          "PUT",
-          {
-            "Content-Type": "application/json",
-          }
-        );
-        // console.log(addKundli.updatedKundli);
-        setIsLoading(false);
-        navigation.navigate("DetailedKundli", {
-          Kundli: kundli.kundli,
-          PlanetPosition: kundli.planet_position,
-          userData: {
-            Name: fullName,
-            Date: DOB.toDateString(),
-            Time: moment(DOB).format("hh:mm a"),
-            Place: `${place.City},${place.State},${place.Country}`,
-          },
-          Charts: [
-            {
-              Name: "Lagna Chart",
-              SVG_XML: lagna,
-            },
-            {
-              Name: "Navamsa Chart",
-              SVG_XML: navamsa,
-            },
-            {
-              Name: "Saptamsa Chart",
-              SVG_XML: saptamsa,
-            },
-          ],
-        });
+            Charts: [
+              {
+                Name: "Lagna Chart",
+                SVG_XML: lagna
+              },
+              {
+                Name: "Navamsa Chart",
+                SVG_XML: navamsa
+              },
+              {
+                Name: "Saptamsa Chart",
+                SVG_XML: saptamsa
+              }
+            ]
+          });
+        }
       } else {
         ToastAndroid.show("Please enter all the details", ToastAndroid.SHORT);
       }
@@ -187,7 +189,7 @@ const CreateKundli = ({ navigation }) => {
         containerStyle={{
           backgroundColor: "#1F4693",
           paddingVertical: 6,
-          borderBottomWidth: 0,
+          borderBottomWidth: 0
         }}
         centerComponent={{
           text: "New Kundli",
@@ -195,8 +197,8 @@ const CreateKundli = ({ navigation }) => {
             color: "#fff",
             fontSize: RFPercentage(3.5),
             fontFamily: "Dongle-Regular",
-            marginTop: RFPercentage(0.5),
-          },
+            marginTop: RFPercentage(0.5)
+          }
         }}
       />
       <View style={{ flex: 1, marginTop: RFPercentage(2) }}>
@@ -206,7 +208,7 @@ const CreateKundli = ({ navigation }) => {
             color: "black",
             fontSize: RFPercentage(2.5),
             marginTop: RFPercentage(1),
-            marginStart: RFPercentage(3),
+            marginStart: RFPercentage(3)
           }}
         >
           Name
@@ -215,7 +217,7 @@ const CreateKundli = ({ navigation }) => {
           <TextInput
             textInputStyle={{ color: "black" }}
             placeholder="Full Name"
-            onChangeText={(fullName) => setFullName(fullName)}
+            onChangeText={fullName => setFullName(fullName)}
           />
         </View>
         <Text
@@ -224,7 +226,7 @@ const CreateKundli = ({ navigation }) => {
             color: "black",
             fontSize: RFPercentage(2),
             marginTop: RFPercentage(1.5),
-            marginStart: RFPercentage(3),
+            marginStart: RFPercentage(3)
           }}
         >
           Date of Birth
@@ -242,7 +244,7 @@ const CreateKundli = ({ navigation }) => {
             mode="date"
             open={openDate}
             date={DOB}
-            onConfirm={(date) => {
+            onConfirm={date => {
               setOpenDate(false);
               setDOB(date);
             }}
@@ -257,7 +259,7 @@ const CreateKundli = ({ navigation }) => {
             color: "black",
             fontSize: RFPercentage(2),
             marginTop: RFPercentage(1.5),
-            marginStart: RFPercentage(3),
+            marginStart: RFPercentage(3)
           }}
         >
           Time of Birth
@@ -274,7 +276,7 @@ const CreateKundli = ({ navigation }) => {
             isVisible={openTime}
             mode="time"
             date={DOB}
-            onConfirm={(time) => {
+            onConfirm={time => {
               DOB.setTime(time);
               setOpenTime(false);
             }}
@@ -288,7 +290,7 @@ const CreateKundli = ({ navigation }) => {
             fontFamily: "Dongle-Regular",
             textAlign: "left",
             color: "black",
-            marginStart: RFPercentage(3),
+            marginStart: RFPercentage(3)
           }}
         >
           If you don't know time, then select 12:00 AM
@@ -299,7 +301,7 @@ const CreateKundli = ({ navigation }) => {
             color: "black",
             fontSize: RFPercentage(2),
             marginTop: RFPercentage(1.5),
-            marginStart: RFPercentage(3),
+            marginStart: RFPercentage(3)
           }}
         >
           Pincode
@@ -310,17 +312,17 @@ const CreateKundli = ({ navigation }) => {
             placeholder="Birth Place Pincode"
             maxLength={6}
             keyboardType="numeric"
-            onChangeText={async (pincode) => {
+            onChangeText={async pincode => {
               if (pincode.length === 6) {
                 const data = await getLocation(pincode);
                 setGeographic({
                   Longitude: data.Longitude,
-                  Latitude: data.Latitude,
+                  Latitude: data.Latitude
                 });
                 setPlace({
                   Country: data.Country,
                   State: data.State,
-                  City: data.City,
+                  City: data.City
                 });
               }
             }}
@@ -334,12 +336,12 @@ const CreateKundli = ({ navigation }) => {
           titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: "#1F4693",
+            backgroundColor: "#1F4693"
           }}
           containerStyle={{
             width: "100%",
             paddingVertical: RFPercentage(1),
-            paddingHorizontal: RFPercentage(2),
+            paddingHorizontal: RFPercentage(2)
           }}
           onPress={generateKundli}
         />
@@ -351,7 +353,7 @@ const CreateKundli = ({ navigation }) => {
             backgroundColor: "#000000aa",
             flex: 1,
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <ActivityIndicator size="large" color="white" />

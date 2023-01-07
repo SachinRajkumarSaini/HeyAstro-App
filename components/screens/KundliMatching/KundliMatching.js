@@ -5,7 +5,7 @@ import {
   ScrollView,
   Modal,
   ActivityIndicator,
-  ToastAndroid,
+  ToastAndroid
 } from "react-native";
 import { Header, Button, Card } from "react-native-elements";
 import { RFPercentage } from "react-native-responsive-fontsize";
@@ -32,11 +32,11 @@ const KundliMatching = ({ navigation }) => {
   const [girlPincode, setGirlPincode] = useState();
   const [boyGeographic, setBoyGeographic] = useState({
     Latitude: null,
-    Longitude: null,
+    Longitude: null
   });
   const [girlGeographic, setGirlGeographic] = useState({
     Latitude: null,
-    Longitude: null,
+    Longitude: null
   });
 
   const matchHoroscope = async () => {
@@ -51,17 +51,23 @@ const KundliMatching = ({ navigation }) => {
       ) {
         setIsLoading(true);
         const KundliMatching = await fetch(
-          `${process.env.HEYASTRO_API_URL}/kundli/match/1/${
-            girlGeographic.Latitude
-          },${girlGeographic.Longitude}/${girlDOB.toISOString()}/${
-            boyGeographic.Latitude
-          },${boyGeographic.Longitude}/${boyDOB.toISOString()}`
+          `${process.env
+            .HEYASTRO_API_URL}/kundli/match/1/${girlGeographic.Latitude},${girlGeographic.Longitude}/${girlDOB.toISOString()}/${boyGeographic.Latitude},${boyGeographic.Longitude}/${boyDOB.toISOString()}`
         );
         const matchingResult = await KundliMatching.json();
-        setIsLoading(false);
-        navigation.navigate("DetailMatching", {
-          KundliMatching: matchingResult,
-        });
+        if (matchingResult.data === "Credit Exhausted") {
+          ToastAndroid.show(
+            "Credit Exhausted, Please try again tomorrow",
+            ToastAndroid.SHORT
+          );
+          setIsLoading(false);
+          return;
+        } else {
+          setIsLoading(false);
+          navigation.navigate("DetailMatching", {
+            KundliMatching: matchingResult
+          });
+        }
       } else {
         ToastAndroid.show("Please fill all the fields", ToastAndroid.SHORT);
       }
@@ -74,17 +80,17 @@ const KundliMatching = ({ navigation }) => {
     }
   };
 
-  const getLocation = async (pincode) => {
+  const getLocation = async pincode => {
     try {
       setIsLoading(true);
       const gettingLocation = await Fetch_API(
         `${process.env.HEYASTRO_API_URL}/getLocation`,
         {
-          pincode: parseInt(pincode),
+          pincode: parseInt(pincode)
         },
         "POST",
         {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         }
       );
       setIsLoading(false);
@@ -111,7 +117,7 @@ const KundliMatching = ({ navigation }) => {
         containerStyle={{
           backgroundColor: "#1F4693",
           paddingVertical: 6,
-          borderBottomWidth: 0,
+          borderBottomWidth: 0
         }}
         centerComponent={{
           text: "Kundli Matching",
@@ -119,8 +125,8 @@ const KundliMatching = ({ navigation }) => {
             color: "#fff",
             fontSize: RFPercentage(3.5),
             fontFamily: "Dongle-Regular",
-            marginTop: RFPercentage(0.5),
-          },
+            marginTop: RFPercentage(0.5)
+          }
         }}
       />
       <View style={{ flex: 1 }}>
@@ -129,7 +135,7 @@ const KundliMatching = ({ navigation }) => {
           <Card
             containerStyle={{
               borderRadius: RFPercentage(1),
-              paddingBottom: RFPercentage(2),
+              paddingBottom: RFPercentage(2)
             }}
           >
             <Text
@@ -138,7 +144,7 @@ const KundliMatching = ({ navigation }) => {
                 color: "black",
                 fontSize: RFPercentage(3),
                 marginTop: RFPercentage(1),
-                textAlign: "center",
+                textAlign: "center"
               }}
             >
               Boy's Details
@@ -149,7 +155,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1),
+                  marginTop: RFPercentage(1)
                 }}
               >
                 Name
@@ -158,7 +164,7 @@ const KundliMatching = ({ navigation }) => {
                 <TextInput
                   textInputStyle={{ color: "black" }}
                   placeholder="Full Name"
-                  onChangeText={(fullName) => setBoyFullName(fullName)}
+                  onChangeText={fullName => setBoyFullName(fullName)}
                 />
               </View>
               <Text
@@ -166,7 +172,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1.5),
+                  marginTop: RFPercentage(1.5)
                 }}
               >
                 Date of Birth
@@ -184,7 +190,7 @@ const KundliMatching = ({ navigation }) => {
                   mode="date"
                   open={openBoyDate}
                   date={boyDOB}
-                  onConfirm={(date) => {
+                  onConfirm={date => {
                     setOpenBoyDate(false);
                     setBoyDOB(date);
                   }}
@@ -198,7 +204,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1.5),
+                  marginTop: RFPercentage(1.5)
                 }}
               >
                 Time of Birth
@@ -215,7 +221,7 @@ const KundliMatching = ({ navigation }) => {
                   isVisible={openBoyTime}
                   mode="time"
                   date={boyDOB}
-                  onConfirm={(time) => {
+                  onConfirm={time => {
                     boyDOB.setTime(new Date(time));
                     setOpenBoyTime(false);
                   }}
@@ -228,7 +234,7 @@ const KundliMatching = ({ navigation }) => {
                 style={{
                   fontFamily: "Dongle-Regular",
                   textAlign: "left",
-                  color: "black",
+                  color: "black"
                 }}
               >
                 If you don't know time, then select 12:00 AM
@@ -238,7 +244,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1.5),
+                  marginTop: RFPercentage(1.5)
                 }}
               >
                 Pincode
@@ -249,12 +255,12 @@ const KundliMatching = ({ navigation }) => {
                   placeholder="Birth Place Pincode"
                   maxLength={6}
                   keyboardType="numeric"
-                  onChangeText={async (pincode) => {
+                  onChangeText={async pincode => {
                     if (pincode.length === 6) {
                       const data = await getLocation(pincode);
                       setBoyGeographic({
                         Longitude: data.Longitude,
-                        Latitude: data.Latitude,
+                        Latitude: data.Latitude
                       });
                     }
                   }}
@@ -267,7 +273,7 @@ const KundliMatching = ({ navigation }) => {
             containerStyle={{
               borderRadius: RFPercentage(1),
               paddingBottom: RFPercentage(2),
-              marginBottom: RFPercentage(2),
+              marginBottom: RFPercentage(2)
             }}
           >
             <Text
@@ -276,7 +282,7 @@ const KundliMatching = ({ navigation }) => {
                 color: "black",
                 fontSize: RFPercentage(3),
                 marginTop: RFPercentage(1),
-                textAlign: "center",
+                textAlign: "center"
               }}
             >
               Girl's Details
@@ -287,7 +293,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1),
+                  marginTop: RFPercentage(1)
                 }}
               >
                 Name
@@ -296,7 +302,7 @@ const KundliMatching = ({ navigation }) => {
                 <TextInput
                   textInputStyle={{ color: "black" }}
                   placeholder="Full Name"
-                  onChangeText={(fullName) => setGirlFullName(fullName)}
+                  onChangeText={fullName => setGirlFullName(fullName)}
                 />
               </View>
               <Text
@@ -304,7 +310,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1.5),
+                  marginTop: RFPercentage(1.5)
                 }}
               >
                 Date of Birth
@@ -322,7 +328,7 @@ const KundliMatching = ({ navigation }) => {
                   mode="date"
                   open={openGirlDate}
                   date={girlDOB}
-                  onConfirm={(date) => {
+                  onConfirm={date => {
                     setOpenGirlDate(false);
                     setGirlDOB(date);
                   }}
@@ -336,7 +342,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1.5),
+                  marginTop: RFPercentage(1.5)
                 }}
               >
                 Time of Birth
@@ -353,7 +359,7 @@ const KundliMatching = ({ navigation }) => {
                   isVisible={openGirlTime}
                   mode="time"
                   date={girlDOB}
-                  onConfirm={(time) => {
+                  onConfirm={time => {
                     girlDOB.setTime(new Date(time));
                     setOpenGirlTime(false);
                   }}
@@ -366,7 +372,7 @@ const KundliMatching = ({ navigation }) => {
                 style={{
                   fontFamily: "Dongle-Regular",
                   textAlign: "left",
-                  color: "black",
+                  color: "black"
                 }}
               >
                 If you don't know time, then select 12:00 AM
@@ -376,7 +382,7 @@ const KundliMatching = ({ navigation }) => {
                   fontFamily: "Dongle-Bold",
                   color: "black",
                   fontSize: RFPercentage(2),
-                  marginTop: RFPercentage(1.5),
+                  marginTop: RFPercentage(1.5)
                 }}
               >
                 Pincode
@@ -387,12 +393,12 @@ const KundliMatching = ({ navigation }) => {
                   placeholder="Birth Place Pincode"
                   maxLength={6}
                   keyboardType="numeric"
-                  onChangeText={async (pincode) => {
+                  onChangeText={async pincode => {
                     if (pincode.length === 6) {
                       const data = await getLocation(pincode);
                       setGirlGeographic({
                         Longitude: data.Longitude,
-                        Latitude: data.Latitude,
+                        Latitude: data.Latitude
                       });
                     }
                   }}
@@ -409,12 +415,12 @@ const KundliMatching = ({ navigation }) => {
           titleStyle={{ fontFamily: "Ubuntu-Regular" }}
           buttonStyle={{
             borderRadius: RFPercentage(1),
-            backgroundColor: "#1F4693",
+            backgroundColor: "#1F4693"
           }}
           containerStyle={{
             width: "100%",
             paddingVertical: RFPercentage(1),
-            paddingHorizontal: RFPercentage(2),
+            paddingHorizontal: RFPercentage(2)
           }}
           onPress={matchHoroscope}
         />
@@ -426,7 +432,7 @@ const KundliMatching = ({ navigation }) => {
             backgroundColor: "#000000aa",
             flex: 1,
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <ActivityIndicator size="large" color="white" />

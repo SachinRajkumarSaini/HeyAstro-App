@@ -105,7 +105,7 @@ export default class CometChatMessagesView extends React.Component {
       // Exit the Screen
       console.log("Exit the Screen");
       this.setState({ showLoader: false });
-      this.props.navigation.goBack();
+      this.props.navigation.navigate("ChatsAndCalls");
     } catch (error) {
       ToastAndroid.show("Something went wrong", ToastAndroid.SHORT);
       this.setState({ showLoader: false });
